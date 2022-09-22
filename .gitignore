@@ -1,1 +1,6 @@
 /.idea/
+
+# Gradle
+out/
+build/
+.gradle/

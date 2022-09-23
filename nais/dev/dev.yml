@@ -1,0 +1,35 @@
+{
+  "applicationName": "sosialhjelp-avtaler-api-dev",
+  "postgresUserName": "sosialhjelp-avtaler-dev",
+  "postgresDatabaseName": "dialogdb-dev",
+  "namespace": "teamdigisos",
+  "ingress": [
+    "https://sosialhjelp-avtaler-api-dev.dev.nav.no/sosialhjelp/avtaler-api"
+  ],
+  "outboundExternalHosts": [
+    "unleash.nais.io",
+  ],
+  "outboundRulesApplications": [
+    "sosialhjelp-avtaler-api-redis",
+  ],
+  "inboundRulesApplications": [
+  ],
+  "env": {
+    "SPRING_PROFILES_ACTIVE": "log-kibana,log-audit",
+    "UNLEASH_API_URL": "https://unleash.nais.io/api",
+    "UNLEASH_INSTANCE_ID": "dev-gcp",
+    "CORS_ORIGINS": "https://digisos.dev.nav.no, https://sosialhjelp.dev.intern.nav.no,",
+
+    "REDIS_HOST": "sosialhjelp-avtaler-api-redis.teamdigisos.svc.cluster.local",
+
+    "XSRF_DOMAIN": "dev.nav.no"
+  },
+  "minReplicas": "1",
+  "maxReplicas": "1",
+  "cpuLimit": "400m",
+  "memoryLimit": "1Gi",
+  "cpuRequest": "15m",
+  "memoryRequest": "512Mi",
+  "prometheusEnabled": true,
+  "tokenXEnabled": true,
+}

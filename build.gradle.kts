@@ -2,7 +2,7 @@
 object Versions {
     const val ktor_version = "2.1.1"
     const val kotlin_version = "1.7.10"
-    const val ktlint = "0.47.1"
+    const val ktlint = "0.45.2"
     const val logback_version = "1.2.11"
 }
 

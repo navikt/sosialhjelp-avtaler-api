@@ -9,10 +9,10 @@ import io.ktor.server.routing.route
 
 fun Route.internalRoutes() {
     route("/sosialhjelp/avtaler-api/internal") {
-        get("/is-alive") {
+        get("/isAlive") {
             call.respondText("Application is alive!", status = HttpStatusCode.OK)
         }
-        get("/is-ready") {
+        get("/isReady") {
             call.respondText("Application is ready!", status = HttpStatusCode.OK)
         }
     }

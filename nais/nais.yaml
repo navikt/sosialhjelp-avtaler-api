@@ -27,53 +27,53 @@ spec:
   envFrom:
     - secret: redis-password-avtaler-api
     - secret: sosialhjelp-xsrf-secret
-tokenx:
-  enabled: {{tokenXEnabled}}
-gcp:
-  sqlInstances:
-    - type: POSTGRES_12
-      name: {{postgresUserName}}
-      tier: db-f1-micro
-      diskSize: 10
-      databases:
-        - name: {{postgresDatabaseName}}
-          envVarPrefix: POSTGRES
-accessPolicy:
-  outbound:
-    external:
-    {{#each outboundExternalHosts}}
-       - host: "{{this}}"
-                 {{else}}
-    []
-    {{/each}}
+  tokenx:
+    enabled: {{tokenXEnabled}}
+  gcp:
+    sqlInstances:
+      - type: POSTGRES_12
+        name: {{postgresUserName}}
+        tier: db-f1-micro
+        diskSize: 10
+        databases:
+          - name: {{postgresDatabaseName}}
+            envVarPrefix: POSTGRES
+  accessPolicy:
+    outbound:
+      external:
+      {{#each outboundExternalHosts}}
+         - host: "{{this}}"
+                   {{else}}
+      []
+      {{/each}}
 
-    rules:
-    {{#each outboundRulesApplications}}
-       - application: "{{this}}"
-                        {{else}}
-    []
-    {{/each}}
+      rules:
+      {{#each outboundRulesApplications}}
+         - application: "{{this}}"
+                          {{else}}
+      []
+      {{/each}}
 
-  inbound:
-    rules:
-    {{#each inboundRulesApplications}}
-       - application: "{{this}}"
-                        {{else}}
-    []
-    {{/each}}
-ingresses:
-  {{#each ingress}}
-     - "{{this}}"
-         {{/each}}
-resources:
-  limits:
-    cpu: {{cpuLimit}}
-    memory: {{memoryLimit}}
-  requests:
-    cpu: {{cpuRequest}}
-    memory: {{memoryRequest}}
-env:
+    inbound:
+      rules:
+      {{#each inboundRulesApplications}}
+         - application: "{{this}}"
+                          {{else}}
+      []
+      {{/each}}
+  ingresses:
+{{#each ingress}}
+    - "{{this}}"
+{{/each}}
+  resources:
+    limits:
+      cpu: {{cpuLimit}}
+      memory: {{memoryLimit}}
+    requests:
+      cpu: {{cpuRequest}}
+      memory: {{memoryRequest}}
+  env:
   {{#each env}}
-     - name: {{@key}}
-value: "{{this}}"
+    - name: {{@key}}
+      value: "{{this}}"
   {{/each}}

@@ -17,10 +17,10 @@ ktlint {
     this.version.set(Versions.ktlint)
 }
 
-group = "no.nav"
+group = "no.nav.sosialhjelp"
 version = "0.0.1"
 application {
-    mainClass.set("no.nav.ApplicationKt")
+    mainClass.set("no.nav.sosialhjelp.avtaler.ApplicationKt")
 
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")

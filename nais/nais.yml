@@ -1,0 +1,81 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: {{applicationName}}
+  namespace: {{namespace}}
+  labels:
+    team: teamdigisos
+spec:
+  image: {{image}}
+  port: 8080
+  liveness:
+    path: /sosialhjelp/avtaler-api/internal/isAlive
+    initialDelay: 50
+    timeout: 1
+    periodSeconds: 10
+    failureThreshold: 10
+  readiness:
+    path: /sosialhjelp/avtaler-api/internal/isReady
+    initialDelay: 45
+    timeout: 1
+  prometheus:
+    enabled: {{prometheusEnabled}}
+    path: /sosialhjelp/avtaler-api/internal/prometheus
+  replicas:
+    min: {{minReplicas}}
+    max: {{maxReplicas}}
+  envFrom:
+    - secret: redis-password-dialog-api
+    - secret: sosialhjelp-xsrf-secret
+tokenx:
+  enabled: {{tokenXEnabled}}
+gcp:
+  sqlInstances:
+    - type: POSTGRES_12
+      name: {{postgresUserName}}
+      tier: db-f1-micro
+      diskSize: 10
+      databases:
+        - name: {{postgresDatabaseName}}
+          envVarPrefix: POSTGRES
+accessPolicy:
+  outbound:
+    external:
+    {{#each outboundExternalHosts}}
+       - host: "{{this}}"
+                 {{else}}
+    []
+    {{/each}}
+
+    rules:
+    {{#each outboundRulesApplications}}
+       - application: "{{this}}"
+                        {{else}}
+    []
+    {{/each}}
+
+  inbound:
+    rules:
+    {{#each inboundRulesApplications}}
+       - application: "{{this}}"
+                        {{else}}
+    []
+    {{/each}}
+    - application: {{innsynAppName}}
+      cluster: {{innsynClusterName}}
+ingresses:
+  {{#each ingress}}
+     - "{{this}}"
+         {{/each}}
+resources:
+  limits:
+    cpu: {{cpuLimit}}
+    memory: {{memoryLimit}}
+  requests:
+    cpu: {{cpuRequest}}
+    memory: {{memoryRequest}}
+env:
+  {{#each env}}
+     - name: {{@key}}
+value: "{{this}}"
+  {{/each}}

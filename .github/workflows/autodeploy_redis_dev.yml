@@ -1,5 +1,6 @@
 name: Auto-deploy redis dev
 on:
+  workflow_dispatch:
   push:
     paths:
       - "nais/redis-config.yml"

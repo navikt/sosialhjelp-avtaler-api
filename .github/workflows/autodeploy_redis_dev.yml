@@ -1,14 +1,14 @@
 name: Auto-deploy redis dev
 on:
-  push: # Deploys automatically to dev-gcp if there is a change in any redis files.
+  push:
     paths:
       - "nais/redis-config.yml"
       - "nais/redisexporter.yml"
-      - ".github/workflows/autodeploy_dev_redis.yml"
+      - ".github/workflows/autodeploy_redis_dev.yml"
     branches-ignore:
       - 'main'
     tags-ignore:
-      - "**" # Don't build any tags
+      - "**"
 
 jobs:
   deploy-dev-gcp:

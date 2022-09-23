@@ -38,29 +38,6 @@ spec:
         databases:
           - name: {{postgresDatabaseName}}
             envVarPrefix: POSTGRES
-  accessPolicy:
-    outbound:
-      external:
-      {{#each outboundExternalHosts}}
-         - host: "{{this}}"
-                   {{else}}
-      []
-      {{/each}}
-
-      rules:
-      {{#each outboundRulesApplications}}
-         - application: "{{this}}"
-                          {{else}}
-      []
-      {{/each}}
-
-    inbound:
-      rules:
-      {{#each inboundRulesApplications}}
-         - application: "{{this}}"
-                          {{else}}
-      []
-      {{/each}}
   ingresses:
 {{#each ingress}}
     - "{{this}}"

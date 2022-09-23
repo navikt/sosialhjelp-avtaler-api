@@ -38,6 +38,13 @@ spec:
         databases:
           - name: {{postgresDatabaseName}}
             envVarPrefix: POSTGRES
+  accessPolicy:
+    inbound:
+      rules:
+        - application: sosialhjelp-avtaler
+    outbound:
+      rules:
+        - application: sosialhjelp-avtaler
   ingresses:
 {{#each ingress}}
     - "{{this}}"

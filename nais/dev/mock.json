@@ -12,9 +12,6 @@
   "outboundRulesApplications": [
     "sosialhjelp-avtaler-api-redis"
   ],
-  "inboundRulesApplications": [
-
-  ],
   "env": {
     "SPRING_PROFILES_ACTIVE": "mock-alt,log-console",
     "UNLEASH_API_URL": "https://unleash.nais.io/api",
@@ -37,5 +34,5 @@
   "cpuRequest": "15m",
   "memoryRequest": "512Mi",
   "prometheusEnabled": false,
-  "tokenXEnabled": false,
+  "tokenXEnabled": false
 }

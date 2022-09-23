@@ -7,12 +7,10 @@
     "https://sosialhjelp-avtaler-api-dev.dev.nav.no/sosialhjelp/avtaler-api"
   ],
   "outboundExternalHosts": [
-    "unleash.nais.io",
+    "unleash.nais.io"
   ],
   "outboundRulesApplications": [
-    "sosialhjelp-avtaler-api-redis",
-  ],
-  "inboundRulesApplications": [
+    "sosialhjelp-avtaler-api-redis"
   ],
   "env": {
     "SPRING_PROFILES_ACTIVE": "log-kibana,log-audit",
@@ -31,5 +29,5 @@
   "cpuRequest": "15m",
   "memoryRequest": "512Mi",
   "prometheusEnabled": true,
-  "tokenXEnabled": true,
+  "tokenXEnabled": true
 }

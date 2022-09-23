@@ -25,7 +25,7 @@ spec:
     min: {{minReplicas}}
     max: {{maxReplicas}}
   envFrom:
-    - secret: redis-password-dialog-api
+    - secret: redis-password-avtaler-api
     - secret: sosialhjelp-xsrf-secret
 tokenx:
   enabled: {{tokenXEnabled}}
@@ -61,8 +61,6 @@ accessPolicy:
                         {{else}}
     []
     {{/each}}
-    - application: {{innsynAppName}}
-      cluster: {{innsynClusterName}}
 ingresses:
   {{#each ingress}}
      - "{{this}}"

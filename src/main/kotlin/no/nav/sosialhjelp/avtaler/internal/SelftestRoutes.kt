@@ -1,4 +1,4 @@
-package no.nav.internal
+package no.nav.sosialhjelp.avtaler.internal
 
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.call
@@ -8,7 +8,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 
 fun Route.internalRoutes() {
-    route("/internal") {
+    route("/sosialhjelp/avtaler-api/internal") {
         get("/is-alive") {
             call.respondText("Application is alive!", status = HttpStatusCode.OK)
         }

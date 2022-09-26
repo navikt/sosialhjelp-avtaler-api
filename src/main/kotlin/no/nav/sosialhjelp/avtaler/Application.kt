@@ -9,13 +9,17 @@ import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
 import no.nav.sosialhjelp.avtaler.internal.internalRoutes
 import java.util.TimeZone
 
+private val log = KotlinLogging.logger {}
+
 fun main() {
     embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
+        log.info("sosialhjelp-avtaler-api starting up...")
         configure()
         setupRoutes()
     }.start(wait = true)

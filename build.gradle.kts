@@ -34,14 +34,14 @@ dependencies {
     implementation("ch.qos.logback:logback-classic:${Versions.logback_version}")
 
     // ktor server
-    fun ktorServer(name: String) = "io.ktor:ktor-server-$name:${Versions.ktor_version}"
-    implementation(ktorServer("core-jvm"))
-    implementation(ktorServer("netty-jvm"))
-    implementation(ktorServer("content-negotiation"))
+    implementation("io.ktor:ktor-server-core-jvm:${Versions.ktor_version}")
+    implementation("io.ktor:ktor-server-netty-jvm:${Versions.ktor_version}")
+    implementation("io.ktor:ktor-server-content-negotiation-jvm:${Versions.ktor_version}")
+
     implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor_version}")
-    implementation("io.ktor:ktor-server-content-negotiation-jvm:2.1.1")
-    implementation("io.ktor:ktor-server-core-jvm:2.1.1")
-    implementation("io.ktor:ktor-serialization-jackson-jvm:2.1.1")
+    implementation("io.ktor:ktor-serialization-jackson-jvm:${Versions.ktor_version}")
+
+    implementation("io.github.microutils:kotlin-logging:2.1.23")
 
     testImplementation("io.ktor:ktor-server-tests-jvm:${Versions.ktor_version}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin_version}")

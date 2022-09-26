@@ -5,8 +5,9 @@ import mu.KotlinLogging
 private val log = KotlinLogging.logger { }
 
 class AvtaleService {
-    fun hentAvtale(): Avtale {
-        log.info("Henter avtale")
-        return Avtale(tittel = "Du kan signere avtale", erSignert = false)
+    fun hentAvtale(person: Person): Avtale {
+        val navn = person.navn
+        log.info("Henter avtale for person $navn")
+        return Avtale(tittel = "Du kan signere avtale, $navn", erSignert = false)
     }
 }

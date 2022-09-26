@@ -16,13 +16,11 @@ fun main() {
 }
 
 fun Application.setupRoutes() {
-
     routing {
-        internalRoutes()
-
         val avtaleService = AvtaleService()
 
-        route("/api/") {
+        route("/sosialhjelp/avtaler-api") {
+            internalRoutes()
             avtaleApi(avtaleService)
         }
     }

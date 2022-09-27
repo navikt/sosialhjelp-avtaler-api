@@ -9,21 +9,21 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 
-data class Person(
-    val navn: String
+data class Kommune(
+    val orgnr: String
 )
 
 fun Route.avtaleApi(avtaleService: AvtaleService) {
     route("/avtale") {
-        get("/{navn}") {
-            val person = Person(navn = call.parameters["navn"] ?: "no name")
-            val avtale = avtaleService.hentAvtale(person)
+        get("/{kommunenr}") {
+            val kommunenummer = call.parameters["kommunenummer"] ?: "0000"
+            val avtale = avtaleService.hentAvtale(kommunenummer)
             call.respond(HttpStatusCode.OK, avtale)
         }
 
         post {
-            val person = call.receive<Person>()
-            val avtale = avtaleService.hentAvtale(person)
+            val kommunenummer = call.receive<Kommune>()
+            val avtale = avtaleService.opprettAvtale(kommunenummer)
             call.respond(HttpStatusCode.OK, avtale)
         }
     }

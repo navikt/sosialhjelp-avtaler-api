@@ -42,11 +42,9 @@ spec:
     inbound:
       rules:
         - application: sosialhjelp-avtaler-dev
-        - application: sosialhjelp-avtaler-mock
     outbound:
       rules:
         - application: sosialhjelp-avtaler-dev
-        - application: sosialhjelp-avtaler-mock
   ingresses:
 {{#each ingress}}
     - "{{this}}"

@@ -6,5 +6,5 @@ data class Avtale(
     val orgnr: String,
     val navn: String,
     val avtaleversjon: String?,
-    val opprettet: LocalDateTime?
+    var opprettet: LocalDateTime?
 )

@@ -1,18 +1,24 @@
 package no.nav.sosialhjelp.avtaler.avtaler
 
 import mu.KotlinLogging
-import no.nav.sosialhjelp.avtaler.kommune.Kommune
+import java.time.LocalDateTime
 
 private val log = KotlinLogging.logger { }
 
 class AvtaleService {
-    fun hentAvtale(kommunenummer: String): List<Avtale> {
-        log.info("Henter avtale for kommune $kommunenummer")
-        return listOf(Avtale(orgnr = kommunenummer, navn = "Kommunenavn", avtaleversjon = "1.0", opprettet = null))
+    private val avtaler = mutableListOf(
+        Avtale(orgnr = "0000", navn = "Null kommune", avtaleversjon = "1.0", opprettet = null),
+        Avtale(orgnr = "0001", navn = "En kommune", avtaleversjon = "1.0", opprettet = null)
+    )
+    fun hentAvtale(orgnr: String): Avtale {
+        log.info("Henter avtale for kommune $orgnr")
+        return avtaler.filter { it.orgnr == orgnr }.first()
     }
 
-    fun opprettAvtale(kommune: Kommune): Avtale {
-        log.info("Oppretter avtale for $kommune")
-        return hentAvtale(kommune.orgnr)[0]
+    fun opprettAvtale(avtale: AvtaleRequest): Avtale {
+        log.info("Oppretter avtale for ${avtale.orgnr}")
+        val avtale = hentAvtale(avtale.orgnr)
+        avtale.opprettet = LocalDateTime.now()
+        return avtale
     }
 }

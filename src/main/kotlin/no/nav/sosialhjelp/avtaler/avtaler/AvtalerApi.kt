@@ -8,7 +8,8 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import no.nav.sosialhjelp.avtaler.kommune.Kommune
+
+data class AvtaleRequest(val orgnr: String)
 
 fun Route.avtaleApi(avtaleService: AvtaleService) {
     route("/avtale") {
@@ -19,8 +20,8 @@ fun Route.avtaleApi(avtaleService: AvtaleService) {
         }
 
         post {
-            val kommunenummer = call.receive<Kommune>()
-            val avtale = avtaleService.opprettAvtale(kommunenummer)
+            val orgnr = call.receive<AvtaleRequest>()
+            val avtale = avtaleService.opprettAvtale(orgnr)
             call.respond(HttpStatusCode.OK, avtale)
         }
     }

@@ -8,10 +8,7 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-
-data class Kommune(
-    val orgnr: String
-)
+import no.nav.sosialhjelp.avtaler.kommune.Kommune
 
 fun Route.avtaleApi(avtaleService: AvtaleService) {
     route("/avtale") {

@@ -13,6 +13,7 @@ import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
 import no.nav.sosialhjelp.avtaler.internal.internalRoutes
+import no.nav.sosialhjelp.avtaler.kommune.kommuneApi
 import java.util.TimeZone
 
 private val log = KotlinLogging.logger {}
@@ -43,6 +44,7 @@ fun Application.setupRoutes() {
 
             route("/api") {
                 avtaleApi(avtaleService)
+                kommuneApi()
             }
         }
     }

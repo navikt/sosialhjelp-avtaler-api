@@ -4,7 +4,7 @@
   "postgresDatabaseName": "dialogdb-mock",
   "namespace": "teamdigisos",
   "ingress": [
-    "https://sosialhjelp-avtaler-api-mock.dev.nav.no/sosialhjelp/avtaler-api"
+    "https://digisos.ekstern.dev.nav.no/sosialhjelp/avtaler-api"
   ],
   "outboundExternalHosts": [
     "unleash.nais.io"

@@ -4,7 +4,7 @@
   "postgresDatabaseName": "dialogdb-dev",
   "namespace": "teamdigisos",
   "ingress": [
-    "https://sosialhjelp-avtaler-api-dev.dev.nav.no/sosialhjelp/avtaler-api"
+    "https://digisos.dev.nav.no/sosialhjelp/avtaler-api"
   ],
   "outboundExternalHosts": [
     "unleash.nais.io"

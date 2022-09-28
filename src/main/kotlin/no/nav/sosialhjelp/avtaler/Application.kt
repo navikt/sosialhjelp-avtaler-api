@@ -6,12 +6,14 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import io.ktor.server.auth.authenticate
 import io.ktor.server.engine.embeddedServer
 import io.ktor.server.netty.Netty
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import mu.KotlinLogging
+import no.nav.sosialhjelp.avtaler.HttpClientConfig.httpClient
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
@@ -41,16 +43,21 @@ fun Application.configure() {
 }
 
 fun Application.setupRoutes() {
+    installAuthentication(httpClient(engineFactory { StubEngine.tokenX() }))
+
+    val avtaleService = AvtaleService()
+    val altinnService = AltinnService()
+
     routing {
         route("/sosialhjelp/avtaler-api") {
             internalRoutes()
 
-            val avtaleService = AvtaleService()
-            val altinnService = AltinnService()
+            authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
 
-            route("/api") {
-                avtaleApi(avtaleService)
-                kommuneApi(avtaleService, altinnService)
+                route("/api") {
+                    avtaleApi(avtaleService)
+                    kommuneApi(avtaleService, altinnService)
+                }
             }
         }
     }

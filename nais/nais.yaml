@@ -28,7 +28,7 @@ spec:
     - secret: redis-password-avtaler-api
     - secret: sosialhjelp-xsrf-secret
   tokenx:
-    enabled: {{tokenXEnabled}}
+    enabled: true
   gcp:
     sqlInstances:
       - type: POSTGRES_12

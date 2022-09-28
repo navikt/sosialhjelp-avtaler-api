@@ -16,10 +16,7 @@
     "SPRING_PROFILES_ACTIVE": "log-kibana,log-audit",
     "UNLEASH_API_URL": "https://unleash.nais.io/api",
     "UNLEASH_INSTANCE_ID": "dev-gcp",
-    "CORS_ORIGINS": "https://digisos.dev.nav.no, https://sosialhjelp.dev.intern.nav.no,",
-
     "REDIS_HOST": "sosialhjelp-avtaler-api-redis.teamdigisos.svc.cluster.local",
-
     "XSRF_DOMAIN": "dev.nav.no"
   },
   "minReplicas": "1",

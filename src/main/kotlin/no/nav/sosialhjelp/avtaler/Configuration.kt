@@ -35,7 +35,12 @@ object Configuration {
     )
 
     private val devProperties = ConfigurationMap(
-        mapOf()
+        mapOf(
+            "application.profile" to "DEV",
+            "application.cluster" to "DEV-GCP",
+            "altinn.altinnUrl" to "https://api-gw-q1.oera.no/ekstern/altinn/api/serviceowner",
+            "altinn.proxyConsumerId" to "sosialhjelavtaler-api-dev",
+        )
     )
 
     private val prodProperties = ConfigurationMap(

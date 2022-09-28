@@ -7,7 +7,7 @@ metadata:
     team: teamdigisos
 spec:
   image: {{image}}
-  port: 8080
+  port: 9090
   liveness:
     path: /sosialhjelp/avtaler-api/internal/isAlive
     initialDelay: 50

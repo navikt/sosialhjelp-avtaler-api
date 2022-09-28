@@ -3,14 +3,11 @@ package no.nav.sosialhjelp.avtaler
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
-import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.response.respond
 import io.ktor.server.routing.IgnoreTrailingSlash
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
@@ -58,7 +55,6 @@ fun Application.setupRoutes() {
     val altinnService = AltinnService()
 
     routing {
-        get("/") { call.respond(HttpStatusCode.OK) }
 
         route("/sosialhjelp/avtaler-api") {
             internalRoutes()

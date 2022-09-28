@@ -26,7 +26,7 @@ object Configuration {
         mapOf(
             "application.profile" to "LOCAL",
             "application.cluster" to "LOCAL",
-            "TOKEN_X_WELL_KNOWN_URL" to "",
+            "TOKEN_X_WELL_KNOWN_URL" to "http://host.docker.internal:8080/default/.well-known/openid-configuration",
             "TOKEN_X_CLIENT_ID" to "local",
             "userclaim" to "sub",
             "REDIS_HOST" to "localhost",
@@ -52,7 +52,7 @@ object Configuration {
     private val config = systemProperties() overriding EnvironmentVariables() overriding resourceProperties overriding defaultProperties
 
     val profile: Profile = this["application.profile"].let { Profile.valueOf(it) }
-
+    val cluster: Cluster = this["application.cluster"].let { Cluster.valueOf(it) }
     val local: Boolean = profile == Profile.LOCAL
     val dev: Boolean = profile == Profile.DEV
     val prod: Boolean = profile == Profile.PROD

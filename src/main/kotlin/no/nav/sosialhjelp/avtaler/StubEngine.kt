@@ -56,7 +56,7 @@ object StubEngine {
         MockEngineBuilder().apply(block)
 
     private fun mockEngine(block: MockEngineBuilder.() -> Unit): HttpClientEngine = MockEngine { request ->
-        log.info { "Svarer på ${request.method.value} ${request.url}" }
+        log.info { "Svarer på ${request.method.value} ${request.url}:${request.url.port}" }
         mockEngineBuilder(block)
             .findOrElse(request) { respondError(HttpStatusCode.NotFound) }
             .handler(this, request)

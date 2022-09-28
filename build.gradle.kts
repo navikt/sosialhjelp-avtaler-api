@@ -40,6 +40,7 @@ dependencies {
 
     // ktor server
     implementation("io.ktor:ktor-server-core-jvm:${Versions.ktor_version}")
+    implementation("io.ktor:ktor-server-cio:${Versions.ktor_version}")
     implementation("io.ktor:ktor-server-netty-jvm:${Versions.ktor_version}")
     implementation("io.ktor:ktor-server-content-negotiation-jvm:${Versions.ktor_version}")
     implementation("io.ktor:ktor-server-auth-jwt:${Versions.ktor_version}")

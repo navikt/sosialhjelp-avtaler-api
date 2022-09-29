@@ -58,11 +58,10 @@ fun Application.setupRoutes() {
 
         route("/sosialhjelp/avtaler-api") {
             internalRoutes()
+            route("/api") {
+                authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
 
-            authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
-
-                route("/api") {
-                    avtaleApi(avtaleService)
+                avtaleApi(avtaleService)
                     kommuneApi(avtaleService, altinnService)
                 }
             }

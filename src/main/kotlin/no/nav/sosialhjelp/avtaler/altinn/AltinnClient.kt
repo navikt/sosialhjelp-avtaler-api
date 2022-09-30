@@ -35,8 +35,8 @@ class AltinnClient(props: Configuration.AltinnProperties) {
                 accept(ContentType.Application.Json)
                 contentType(ContentType.Application.Json)
                 header("X-Consumer-ID", props.proxyConsumerId)
-                header("X-NAV-APIKEY", props.apiGWKey)
                 header("APIKEY", props.apiKey)
+                header("Authorization", "Bearer ${maskinportenTokenProvider.invoke()}")
             }
         }
     }

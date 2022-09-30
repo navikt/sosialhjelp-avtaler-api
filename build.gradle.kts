@@ -7,6 +7,8 @@ object Versions {
     const val logback_version = "1.2.11"
     const val jackson_version = "2.13.3"
     const val microutils_version = "2.1.23"
+    const val nimbus_jose_version = "9.8.1"
+    const val nimbus_sdk_version = "9.43.1"
 }
 
 plugins {
@@ -59,6 +61,9 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jackson_version}")
 
     implementation("io.github.microutils:kotlin-logging:${Versions.microutils_version}")
+
+    implementation("com.nimbusds:nimbus-jose-jwt:${Versions.nimbus_jose_version}")
+    implementation("com.nimbusds:oauth2-oidc-sdk:${Versions.nimbus_sdk_version}")
 
     // test
     testImplementation(kotlin("test"))

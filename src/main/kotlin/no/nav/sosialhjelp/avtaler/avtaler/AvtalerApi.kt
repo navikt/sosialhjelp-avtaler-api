@@ -17,7 +17,8 @@ fun Route.avtaleApi(avtaleService: AvtaleService) {
     route("/avtale") {
         get("/{kommunenr}") {
             val kommunenummer = call.parameters["kommunenummer"] ?: "0000"
-            val avtale = avtaleService.hentAvtale(kommunenummer,
+            val avtale = avtaleService.hentAvtale(
+                kommunenummer,
                 fnr = call.extractFnr(),
                 tjeneste = Avgiver.Tjeneste.AVTALESIGNERING,
             )

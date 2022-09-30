@@ -19,6 +19,11 @@ object Configuration {
             "altinn.proxyConsumerId" to "",
             "ALTINN_APIKEY" to "",
             "ALTINN_APIGW_APIKEY" to "",
+            "maskinporten.clientId" to "",
+            "maskinporten.issuer" to "",
+            "maskinporten.scopes" to "",
+            "maskinporten.tokenEndpointUrl" to "",
+            "maskinporten.privateJwk" to "",
         )
     )
 
@@ -64,6 +69,7 @@ object Configuration {
 
     val tokenXProperties = TokenXProperties()
     val altinnProperties = AltinnProperties()
+    val maskinportenProperties = MaskinportenProperties()
 
     operator fun get(key: String): String = config[Key(key, stringType)]
 
@@ -85,6 +91,13 @@ object Configuration {
         val baseUrl: String = this["altinn.altinnUrl"],
         val proxyConsumerId: String = this["altinn.proxyConsumerId"],
         val apiKey: String = this["ALTINN_APIKEY"],
-        val apiGWKey: String = this["ALTINN_APIGW_APIKEY"],
+    )
+
+    data class MaskinportenProperties(
+        val clientId: String = this["maskinporten.clientId"],
+        val issuer: String = this["maskinporten.issuer"],
+        val scopes: String = this["maskinporten.scopes"],
+        val tokenEndpointUrl: String = this["maskinporten.tokenEndpointUrl"],
+        val privateJwk: String = this["maskinporten.privateJwk"],
     )
 }

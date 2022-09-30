@@ -17,7 +17,8 @@
     "UNLEASH_API_URL": "https://unleash.nais.io/api",
     "UNLEASH_INSTANCE_ID": "dev-gcp",
     "REDIS_HOST": "sosialhjelp-avtaler-api-redis.teamdigisos.svc.cluster.local",
-    "XSRF_DOMAIN": "dev.nav.no"
+    "XSRF_DOMAIN": "dev.nav.no",
+    "MASKINPORTEN_URL": "https://ver2.maskinporten.no"
   },
   "minReplicas": "1",
   "maxReplicas": "1",

@@ -38,7 +38,7 @@ object Configuration {
         mapOf(
             "application.profile" to "DEV",
             "application.cluster" to "DEV-GCP",
-            "altinn.altinnUrl" to "https://api-gw-q1.oera.no/ekstern/altinn/api/serviceowner",
+            "altinn.altinnUrl" to "https://tt02.altinn.no/api/serviceowner",
             "altinn.proxyConsumerId" to "sosialhjelavtaler-api-dev",
         )
     )
@@ -63,6 +63,7 @@ object Configuration {
     val prod: Boolean = profile == Profile.PROD
 
     val tokenXProperties = TokenXProperties()
+    val altinnProperties = AltinnProperties()
 
     operator fun get(key: String): String = config[Key(key, stringType)]
 
@@ -79,4 +80,11 @@ object Configuration {
     enum class Cluster {
         `PROD-GCP`, `DEV-GCP`, `LOCAL`
     }
+
+    data class AltinnProperties(
+        val baseUrl: String = this["altinn.altinnUrl"],
+        val proxyConsumerId: String = this["altinn.proxyConsumerId"],
+        val apiKey: String = this["ALTINN_APIKEY"],
+        val apiGWKey: String = this["ALTINN_APIGW_APIKEY"],
+    )
 }

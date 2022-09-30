@@ -27,6 +27,7 @@ spec:
   envFrom:
     - secret: redis-password-avtaler-api
     - secret: sosialhjelp-xsrf-secret
+    - secret: altinn-api-key
   tokenx:
     enabled: true
   gcp:
@@ -61,3 +62,9 @@ spec:
     - name: {{@key}}
       value: "{{this}}"
   {{/each}}
+  maskinporten:
+    enabled: true
+    scopes:
+      consumes:
+        - name: "altinn:serviceowner/reportees"
+        - name: "altinn:serviceowner/rolesandrights"

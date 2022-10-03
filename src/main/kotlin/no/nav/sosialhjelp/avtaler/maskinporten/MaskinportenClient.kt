@@ -21,7 +21,6 @@ interface MaskinportenClient {
     fun hentAltinnToken(): String
 }
 
-
 class MaskinportenClientImpl(
     private val props: Configuration.MaskinportenProperties
 ) : MaskinportenClient {

@@ -19,11 +19,11 @@ object Configuration {
             "altinn.proxyConsumerId" to "",
             "ALTINN_APIKEY" to "",
             "ALTINN_APIGW_APIKEY" to "",
-            "maskinporten.clientId" to "",
-            "maskinporten.issuer" to "",
-            "maskinporten.scopes" to "",
-            "maskinporten.tokenEndpointUrl" to "",
-            "maskinporten.privateJwk" to "",
+            "MASKINPORTEN_CLIENT_ID" to "",
+            "MASKINPORTEN_ISSUER" to "",
+            "MASKINPORTEN_SCOPES" to "",
+            "MASKINPORTEN_TOKEN_ENDPOINT" to "",
+            "MASKINPORTEN_CLIENT_JWK" to "",
         )
     )
 
@@ -94,11 +94,11 @@ object Configuration {
     )
 
     data class MaskinportenProperties(
-        val clientId: String = this["maskinporten.clientId"],
-        val issuer: String = this["maskinporten.issuer"],
-        val scopes: String = this["maskinporten.scopes"],
-        val tokenEndpointUrl: String = this["maskinporten.tokenEndpointUrl"],
-        val privateJwk: String = this["maskinporten.privateJwk"],
+        val clientId: String = this["MASKINPORTEN_CLIENT_ID"],
+        val issuer: String = this["MASKINPORTEN_ISSUER"],
+        val scopes: String = this["MASKINPORTEN_SCOPES"],
+        val tokenEndpointUrl: String = this["MASKINPORTEN_TOKEN_ENDPOINT"],
+        val privateJwk: String = this["MASKINPORTEN_CLIENT_JWK"],
         val altinnUrl: String = this["altinn.altinnUrl"],
     )
 }

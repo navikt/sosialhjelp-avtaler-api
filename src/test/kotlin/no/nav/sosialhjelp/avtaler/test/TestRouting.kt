@@ -3,6 +3,7 @@ package no.nav.sosialhjelp.avtaler.test
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import io.kotest.common.runBlocking
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.accept
@@ -51,7 +52,7 @@ class TestRouting(configuration: Routing.() -> Unit) {
         }
     }
 
-    internal fun test(block: suspend TestRouting.() -> Unit) = {
-        this
+    internal fun test(block: suspend TestRouting.() -> Unit) = runBlocking {
+        block(this)
     }
 }

@@ -9,6 +9,7 @@ object Versions {
     const val microutils_version = "2.1.23"
     const val nimbus_jose_version = "9.8.1"
     const val nimbus_sdk_version = "9.43.1"
+    const val mockVersion = "1.12.8"
 }
 
 plugins {
@@ -68,7 +69,7 @@ dependencies {
     // test
     testImplementation(kotlin("test"))
     testImplementation("io.ktor:ktor-server-test-host:${Versions.ktor_version}")
-    testImplementation("io.mockk:mockk:1.11.0")
+    testImplementation("io.mockk:mockk:${Versions.mockVersion}")
     val kotestVersion = "5.4.2"
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core-jvm:$kotestVersion")

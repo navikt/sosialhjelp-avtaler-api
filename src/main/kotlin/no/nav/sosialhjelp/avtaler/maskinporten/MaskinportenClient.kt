@@ -10,6 +10,7 @@ import com.nimbusds.oauth2.sdk.JWTBearerGrant
 import com.nimbusds.oauth2.sdk.Scope
 import com.nimbusds.oauth2.sdk.TokenRequest
 import com.nimbusds.oauth2.sdk.TokenResponse
+import no.nav.sosialhjelp.avtaler.Configuration
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.time.Instant
@@ -19,13 +20,16 @@ interface MaskinportenClient {
 
     fun hentAltinnToken(): String
 }
-class MaskinportenClientImpl(
-    private val clientId: String,
+
+/*
+*     private val clientId: String,
     private val issuer: String,
     private val altinnUrl: String,
     private val scopes: List<String>,
     tokenEndpointUrl: String,
-    privateJwk: String,
+    privateJwk: String,*/
+class MaskinportenClientImpl(
+    private val props: Configuration.MaskinportenProperties
 ) : MaskinportenClient {
 
     private val log = LoggerFactory.getLogger(javaClass)
@@ -36,10 +40,12 @@ class MaskinportenClientImpl(
 
     private val assertionSigner: JWSSigner
 
-    init {
-        val rsaKey = RSAKey.parse(privateJwk)
+    private val scopesList = props.scopes.split(" ")
 
-        tokenEndpoint = URI.create(tokenEndpointUrl)
+    init {
+        val rsaKey = RSAKey.parse(props.privateJwk)
+
+        tokenEndpoint = URI.create(props.tokenEndpointUrl)
         privateJwkKeyId = rsaKey.keyID
         assertionSigner = RSASSASigner(rsaKey)
     }
@@ -48,10 +54,10 @@ class MaskinportenClientImpl(
         val signedJwt = signedClientAssertion(
             clientAssertionHeader(privateJwkKeyId),
             clientAssertionClaims(
-                clientId,
-                issuer,
-                altinnUrl,
-                scopes
+                props.clientId,
+                props.issuer,
+                props.altinnUrl,
+                scopesList
             ),
             assertionSigner
         )
@@ -59,7 +65,7 @@ class MaskinportenClientImpl(
         val request = TokenRequest(
             tokenEndpoint,
             JWTBearerGrant(signedJwt),
-            Scope(*scopes.toTypedArray()),
+            Scope(*scopesList.toTypedArray()),
         )
 
         val response = TokenResponse.parse(request.toHTTPRequest().send())

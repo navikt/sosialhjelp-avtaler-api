@@ -18,11 +18,12 @@ import io.ktor.http.contentType
 import io.ktor.serialization.jackson.jackson
 import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.Configuration
+import no.nav.sosialhjelp.avtaler.maskinporten.MaskinportenClient
 
 private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
-class AltinnClient(props: Configuration.AltinnProperties) {
+class AltinnClient(props: Configuration.AltinnProperties, maskinportenClient: MaskinportenClient) {
 
     private val client: HttpClient = HttpClient(CIO) {
         install(ContentNegotiation) {
@@ -36,7 +37,7 @@ class AltinnClient(props: Configuration.AltinnProperties) {
                 contentType(ContentType.Application.Json)
                 header("X-Consumer-ID", props.proxyConsumerId)
                 header("APIKEY", props.apiKey)
-                header("Authorization", "Bearer ${maskinportenTokenProvider.invoke()}")
+                header("Authorization", "Bearer ${maskinportenClient.hentAltinnToken()}")
             }
         }
     }

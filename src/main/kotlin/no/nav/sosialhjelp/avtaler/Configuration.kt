@@ -99,5 +99,6 @@ object Configuration {
         val scopes: String = this["maskinporten.scopes"],
         val tokenEndpointUrl: String = this["maskinporten.tokenEndpointUrl"],
         val privateJwk: String = this["maskinporten.privateJwk"],
+        val altinnUrl: String = this["altinn.altinnUrl"],
     )
 }

@@ -67,11 +67,10 @@ dependencies {
 
     // test
     testImplementation(kotlin("test"))
-    testImplementation("io.ktor:ktor-server:test-host:${Versions.ktor_version}")
-    testImplementation("io.mockk:mockk:1.12.7")
+    testImplementation("io.ktor:ktor-server-test-host:${Versions.ktor_version}")
+    testImplementation("io.mockk:mockk:1.11.0")
     val kotestVersion = "5.4.2"
     testImplementation("io.kotest:kotest-runner-junit5:$kotestVersion")
     testImplementation("io.kotest:kotest-assertions-core-jvm:$kotestVersion")
-    testImplementation("io.ktor:ktor-server-tests-jvm:${Versions.ktor_version}")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin_version}")
+    testImplementation("org.junit.jupiter:junit-jupiter-params:5.9.0")
 }

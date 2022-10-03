@@ -7,9 +7,6 @@ import mu.KotlinLogging
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
 class AltinnService(private val altinnClient: AltinnClient) {
-    fun hentKommunerFor(): List<String> {
-        return listOf("0000", "0001")
-    }
 
     suspend fun hentAvgivere(fnr: String, tjeneste: Avgiver.Tjeneste): List<Avgiver> =
         withContext(Dispatchers.IO) {

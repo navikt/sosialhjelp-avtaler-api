@@ -8,12 +8,12 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.mockk.coEvery
 import io.mockk.mockk
-import no.nav.hjelpemidler.brille.test.TestRouting
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.kommune.Kommune
+import no.nav.sosialhjelp.avtaler.test.TestRouting
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 
@@ -22,7 +22,7 @@ internal class AvtaleApiTest {
 
     private val routing = TestRouting {
         authenticate("test") {
-            AvtaleService()
+            AvtaleService(altinnService)
         }
     }
 

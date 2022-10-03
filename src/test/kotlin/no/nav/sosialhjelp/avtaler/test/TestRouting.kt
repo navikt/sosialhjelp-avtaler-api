@@ -1,9 +1,8 @@
-package no.nav.hjelpemidler.brille.test
+package no.nav.sosialhjelp.avtaler.test
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import io.kotest.common.runBlocking
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.accept
@@ -15,7 +14,6 @@ import io.ktor.server.config.MapApplicationConfig
 import io.ktor.server.routing.Routing
 import io.ktor.server.routing.routing
 import io.ktor.server.testing.TestApplication
-import kotlinx.coroutines.runBlocking
 import no.nav.sosialhjelp.avtaler.UserPrincipal
 import no.nav.sosialhjelp.avtaler.configure
 
@@ -53,7 +51,7 @@ class TestRouting(configuration: Routing.() -> Unit) {
         }
     }
 
-    internal fun test(block: suspend TestRouting.() -> Unit) = runBlocking {
-        block(this)
+    internal fun test(block: suspend TestRouting.() -> Unit) = {
+        this
     }
 }

@@ -1,10 +1,6 @@
 package no.nav.sosialhjelp.avtaler.avtale
 
-import io.kotest.matchers.shouldBe
 import io.ktor.client.request.get
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.http.HttpStatusCode
 import io.ktor.server.auth.authenticate
 import io.mockk.coEvery
 import io.mockk.mockk
@@ -17,7 +13,6 @@ import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
 import no.nav.sosialhjelp.avtaler.kommune.Kommune
 import no.nav.sosialhjelp.avtaler.test.TestRouting
 import kotlin.test.BeforeTest
-import kotlin.test.Test
 
 internal class AvtaleApiTest {
     private val altinnService = mockk<AltinnService>()

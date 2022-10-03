@@ -12,4 +12,3 @@ data class Avtale(
 data class OpprettAvtale(
     val orgnr: String,
 )
-

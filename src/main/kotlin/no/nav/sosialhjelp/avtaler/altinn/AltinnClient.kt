@@ -44,7 +44,7 @@ class AltinnClient(props: Configuration.AltinnProperties, maskinportenClient: Ma
     private val baseUrl = props.baseUrl
 
     suspend fun hentAvgivere(fnr: String, tjeneste: Avgiver.Tjeneste): List<Avgiver> {
-        val response = client.get("$baseUrl/reportees") {
+        val response = client.get("$baseUrl/api/serviceowner/reportees") {
             url {
                 parameters.append("ForceEIAuthentication", "true")
                 parameters.append("subject", fnr)
@@ -63,7 +63,7 @@ class AltinnClient(props: Configuration.AltinnProperties, maskinportenClient: Ma
     }
 
     suspend fun hentRettigheter(fnr: String, orgnr: String): Set<Avgiver.Tjeneste> {
-        val response = client.get("$baseUrl/authorization/rights") {
+        val response = client.get("$baseUrl/api/serviceowner/authorization/rights") {
             url {
                 parameters.append("ForceEIAuthentication", "true")
                 parameters.append("subject", fnr)

@@ -21,13 +21,7 @@ interface MaskinportenClient {
     fun hentAltinnToken(): String
 }
 
-/*
-*     private val clientId: String,
-    private val issuer: String,
-    private val altinnUrl: String,
-    private val scopes: List<String>,
-    tokenEndpointUrl: String,
-    privateJwk: String,*/
+
 class MaskinportenClientImpl(
     private val props: Configuration.MaskinportenProperties
 ) : MaskinportenClient {

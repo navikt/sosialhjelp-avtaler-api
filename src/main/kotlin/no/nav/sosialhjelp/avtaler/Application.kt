@@ -24,9 +24,15 @@ import no.nav.sosialhjelp.avtaler.maskinporten.MaskinportenClientImpl
 import java.util.TimeZone
 
 private val log = KotlinLogging.logger {}
+private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
 fun main(args: Array<String>) {
     io.ktor.server.cio.EngineMain.main(args)
+
+    Thread.setDefaultUncaughtExceptionHandler { _, e ->
+        log.error { "Uncaught exception logget i securelog" }
+        sikkerLog.error(e) { e.message }
+    }
 }
 
 fun Application.module() {

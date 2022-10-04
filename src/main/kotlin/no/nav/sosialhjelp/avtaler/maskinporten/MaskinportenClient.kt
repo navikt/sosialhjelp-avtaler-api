@@ -1,9 +1,12 @@
 package no.nav.sosialhjelp.avtaler.maskinporten
 
+import com.nimbusds.jose.Algorithm
 import com.nimbusds.jose.JWSHeader
 import com.nimbusds.jose.JWSSigner
 import com.nimbusds.jose.crypto.RSASSASigner
+import com.nimbusds.jose.jwk.KeyUse
 import com.nimbusds.jose.jwk.RSAKey
+import com.nimbusds.jose.jwk.gen.RSAKeyGenerator
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import com.nimbusds.oauth2.sdk.JWTBearerGrant
@@ -11,6 +14,7 @@ import com.nimbusds.oauth2.sdk.Scope
 import com.nimbusds.oauth2.sdk.TokenRequest
 import com.nimbusds.oauth2.sdk.TokenResponse
 import no.nav.sosialhjelp.avtaler.Configuration
+import no.nav.sosialhjelp.avtaler.Configuration.getOrNull
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.time.Instant
@@ -35,8 +39,16 @@ class MaskinportenClientImpl(
 
     private val scopesList = props.scopes.split(" ")
 
+    private fun getRSAkey(clientJwk: String?): RSAKey = clientJwk?.let { RSAKey.parse(it) } ?: generateRSAKey()
+
+    private fun generateRSAKey() = RSAKeyGenerator(2048)
+        .keyID(UUID.randomUUID().toString())
+        .keyUse(KeyUse.SIGNATURE)
+        .algorithm(Algorithm.parse("RS256"))
+        .generate()
+
     init {
-        val rsaKey = RSAKey.parse(props.privateJwk)
+        val rsaKey: RSAKey = getRSAkey(getOrNull(props.privateJwk))
 
         tokenEndpoint = URI.create(props.tokenEndpointUrl)
         privateJwkKeyId = rsaKey.keyID

@@ -6,6 +6,7 @@ import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
+import java.util.UUID
 
 object Configuration {
 
@@ -36,6 +37,8 @@ object Configuration {
             "userclaim" to "sub",
             "REDIS_HOST" to "localhost",
             "REDIS_PASSWORD" to "",
+            "MASKINPORTEN_CLIENT_ID" to UUID.randomUUID().toString(),
+            "MASKINPORTEN_WELL_KNOWN_URL" to "https://ver2.maskinporten.no/.well-known/oauth-authorization-server",
         )
     )
 
@@ -60,6 +63,7 @@ object Configuration {
         }
 
     private val config = systemProperties() overriding EnvironmentVariables() overriding resourceProperties overriding defaultProperties
+    fun getOrNull(key: String): String? = config.getOrNull(Key(key, stringType))
 
     val profile: Profile = this["application.profile"].let { Profile.valueOf(it) }
     val cluster: Cluster = this["application.cluster"].let { Cluster.valueOf(it) }

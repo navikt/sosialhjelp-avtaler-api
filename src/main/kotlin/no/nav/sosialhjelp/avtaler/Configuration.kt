@@ -37,6 +37,7 @@ object Configuration {
             "userclaim" to "sub",
             "REDIS_HOST" to "localhost",
             "REDIS_PASSWORD" to "",
+            "MASKINPORTEN_SCOPES" to "scope1 scope2",
             "MASKINPORTEN_CLIENT_ID" to UUID.randomUUID().toString(),
             "MASKINPORTEN_WELL_KNOWN_URL" to "https://ver2.maskinporten.no/.well-known/oauth-authorization-server",
         )
@@ -104,5 +105,6 @@ object Configuration {
         val tokenEndpointUrl: String = this["MASKINPORTEN_TOKEN_ENDPOINT"],
         val privateJwk: String = this["MASKINPORTEN_CLIENT_JWK"],
         val altinnUrl: String = this["altinn.altinnUrl"],
+        val wellKnownUrl: String = this["MASKINPORTEN_WELL_KNOWN_URL"]
     )
 }

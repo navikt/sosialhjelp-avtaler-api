@@ -71,5 +71,13 @@ object StubEngine {
                 )
             )
         }
+        get("/.well-known/oauth-authorization-server") {
+            respond(
+                mapOf(
+                    "issuer" to "http://localhost:8080/default",
+                    "jwks_uri" to "http://localhost:8080/default/jwks"
+                )
+            )
+        }
     }
 }

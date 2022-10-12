@@ -33,6 +33,8 @@ class MaskinportenService(private val maskinportenConfig: Configuration.Maskinpo
     }
 
     suspend fun getToken(): String {
+        logger.info("getToken is called.")
+
         val expires = Instant.now().plusSeconds(120L)
         return mutex.withLock {
             if (token.expiresAt.isBefore(expires)) {

@@ -47,7 +47,6 @@ class AltinnClient(props: Configuration.AltinnProperties, maskinportenService: M
     suspend fun hentAvgivere(fnr: String, tjeneste: Avgiver.Tjeneste): List<Avgiver> {
         val response = client.get("$baseUrl/api/serviceowner/reportees") {
             url {
-
                 parameters.append("ForceEIAuthentication", "true")
                 parameters.append("subject", fnr)
                 parameters.append("serviceCode", tjeneste.kode)
@@ -55,7 +54,6 @@ class AltinnClient(props: Configuration.AltinnProperties, maskinportenService: M
                 parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active'")
                 parameters.append("\$top", "200")
             }
-            header("Authorization", "Bearer ${service.getToken()}")
         }
         sikkerLog.info { "Hentet avgivere med url: ${response.request.url}" }
         if (response.status == HttpStatusCode.OK) {
@@ -66,15 +64,21 @@ class AltinnClient(props: Configuration.AltinnProperties, maskinportenService: M
     }
 
     suspend fun hentRettigheter(fnr: String, orgnr: String): Set<Avgiver.Tjeneste> {
+        val token = service.getToken()
+
         val response = client.get("$baseUrl/api/serviceowner/authorization/rights") {
+
             url {
                 parameters.append("ForceEIAuthentication", "true")
                 parameters.append("subject", fnr)
                 parameters.append("reportee", orgnr)
                 parameters.append("\$filter", Avgiver.Tjeneste.FILTER)
             }
-            header("Authorization", "Bearer ${service.getToken()}")
+            headers {
+                header("Authorization", "Bearer $token")
+            }
         }
+
         sikkerLog.info { "Hentet rettigheter med url: ${response.request.url}" }
         if (response.status == HttpStatusCode.OK) {
             return response.body<HentRettigheterResponse?>()?.tilSet() ?: emptySet()

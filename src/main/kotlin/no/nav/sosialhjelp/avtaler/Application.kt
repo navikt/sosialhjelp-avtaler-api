@@ -6,12 +6,14 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
-import io.ktor.server.engine.embeddedServer
-import io.ktor.server.netty.Netty
+import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.routing.IgnoreTrailingSlash
+import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import mu.KotlinLogging
+import no.nav.sosialhjelp.avtaler.HttpClientConfig.httpClient
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
@@ -21,12 +23,17 @@ import java.util.TimeZone
 
 private val log = KotlinLogging.logger {}
 
-fun main() {
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0") {
-        log.info("sosialhjelp-avtaler-api starting up...")
-        configure()
-        setupRoutes()
-    }.start(wait = true)
+fun main(args: Array<String>) {
+    io.ktor.server.cio.EngineMain.main(args)
+}
+
+fun Application.module() {
+    val host = environment.config.propertyOrNull("ktor.deployment.host")?.getString() ?: "0.0.0.0"
+    val port = environment.config.propertyOrNull("ktor.deployment.port")?.getString() ?: "8080"
+
+    log.info("sosialhjelp-avtaler-api starting up on $host:$port...")
+    configure()
+    setupRoutes()
 }
 
 fun Application.configure() {
@@ -38,21 +45,25 @@ fun Application.configure() {
             disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         }
     }
+    install(IgnoreTrailingSlash)
 }
 
 fun Application.setupRoutes() {
+    installAuthentication(httpClient(engineFactory { StubEngine.tokenX() }))
+
+    val avtaleService = AvtaleService()
+    val altinnService = AltinnService()
+
     routing {
+
         route("/sosialhjelp/avtaler-api") {
             internalRoutes()
-
-            val avtaleService = AvtaleService()
-            val altinnService = AltinnService()
-
             route("/api") {
-                avtaleApi(avtaleService)
-                kommuneApi(avtaleService, altinnService)
+                authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
+                    avtaleApi(avtaleService)
+                    kommuneApi(avtaleService, altinnService)
+                }
             }
         }
     }
 }
-// curl -X POST  --header "Content-Type: application/json" --data  '{"orgnr": "0000"}' -v http://localhost:8080/sosialhjelp/avtaler-api/api/avtale/

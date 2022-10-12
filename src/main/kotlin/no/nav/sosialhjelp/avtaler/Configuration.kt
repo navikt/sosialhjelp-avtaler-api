@@ -14,8 +14,8 @@ import com.nimbusds.jose.jwk.gen.RSAKeyGenerator
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import kotlinx.coroutines.runBlocking
-import java.util.UUID
 import no.nav.sosialhjelp.avtaler.HttpClientConfig.httpClient
+import java.util.UUID
 
 object Configuration {
 
@@ -84,7 +84,7 @@ object Configuration {
 
     val tokenXProperties = TokenXProperties()
     val altinnProperties = AltinnProperties()
-    val maskinportenProperties : MaskinportenProperties = MaskinportenProperties()
+    val maskinportenProperties: MaskinportenProperties = MaskinportenProperties()
 
     operator fun get(key: String): String = config[Key(key, stringType)]
 
@@ -107,7 +107,6 @@ object Configuration {
         val proxyConsumerId: String = this["altinn.proxyConsumerId"],
         val apiKey: String = this["ALTINN_APIKEY"],
     )
-
 
     private fun getRSAkey(clientJwk: String?): RSAKey {
         if (clientJwk.isNullOrEmpty()) {

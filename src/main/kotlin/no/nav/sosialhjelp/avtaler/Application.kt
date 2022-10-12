@@ -20,7 +20,6 @@ import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
 import no.nav.sosialhjelp.avtaler.internal.internalRoutes
 import no.nav.sosialhjelp.avtaler.kommune.kommuneApi
-import no.nav.sosialhjelp.avtaler.maskinporten.MaskinportenClientImpl
 import no.nav.sosialhjelp.avtaler.maskinporten.MaskinportenService
 import java.util.TimeZone
 

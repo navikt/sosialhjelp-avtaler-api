@@ -1,6 +1,5 @@
 package no.nav.sosialhjelp.avtaler.maskinporten
 
-
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.fasterxml.jackson.annotation.JsonAlias
@@ -12,7 +11,6 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.Configuration
-import no.nav.sosialhjelp.avtaler.Configuration.getOrNull
 import no.nav.sosialhjelp.avtaler.HttpClientConfig
 import no.nav.sosialhjelp.avtaler.utils.Utils.retry
 import java.time.Instant
@@ -59,7 +57,6 @@ class MaskinportenService(private val maskinportenConfig: Configuration.Maskinpo
             response.body()
         }
     }
-
 
     private fun generateJWT(metadata: Configuration.Metadata): String {
         val now = Instant.now()

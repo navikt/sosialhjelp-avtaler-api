@@ -18,7 +18,6 @@ import io.ktor.http.contentType
 import io.ktor.serialization.jackson.jackson
 import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.Configuration
-import no.nav.sosialhjelp.avtaler.maskinporten.MaskinportenClient
 import no.nav.sosialhjelp.avtaler.maskinporten.MaskinportenService
 
 private val log = KotlinLogging.logger { }
@@ -57,7 +56,6 @@ class AltinnClient(props: Configuration.AltinnProperties, maskinportenService: M
                 parameters.append("\$top", "200")
             }
             header("Authorization", "Bearer ${service.getToken()}")
-
         }
         sikkerLog.info { "Hentet avgivere med url: ${response.request.url}" }
         if (response.status == HttpStatusCode.OK) {
@@ -76,7 +74,6 @@ class AltinnClient(props: Configuration.AltinnProperties, maskinportenService: M
                 parameters.append("\$filter", Avgiver.Tjeneste.FILTER)
             }
             header("Authorization", "Bearer ${service.getToken()}")
-
         }
         sikkerLog.info { "Hentet rettigheter med url: ${response.request.url}" }
         if (response.status == HttpStatusCode.OK) {

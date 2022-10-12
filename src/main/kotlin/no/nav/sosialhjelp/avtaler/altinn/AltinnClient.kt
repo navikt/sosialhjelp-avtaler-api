@@ -33,7 +33,7 @@ class AltinnClient(props: Configuration.AltinnProperties, maskinportenService: M
         }
         defaultRequest {
             headers {
-                accept(ContentType.Application.Json)
+                accept(ContentType.Application.Any)
                 contentType(ContentType.Application.Json)
                 header("X-Consumer-ID", props.proxyConsumerId)
                 header("APIKEY", props.apiKey)
@@ -76,6 +76,7 @@ class AltinnClient(props: Configuration.AltinnProperties, maskinportenService: M
             }
             headers {
                 header("Authorization", "Bearer $token")
+                accept(ContentType.Application.FontWoff)
             }
         }
 

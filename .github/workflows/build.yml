@@ -52,10 +52,9 @@ jobs:
         run: |
           docker push --all-tags ${{ env.DOCKER_IMAGE }}
       - name: Create tag and release
-        uses: actions/create-release@v1
+        uses: ncipollo/release-action@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.artifact-version.outputs.version }}
-          release_name: ${{ steps.artifact-version.outputs.version }}
-          commitish: ${{ github.sha }}
+          tag: ${{ steps.artifact-version.outputs.version }}
+          commit: ${{ github.sha }}

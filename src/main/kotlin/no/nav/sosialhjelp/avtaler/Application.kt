@@ -21,6 +21,7 @@ import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
 import no.nav.sosialhjelp.avtaler.internal.internalRoutes
 import no.nav.sosialhjelp.avtaler.kommune.kommuneApi
 import no.nav.sosialhjelp.avtaler.maskinporten.MaskinportenClientImpl
+import no.nav.sosialhjelp.avtaler.maskinporten.MaskinportenService
 import java.util.TimeZone
 
 private val log = KotlinLogging.logger {}
@@ -59,9 +60,9 @@ fun Application.configure() {
 fun Application.setupRoutes() {
     installAuthentication(httpClient(engineFactory { StubEngine.tokenX() }))
 
-    val maskinportenClient = MaskinportenClientImpl(Configuration.maskinportenProperties)
+    val maskinportenService = MaskinportenService(Configuration.maskinportenProperties)
 
-    val altinnService = AltinnService(AltinnClient(Configuration.altinnProperties, maskinportenClient))
+    val altinnService = AltinnService(AltinnClient(Configuration.altinnProperties, maskinportenService))
     val avtaleService = AvtaleService(altinnService)
 
     routing {

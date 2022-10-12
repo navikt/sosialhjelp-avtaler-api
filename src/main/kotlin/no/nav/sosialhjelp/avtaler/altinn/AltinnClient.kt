@@ -19,11 +19,12 @@ import io.ktor.serialization.jackson.jackson
 import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.maskinporten.MaskinportenClient
+import no.nav.sosialhjelp.avtaler.maskinporten.MaskinportenService
 
 private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
-class AltinnClient(props: Configuration.AltinnProperties, maskinportenClient: MaskinportenClient) {
+class AltinnClient(props: Configuration.AltinnProperties, maskinportenService: MaskinportenService) {
 
     private val client: HttpClient = HttpClient(CIO) {
         install(ContentNegotiation) {
@@ -37,15 +38,17 @@ class AltinnClient(props: Configuration.AltinnProperties, maskinportenClient: Ma
                 contentType(ContentType.Application.Json)
                 header("X-Consumer-ID", props.proxyConsumerId)
                 header("APIKEY", props.apiKey)
-                header("Authorization", "Bearer ${maskinportenClient.hentAltinnToken()}")
             }
         }
     }
     private val baseUrl = props.baseUrl
 
+    private val service = maskinportenService
+
     suspend fun hentAvgivere(fnr: String, tjeneste: Avgiver.Tjeneste): List<Avgiver> {
         val response = client.get("$baseUrl/api/serviceowner/reportees") {
             url {
+
                 parameters.append("ForceEIAuthentication", "true")
                 parameters.append("subject", fnr)
                 parameters.append("serviceCode", tjeneste.kode)
@@ -53,6 +56,8 @@ class AltinnClient(props: Configuration.AltinnProperties, maskinportenClient: Ma
                 parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active'")
                 parameters.append("\$top", "200")
             }
+            header("Authorization", "Bearer ${service.getToken()}")
+
         }
         sikkerLog.info { "Hentet avgivere med url: ${response.request.url}" }
         if (response.status == HttpStatusCode.OK) {
@@ -70,6 +75,8 @@ class AltinnClient(props: Configuration.AltinnProperties, maskinportenClient: Ma
                 parameters.append("reportee", orgnr)
                 parameters.append("\$filter", Avgiver.Tjeneste.FILTER)
             }
+            header("Authorization", "Bearer ${service.getToken()}")
+
         }
         sikkerLog.info { "Hentet rettigheter med url: ${response.request.url}" }
         if (response.status == HttpStatusCode.OK) {

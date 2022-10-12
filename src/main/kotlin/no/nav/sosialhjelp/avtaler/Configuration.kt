@@ -1,12 +1,21 @@
 package no.nav.sosialhjelp.avtaler
 
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.natpryce.konfig.ConfigurationMap
 import com.natpryce.konfig.ConfigurationProperties.Companion.systemProperties
 import com.natpryce.konfig.EnvironmentVariables
 import com.natpryce.konfig.Key
 import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
+import com.nimbusds.jose.Algorithm
+import com.nimbusds.jose.jwk.KeyUse
+import com.nimbusds.jose.jwk.RSAKey
+import com.nimbusds.jose.jwk.gen.RSAKeyGenerator
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import kotlinx.coroutines.runBlocking
 import java.util.UUID
+import no.nav.sosialhjelp.avtaler.HttpClientConfig.httpClient
 
 object Configuration {
 
@@ -64,6 +73,7 @@ object Configuration {
         }
 
     private val config = systemProperties() overriding EnvironmentVariables() overriding resourceProperties overriding defaultProperties
+
     fun getOrNull(key: String): String? = config.getOrNull(Key(key, stringType))
 
     val profile: Profile = this["application.profile"].let { Profile.valueOf(it) }
@@ -74,7 +84,7 @@ object Configuration {
 
     val tokenXProperties = TokenXProperties()
     val altinnProperties = AltinnProperties()
-    val maskinportenProperties = MaskinportenProperties()
+    val maskinportenProperties : MaskinportenProperties = MaskinportenProperties()
 
     operator fun get(key: String): String = config[Key(key, stringType)]
 
@@ -98,6 +108,22 @@ object Configuration {
         val apiKey: String = this["ALTINN_APIKEY"],
     )
 
+
+    private fun getRSAkey(clientJwk: String?): RSAKey {
+        if (clientJwk.isNullOrEmpty()) {
+            return generateRSAKey()
+        }
+        return clientJwk.let {
+            RSAKey.parse(it)
+        }
+    }
+
+    private fun generateRSAKey() = RSAKeyGenerator(2048)
+        .keyID(UUID.randomUUID().toString())
+        .keyUse(KeyUse.SIGNATURE)
+        .algorithm(Algorithm.parse("RS256"))
+        .generate()
+
     data class MaskinportenProperties(
         val clientId: String = this["MASKINPORTEN_CLIENT_ID"],
         val issuer: String = this["MASKINPORTEN_ISSUER"],
@@ -105,6 +131,20 @@ object Configuration {
         val tokenEndpointUrl: String = this["MASKINPORTEN_TOKEN_ENDPOINT"],
         val privateJwk: String = this["MASKINPORTEN_CLIENT_JWK"],
         val altinnUrl: String = this["altinn.altinnUrl"],
-        val wellKnownUrl: String = this["MASKINPORTEN_WELL_KNOWN_URL"]
+        val wellKnownUrl: String = this["MASKINPORTEN_WELL_KNOWN_URL"],
+        val clientJwk: RSAKey = getRSAkey(getOrNull("MASKINPORTEN_CLIENT_JWK")),
     )
+
+    data class Metadata(
+        @JsonProperty("issuer") val issuer: String,
+        @JsonProperty("jwks_uri") val jwksUri: String,
+        @JsonProperty("token_endpoint") val tokenEndpoint: String
+    )
+
+    fun wellKnowConfig(wellKnownUrl: String): Metadata {
+        val metadata: Metadata by lazy {
+            runBlocking { httpClient().get(wellKnownUrl).body() }
+        }
+        return metadata
+    }
 }

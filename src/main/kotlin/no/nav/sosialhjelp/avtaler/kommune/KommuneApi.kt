@@ -12,7 +12,7 @@ import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 fun Route.kommuneApi(avtaleService: AvtaleService, altinnService: AltinnService) {
     route("/kommuner") {
         get {
-            val fnr = "fake fnr"
+            val fnr = "fake fnr" // call.extractFnr()
 
             val kommunerFraAltinn = altinnService.hentKommunerFor(fnr)
 

@@ -33,7 +33,7 @@ class AltinnClient(props: Configuration.AltinnProperties, maskinportenService: M
         }
         defaultRequest {
             headers {
-                accept(ContentType.Application.Any)
+                accept(ContentType.Application.Json)
                 contentType(ContentType.Application.Json)
                 header("X-Consumer-ID", props.proxyConsumerId)
                 header("APIKEY", props.apiKey)
@@ -45,6 +45,8 @@ class AltinnClient(props: Configuration.AltinnProperties, maskinportenService: M
     private val service = maskinportenService
 
     suspend fun hentAvgivere(fnr: String, tjeneste: Avgiver.Tjeneste): List<Avgiver> {
+        val token = service.getToken()
+
         val response = client.get("$baseUrl/api/serviceowner/reportees") {
             url {
                 parameters.append("ForceEIAuthentication", "true")
@@ -53,6 +55,10 @@ class AltinnClient(props: Configuration.AltinnProperties, maskinportenService: M
                 parameters.append("serviceEdition", tjeneste.versjon.toString())
                 parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active'")
                 parameters.append("\$top", "200")
+            }
+            headers {
+                header("Authorization", "Bearer $token")
+                accept(ContentType.Application.Any)
             }
         }
         sikkerLog.info { "Hentet avgivere med url: ${response.request.url}" }

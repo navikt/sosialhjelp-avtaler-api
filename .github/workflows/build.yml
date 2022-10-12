@@ -56,6 +56,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.artifact-version.outputs.version }}
-          release_name: ${{ steps.artifact-version.outputs.version }}
-          commitish: ${{ github.sha }}
+          tag: ${{ steps.artifact-version.outputs.version }}
+          commit: ${{ github.sha }}

@@ -14,6 +14,7 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.HttpClientConfig.httpClient
+import no.nav.sosialhjelp.avtaler.altinn.AltinnClient
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
@@ -51,8 +52,8 @@ fun Application.configure() {
 fun Application.setupRoutes() {
     installAuthentication(httpClient(engineFactory { StubEngine.tokenX() }))
 
-    val avtaleService = AvtaleService()
-    val altinnService = AltinnService()
+    val altinnService = AltinnService(AltinnClient(Configuration.altinnProperties))
+    val avtaleService = AvtaleService(altinnService)
 
     routing {
 

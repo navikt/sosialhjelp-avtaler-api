@@ -39,13 +39,6 @@ spec:
           - name: {{postgresDatabaseName}}
             envVarPrefix: POSTGRES
   accessPolicy:
-    inbound:
-      rules:
-      {{#each inboundRulesApplications}}
-        - application: "{{this}}"
-       {{else}}
-      []
-      {{/each}}
     outbound:
       rules:
       {{#each outboundRulesApplications}}

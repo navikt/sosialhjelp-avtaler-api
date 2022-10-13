@@ -41,13 +41,20 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: sosialhjelp-avtaler-dev
+      {{#each inboundRulesApplications}}
+        - application: "{{this}}"
+       {{else}}
+      []
+      {{/each}}
     outbound:
       rules:
-        - application: sosialhjelp-avtaler-dev
+      {{#each outboundRulesApplications}}
+        - application: "{{this}}"
+      {{else}}
+      []
+      {{/each}}
         - application: altinn-rettigheter-proxy
-          namespace: {{namespace}}
-          cluster: {{altinn-rettigheter-cluster}}
+          namespace: arbeidsgiver
   ingresses:
 {{#each ingress}}
     - "{{this}}"

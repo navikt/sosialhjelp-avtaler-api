@@ -7,11 +7,9 @@
   "ingress": [
     "https://digisos.dev.nav.no/sosialhjelp/avtaler-api"
   ],
-  "outboundExternalHosts": [
-    "unleash.nais.io"
-  ],
   "outboundRulesApplications": [
-    "sosialhjelp-avtaler-api-redis"
+    "sosialhjelp-avtaler-api-redis",
+    "sosialhjelp-soknad-api-dev"
   ],
   "env": {
     "SPRING_PROFILES_ACTIVE": "log-kibana,log-audit",

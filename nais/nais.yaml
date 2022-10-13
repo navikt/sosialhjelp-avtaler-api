@@ -45,6 +45,8 @@ spec:
     outbound:
       rules:
         - application: sosialhjelp-avtaler-dev
+        - application: altinn-rettigheter-proxy
+          namespace: arbeidsgiver
   ingresses:
 {{#each ingress}}
     - "{{this}}"

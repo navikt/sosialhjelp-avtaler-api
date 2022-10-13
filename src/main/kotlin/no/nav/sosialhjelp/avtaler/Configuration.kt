@@ -17,8 +17,8 @@ object Configuration {
             "unleash.unleash-uri" to "https://unleash.nais.io/api/",
             "altinn.altinnUrl" to "",
             "altinn.proxyConsumerId" to "",
-            "ALTINN_APIKEY" to "",
-            "ALTINN_APIGW_APIKEY" to "",
+            "ALTINN_APIKEY" to "dummyverdi",
+            "ALTINN_APIGW_APIKEY" to "dummyverdi",
         )
     )
 

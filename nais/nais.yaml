@@ -46,7 +46,8 @@ spec:
       rules:
         - application: sosialhjelp-avtaler-dev
         - application: altinn-rettigheter-proxy
-          namespace: arbeidsgiver
+          namespace: {{namespace}}
+          cluster: {{altinn-rettigheter-cluster}}
   ingresses:
 {{#each ingress}}
     - "{{this}}"

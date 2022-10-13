@@ -7,6 +7,7 @@ object Versions {
     const val logback_version = "1.2.11"
     const val jackson_version = "2.13.3"
     const val microutils_version = "2.1.23"
+    const val altinnKlientVersion = "3.1.0"
 }
 
 plugins {
@@ -59,6 +60,9 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jackson_version}")
 
     implementation("io.github.microutils:kotlin-logging:${Versions.microutils_version}")
+
+    // altinn
+    implementation("no.nav.arbeidsgiver:altinn-rettigheter-proxy-klient:${Versions.altinnKlientVersion}")
 
     // test
     testImplementation("io.ktor:ktor-server-tests-jvm:${Versions.ktor_version}")

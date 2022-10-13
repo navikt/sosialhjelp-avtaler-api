@@ -38,8 +38,8 @@ object Configuration {
         mapOf(
             "application.profile" to "DEV",
             "application.cluster" to "DEV-GCP",
-            "altinn.altinnUrl" to "https://api-gw-q1.oera.no/ekstern/altinn/api/serviceowner",
-            "altinn.proxyConsumerId" to "sosialhjelavtaler-api-dev",
+            "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.intern.nav.no/altinn-rettigheter-proxy/ekstern/altinn/api/serviceowner/",
+            "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api",
         )
     )
 

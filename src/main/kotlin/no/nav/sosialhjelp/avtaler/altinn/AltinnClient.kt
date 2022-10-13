@@ -34,7 +34,7 @@ class AltinnClient(props: Configuration.AltinnProperties) {
             headers {
                 accept(ContentType.Application.Json)
                 contentType(ContentType.Application.Json)
-                header("X-Consumer-ID", props.proxyConsumerId)
+                header("APIKEY", props.apiKey)
             }
         }
     }
@@ -44,8 +44,8 @@ class AltinnClient(props: Configuration.AltinnProperties) {
 
         val response = client.get("$baseUrl/api/serviceowner/reportees") {
             url {
-                // parameters.append("ForceEIAuthentication", "true")
-                // parameters.append("subject", fnr)
+                parameters.append("ForceEIAuthentication", "")
+                parameters.append("subject", fnr)
                 parameters.append("serviceCode", tjeneste.kode)
                 parameters.append("serviceEdition", tjeneste.versjon.toString())
                 parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active'")

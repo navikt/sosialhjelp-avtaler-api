@@ -39,12 +39,15 @@ spec:
           - name: {{postgresDatabaseName}}
             envVarPrefix: POSTGRES
   accessPolicy:
+    inbound:
+      rules:
+      {{#each inboundRulesApplications}}
+        - application: "{{this}}"
+     {{/each}}
     outbound:
       rules:
       {{#each outboundRulesApplications}}
         - application: "{{this}}"
-      {{else}}
-      []
       {{/each}}
         - application: altinn-rettigheter-proxy
           namespace: arbeidsgiver

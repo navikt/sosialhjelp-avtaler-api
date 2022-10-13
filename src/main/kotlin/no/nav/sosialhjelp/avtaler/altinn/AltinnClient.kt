@@ -45,7 +45,7 @@ class AltinnClient(props: Configuration.AltinnProperties) {
         val response = client.get("$baseUrl/api/serviceowner/reportees") {
             url {
                 parameters.append("ForceEIAuthentication", "true")
-                parameters.append("subject", fnr)
+                // parameters.append("subject", fnr)
                 parameters.append("serviceCode", tjeneste.kode)
                 parameters.append("serviceEdition", tjeneste.versjon.toString())
                 parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active'")

@@ -42,7 +42,7 @@ object Configuration {
             "application.profile" to "DEV",
             "application.cluster" to "DEV-GCP",
             "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.dev.nav.no/altinn-rettigheter-proxy/ekstern/altinn",
-            "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api",
+            "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api-dev",
             "altinn.altinnRettigheterAudience" to "dev-gcp:arbeidsgiver:altinn-rettigheter-proxy"
         )
     )
@@ -92,6 +92,6 @@ object Configuration {
         val apiKey: String = this["ALTINN_APIKEY"],
         val apiGWKey: String = this["ALTINN_APIGW_APIKEY"],
         val altinnRettigheterAudience: String = this["altinn.altinnRettigheterAudience"],
-        val tokenXTokenEnpoint: String = this["TOKEN_X_TOKEN_ENDPOINT"],
+        val tokenXTokenEndpoint: String = this["TOKEN_X_TOKEN_ENDPOINT"],
     )
 }

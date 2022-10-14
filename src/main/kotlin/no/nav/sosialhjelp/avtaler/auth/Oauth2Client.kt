@@ -5,6 +5,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.forms.submitForm
 import io.ktor.http.Parameters
 import io.ktor.http.ParametersBuilder
+import mu.KotlinLogging
 import no.nav.security.token.support.client.core.ClientAuthenticationProperties
 import no.nav.security.token.support.client.core.OAuth2GrantType
 import no.nav.security.token.support.client.core.OAuth2ParameterNames
@@ -12,11 +13,14 @@ import no.nav.security.token.support.client.core.auth.ClientAssertion
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
 import java.net.URI
 
+private val log = KotlinLogging.logger { }
+
 class Oauth2Client(
     private val httpClient: HttpClient,
     private val clientAuthProperties: ClientAuthenticationProperties,
 ) {
     suspend fun exchangeToken(token: String, tokenEndpointUrl: String, audience: String): OAuth2AccessTokenResponse {
+        log.info { "exhangeToken tokenendpointurl:$tokenEndpointUrl,  audience:$audience " }
         val grant = GrantRequest.tokenExchange(token, audience)
         return httpClient.tokenRequest(
             tokenEndpointUrl,

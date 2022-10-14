@@ -14,7 +14,7 @@ object Configuration {
             "userclaim" to "pid",
             "TOKEN_X_CLIENT_ID" to "abc",
             "TOKEN_X_WELL_KNOWN_URL" to "abc",
-            "TOKEN_X_TOKEN_ENDPOINT" to "abc",
+            "TOKEN_X_TOKEN_ENDPOINT" to "",
             "TOKEN_X_PRIVATE_JWK" to "",
             "unleash.unleash-uri" to "https://unleash.nais.io/api/",
             "altinn.altinnUrl" to "",

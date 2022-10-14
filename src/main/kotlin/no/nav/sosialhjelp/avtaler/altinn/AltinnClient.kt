@@ -36,7 +36,6 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
             headers {
                 accept(ContentType.Application.Json)
                 contentType(ContentType.Application.Json)
-                header("APIKEY", props.apiKey)
             }
         }
     }
@@ -56,8 +55,8 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
                     parameters.append("serviceEdition", tjeneste.versjon.toString())
                     parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active'")
                     parameters.append("\$top", "200")
+                    header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
                 }
-                header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
             }
             sikkerLog.info { "Hentet avgivere med url: ${response.request.url}" }
             if (response.status == HttpStatusCode.OK) {

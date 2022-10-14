@@ -15,15 +15,33 @@ class AvtaleService(
         Avtale(orgnr = "0000", navn = "Null kommune", avtaleversjon = "1.0", opprettet = null),
         Avtale(orgnr = "0001", navn = "En kommune", avtaleversjon = "1.0", opprettet = null)
     )
-    suspend fun hentAvtale(orgnr: String, fnr: String, tjeneste: Avgiver.Tjeneste, token: String?): Avtale {
+
+    suspend fun hentAvtaler(fnr: String, tjeneste: Avgiver.Tjeneste, token: String?): List<Avtale> {
         val avgivereFiltrert = altinnService.hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
 
         sikkerLog.info {
             "Filtrert avgivere for fnr: $fnr, tjeneste: $tjeneste, avgivere: $avgivereFiltrert"
         }
-        log.info("Henter avtale for kommune $orgnr")
-        return avtaler.filter { it.orgnr == orgnr }.first()
+
+        return avgivereFiltrert
+            .map {
+                Avtale(
+                    orgnr = it.orgnr,
+                    navn = it.navn,
+                    avtaleversjon = "1.0",
+                    opprettet = null,
+                )
+            }
     }
+
+    suspend fun hentAvtale(
+        fnr: String,
+        orgnr: String,
+        tjeneste: Avgiver.Tjeneste,
+        token: String?
+    ): Avtale? = hentAvtaler(fnr = fnr, tjeneste = tjeneste, token = token).associateBy {
+        it.orgnr
+    }[orgnr]
 
     suspend fun opprettAvtale(avtale: AvtaleRequest, fnrInnsender: String, token: String?): Avtale {
         if (!altinnService.harTilgangTilSignering(fnrInnsender, avtale.orgnr)) {
@@ -31,8 +49,13 @@ class AvtaleService(
         }
 
         log.info("Oppretter avtale for ${avtale.orgnr}")
-        val avtale = hentAvtale(avtale.orgnr, fnrInnsender, Avgiver.Tjeneste.AVTALESIGNERING, token = token)
-        avtale.opprettet = LocalDateTime.now()
-        return avtale
+        val nyAvtale = Avtale(
+            orgnr = avtale.orgnr,
+            navn = "",
+            avtaleversjon = "1.0",
+            opprettet = LocalDateTime.now()
+        )
+        nyAvtale.opprettet = LocalDateTime.now()
+        return nyAvtale
     }
 }

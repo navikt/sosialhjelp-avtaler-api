@@ -20,14 +20,11 @@ private val log = KotlinLogging.logger { }
 fun Route.kommuneApi(avtaleService: AvtaleService, altinnService: AltinnService) {
     route("/kommuner") {
         get {
-            val fnr = call.extractFnr()
-
-            val kommunerFraAltinn = altinnService.hentAvgivere(fnr, Avgiver.Tjeneste.AVTALESIGNERING, this.context.getAccessToken())
-
-            val kommuner = kommunerFraAltinn.map {
-                val avtale = avtaleService.hentAvtale(it.orgnr, fnr, Avgiver.Tjeneste.AVTALESIGNERING, this.context.getAccessToken())
-                Kommune(orgnr = avtale.orgnr, navn = avtale.navn, opprettet = avtale.opprettet)
-            }.toList()
+            val kommuner = avtaleService.hentAvtaler(
+                fnr = call.extractFnr(),
+                tjeneste = Avgiver.Tjeneste.AVTALESIGNERING,
+                this.context.getAccessToken()
+            )
             call.respond(HttpStatusCode.OK, kommuner)
         }
     }

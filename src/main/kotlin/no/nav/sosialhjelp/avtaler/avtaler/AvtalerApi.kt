@@ -19,13 +19,17 @@ data class AvtaleRequest(val orgnr: String)
 fun Route.avtaleApi(avtaleService: AvtaleService) {
     route("/avtale") {
         get("/{kommunenr}") {
-            val kommunenummer = call.parameters["kommunenummer"] ?: "0000"
+            val kommunenummer = call.kommunenr()
             val avtale = avtaleService.hentAvtale(
-                kommunenummer,
                 fnr = call.extractFnr(),
+                orgnr = kommunenummer,
                 tjeneste = Avgiver.Tjeneste.AVTALESIGNERING,
                 token = this.context.getAccessToken()
             )
+            if (avtale == null) {
+                call.response.status(HttpStatusCode.NotFound)
+                return@get
+            }
             call.respond(HttpStatusCode.OK, avtale)
         }
 
@@ -43,4 +47,8 @@ private fun ApplicationCall.getAccessToken(): String? {
         return authorizationHeader.blob
     }
     return null
+}
+
+private fun ApplicationCall.kommunenr(): String = requireNotNull(parameters["kommunenr"]) {
+    "Mangler kommunenr i URL"
 }

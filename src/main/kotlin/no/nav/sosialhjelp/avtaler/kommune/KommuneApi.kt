@@ -1,7 +1,10 @@
 package no.nav.sosialhjelp.avtaler.kommune
 
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.auth.HttpAuthHeader
+import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
+import io.ktor.server.auth.parseAuthorizationHeader
 import io.ktor.server.response.respond
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
@@ -16,13 +19,21 @@ fun Route.kommuneApi(avtaleService: AvtaleService, altinnService: AltinnService)
         get {
             val fnr = call.extractFnr()
 
-            val kommunerFraAltinn = altinnService.hentAvgivere(fnr, Avgiver.Tjeneste.AVTALESIGNERING)
+            val kommunerFraAltinn = altinnService.hentAvgivere(fnr, Avgiver.Tjeneste.AVTALESIGNERING, this.context.getAccessToken())
 
             val kommuner = kommunerFraAltinn.map {
-                val avtale = avtaleService.hentAvtale(it.orgnr, fnr, Avgiver.Tjeneste.AVTALESIGNERING)
+                val avtale = avtaleService.hentAvtale(it.orgnr, fnr, Avgiver.Tjeneste.AVTALESIGNERING, this.context.getAccessToken())
                 Kommune(orgnr = avtale.orgnr, navn = avtale.navn, opprettet = avtale.opprettet)
             }.toList()
             call.respond(HttpStatusCode.OK, kommuner)
         }
     }
+}
+
+private fun ApplicationCall.getAccessToken(): String? {
+    val authorizationHeader = request.parseAuthorizationHeader()
+    if (authorizationHeader is HttpAuthHeader.Single && authorizationHeader.authScheme == "Bearer") {
+        return authorizationHeader.blob
+    }
+    return null
 }

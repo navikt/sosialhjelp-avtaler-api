@@ -8,9 +8,9 @@ private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
 class AltinnService(private val altinnClient: AltinnClient) {
 
-    suspend fun hentAvgivere(fnr: String, tjeneste: Avgiver.Tjeneste): List<Avgiver> =
+    suspend fun hentAvgivere(fnr: String, tjeneste: Avgiver.Tjeneste, token: String?): List<Avgiver> =
         withContext(Dispatchers.IO) {
-            val avgivere = altinnClient.hentAvgivere(fnr = fnr, tjeneste = tjeneste)
+            val avgivere = altinnClient.hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
             sikkerLog.info {
                 "Avgivere for fnr: $fnr, tjeneste: $tjeneste, avgivere: $avgivere"
             }

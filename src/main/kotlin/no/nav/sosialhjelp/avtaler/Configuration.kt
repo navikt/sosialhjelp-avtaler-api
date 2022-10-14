@@ -14,9 +14,12 @@ object Configuration {
             "userclaim" to "pid",
             "TOKEN_X_CLIENT_ID" to "abc",
             "TOKEN_X_WELL_KNOWN_URL" to "abc",
+            "TOKEN_X_TOKEN_ENDPOINT" to "abc",
+            "TOKEN_X_PRIVATE_JWK" to "",
             "unleash.unleash-uri" to "https://unleash.nais.io/api/",
             "altinn.altinnUrl" to "",
             "altinn.proxyConsumerId" to "",
+            "altinn.altinnRettigheterAudience" to "",
             "ALTINN_APIKEY" to "dummyverdi",
             "ALTINN_APIGW_APIKEY" to "dummyverdi",
         )
@@ -40,6 +43,7 @@ object Configuration {
             "application.cluster" to "DEV-GCP",
             "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.dev.nav.no/altinn-rettigheter-proxy/ekstern/altinn",
             "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api",
+            "altinn.altinnRettigheterAudience" to "dev-gcp:arbeidsgiver:altinn-rettigheter-proxy"
         )
     )
 
@@ -71,6 +75,7 @@ object Configuration {
         val clientId: String = this["TOKEN_X_CLIENT_ID"],
         val wellKnownUrl: String = this["TOKEN_X_WELL_KNOWN_URL"],
         val userclaim: String = this["userclaim"],
+        val privateJwk: String = this["TOKEN_X_PRIVATE_JWK"]
     )
 
     enum class Profile {
@@ -86,5 +91,7 @@ object Configuration {
         val proxyConsumerId: String = this["altinn.proxyConsumerId"],
         val apiKey: String = this["ALTINN_APIKEY"],
         val apiGWKey: String = this["ALTINN_APIGW_APIKEY"],
+        val altinnRettigheterAudience: String = this["altinn.altinnRettigheterAudience"],
+        val tokenXTokenEnpoint: String = this["TOKEN_X_TOKEN_ENDPOINT"],
     )
 }

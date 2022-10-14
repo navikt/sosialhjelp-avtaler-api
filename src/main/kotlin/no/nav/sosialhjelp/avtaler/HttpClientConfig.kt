@@ -28,3 +28,13 @@ fun engineFactory(block: () -> HttpClientEngine): HttpClientEngine = when (Confi
     Configuration.Profile.LOCAL -> block()
     else -> CIO.create()
 }
+
+fun getDefaultHttpClient(): HttpClient {
+    return HttpClient(CIO) {
+        install(ContentNegotiation) {
+            jackson {
+                disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+            }
+        }
+    }
+}

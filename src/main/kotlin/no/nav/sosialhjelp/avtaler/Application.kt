@@ -3,19 +3,21 @@ package no.nav.sosialhjelp.avtaler
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.IgnoreTrailingSlash
-import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import mu.KotlinLogging
+import no.nav.security.token.support.client.core.ClientAuthenticationProperties
 import no.nav.sosialhjelp.avtaler.HttpClientConfig.httpClient
 import no.nav.sosialhjelp.avtaler.altinn.AltinnClient
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService
+import no.nav.sosialhjelp.avtaler.auth.Oauth2Client
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
 import no.nav.sosialhjelp.avtaler.internal.internalRoutes
@@ -52,7 +54,17 @@ fun Application.configure() {
 fun Application.setupRoutes() {
     installAuthentication(httpClient(engineFactory { StubEngine.tokenX() }))
 
-    val altinnService = AltinnService(AltinnClient(Configuration.altinnProperties))
+    // Token X
+    val authProperties = ClientAuthenticationProperties.builder()
+        .clientId(Configuration.tokenXProperties.clientId)
+        .clientJwk(Configuration.tokenXProperties.privateJwk)
+        .clientAuthMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
+        .build()
+
+    val defaultHttpClient = getDefaultHttpClient()
+
+    val tokenExchangeClient = Oauth2Client(defaultHttpClient, authProperties)
+    val altinnService = AltinnService(AltinnClient(Configuration.altinnProperties, tokenExchangeClient))
     val avtaleService = AvtaleService(altinnService)
 
     routing {

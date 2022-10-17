@@ -76,11 +76,10 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
 
             val response = client.get("$baseUrl/api/serviceowner/authorization/rights") {
                 url {
-                    parameters.append("ForceEIAuthentication", "true")
+                    parameters.append("ForceEIAuthentication", "")
                     parameters.append("subject", fnr)
                     parameters.append("reportee", orgnr)
                     parameters.append("\$filter", Avgiver.Tjeneste.FILTER)
-                    header("APIKEY", apiKey)
                     header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
                 }
             }

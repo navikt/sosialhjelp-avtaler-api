@@ -3,7 +3,6 @@
   "postgresUserName": "sosialhjelp-avtaler-dev",
   "postgresDatabaseName": "dialogdb-dev",
   "namespace": "teamdigisos",
-  "altinn-rettigheter-cluster": "dev-gcp",
   "ingress": [
     "https://digisos.dev.nav.no/sosialhjelp/avtaler-api"
   ],

@@ -17,9 +17,9 @@ class AltinnService(private val altinnClient: AltinnClient) {
             avgivere
         }
 
-    suspend fun harTilgangTilSignering(fnr: String, orgnr: String): Boolean = withContext(Dispatchers.IO) {
+    suspend fun harTilgangTilSignering(fnr: String, orgnr: String, token: String?): Boolean = withContext(Dispatchers.IO) {
         altinnClient
-            .hentRettigheter(fnr = fnr, orgnr = orgnr)
+            .hentRettigheter(fnr = fnr, orgnr = orgnr, token = token)
             .contains(Avgiver.Tjeneste.AVTALESIGNERING)
     }
 }

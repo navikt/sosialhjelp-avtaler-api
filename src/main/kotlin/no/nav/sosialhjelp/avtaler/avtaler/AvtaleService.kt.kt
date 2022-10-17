@@ -44,7 +44,7 @@ class AvtaleService(
     }[orgnr]
 
     suspend fun opprettAvtale(avtale: AvtaleRequest, fnrInnsender: String, token: String?): Avtale {
-        if (!altinnService.harTilgangTilSignering(fnrInnsender, avtale.orgnr)) {
+        if (!altinnService.harTilgangTilSignering(fnrInnsender, avtale.orgnr, token)) {
             throw AvtaleManglerTilgangException(avtale.orgnr)
         }
 

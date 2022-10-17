@@ -69,22 +69,28 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
         return emptyList()
     }
 
-    suspend fun hentRettigheter(fnr: String, orgnr: String): Set<Avgiver.Tjeneste> {
+    suspend fun hentRettigheter(fnr: String, orgnr: String, token: String?): Set<Avgiver.Tjeneste> {
+        token?.let {
+            val scopedAccessToken = tokenClient.exchangeToken(token, tokenXEndpointUrl, altinnRettigheterAudience).accessToken
 
-        val response = client.get("$baseUrl/api/serviceowner/authorization/rights") {
-            url {
-                parameters.append("ForceEIAuthentication", "true")
-                parameters.append("subject", fnr)
-                parameters.append("reportee", orgnr)
-                parameters.append("\$filter", Avgiver.Tjeneste.FILTER)
+            val response = client.get("$baseUrl/api/serviceowner/authorization/rights") {
+                url {
+                    parameters.append("ForceEIAuthentication", "true")
+                    parameters.append("subject", fnr)
+                    parameters.append("reportee", orgnr)
+                    parameters.append("\$filter", Avgiver.Tjeneste.FILTER)
+                    header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
+                }
             }
-        }
 
-        sikkerLog.info { "Hentet rettigheter med url: ${response.request.url}" }
-        if (response.status == HttpStatusCode.OK) {
-            return response.body<HentRettigheterResponse?>()?.tilSet() ?: emptySet()
+            sikkerLog.info { "Hentet rettigheter med url: ${response.request.url}" }
+            if (response.status == HttpStatusCode.OK) {
+                return response.body<HentRettigheterResponse?>()?.tilSet() ?: emptySet()
+            }
+            log.warn { "Kunne ikke hente rettigheter, status: ${response.status}" }
+            return emptySet()
         }
-        log.warn { "Kunne ikke hente rettigheter, status: ${response.status}" }
+        log.warn("Ingen access token i request, kan ikke hente ny token til altinn-proxy")
         return emptySet()
     }
 

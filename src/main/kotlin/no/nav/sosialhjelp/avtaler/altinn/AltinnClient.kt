@@ -42,6 +42,7 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
     private val baseUrl = props.baseUrl
     private val altinnRettigheterAudience = props.altinnRettigheterAudience
     private val tokenXEndpointUrl = props.tokenXTokenEndpoint
+    private val apiKey = props.apiKey
 
     suspend fun hentAvgivere(fnr: String, tjeneste: Avgiver.Tjeneste, token: String?): List<Avgiver> {
         token?.let {
@@ -79,6 +80,7 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
                     parameters.append("subject", fnr)
                     parameters.append("reportee", orgnr)
                     parameters.append("\$filter", Avgiver.Tjeneste.FILTER)
+                    header("APIKEY", apiKey)
                     header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
                 }
             }

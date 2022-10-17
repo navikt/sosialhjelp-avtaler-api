@@ -7,6 +7,7 @@ object Versions {
     const val logback_version = "1.2.11"
     const val jackson_version = "2.13.3"
     const val microutils_version = "2.1.23"
+    const val token_support_version = "1.3.9"
 }
 
 plugins {
@@ -59,6 +60,10 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jackson_version}")
 
     implementation("io.github.microutils:kotlin-logging:${Versions.microutils_version}")
+
+    // altinn
+    implementation("no.nav.security:token-validation-ktor:${Versions.token_support_version}")
+    implementation("no.nav.security:token-client-core:${Versions.token_support_version}")
 
     // test
     testImplementation("io.ktor:ktor-server-tests-jvm:${Versions.ktor_version}")

@@ -8,3 +8,7 @@ data class Avtale(
     val avtaleversjon: String?,
     var opprettet: LocalDateTime?
 )
+
+data class OpprettAvtale(
+    val orgnr: String,
+)

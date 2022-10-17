@@ -41,10 +41,16 @@ spec:
   accessPolicy:
     inbound:
       rules:
-        - application: sosialhjelp-avtaler-dev
+      {{#each inboundRulesApplications}}
+        - application: "{{this}}"
+     {{/each}}
     outbound:
       rules:
-        - application: sosialhjelp-avtaler-dev
+      {{#each outboundRulesApplications}}
+        - application: "{{this}}"
+      {{/each}}
+        - application: altinn-rettigheter-proxy
+          namespace: arbeidsgiver
   ingresses:
 {{#each ingress}}
     - "{{this}}"
@@ -61,3 +67,6 @@ spec:
     - name: {{@key}}
       value: "{{this}}"
   {{/each}}
+  azure:
+    application:
+      enabled: true

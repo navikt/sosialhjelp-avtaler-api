@@ -79,7 +79,7 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
                     parameters.append("ForceEIAuthentication", "")
                     parameters.append("subject", fnr)
                     parameters.append("reportee", orgnr)
-                    parameters.append("\$filter", Avgiver.Tjeneste.FILTER)
+                    // parameters.append("\$filter", Avgiver.Tjeneste.FILTER)
                     header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
                 }
             }

@@ -22,9 +22,6 @@ object Configuration {
             "altinn.altinnRettigheterAudience" to "",
             "ALTINN_APIKEY" to "dummyverdi",
             "ALTINN_APIGW_APIKEY" to "dummyverdi",
-            "gcp.projectId" to "",
-            "gcp.dbregion" to "",
-            "gcp.dbinstance" to "",
         )
     )
 
@@ -47,9 +44,6 @@ object Configuration {
             "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.dev.nav.no/altinn-rettigheter-proxy/ekstern/altinn",
             "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api-dev",
             "altinn.altinnRettigheterAudience" to "dev-gcp:arbeidsgiver:altinn-rettigheter-proxy",
-            "gcp.projectId" to "teamdigisos-dev-46f0",
-            "gcp.dbregion" to "europe-north1",
-            "gcp.dbinstance" to "sosialhjelp-avtaler-api-db-dev",
         )
     )
 
@@ -108,9 +102,5 @@ object Configuration {
         val databasePassword: String = this["POSTGRES_PASSWORD"],
         val databaseHost: String = this["POSTGRES_HOST"],
         val databasePort: String = this["POSTGRES_PORT"],
-
-        val gcpProject: String = this["gcp.project"],
-        val gcpDbRegion: String = this["gcp.dbregion"],
-        val gcpDbInstance: String = this["gcp.dbinstance"],
     )
 }

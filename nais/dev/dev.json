@@ -1,7 +1,7 @@
 {
   "applicationName": "sosialhjelp-avtaler-api-dev",
-  "postgresUserName": "sosialhjelp-avtaler-dev",
-  "postgresDatabaseName": "dialogdb-dev",
+  "postgresUserName": "sosialhjelp-avtaler-api-db-dev",
+  "postgresDatabaseName": "avtalerapidb-dev",
   "namespace": "teamdigisos",
   "ingress": [
     "https://digisos.dev.nav.no/sosialhjelp/avtaler-api"

@@ -31,7 +31,7 @@ spec:
     enabled: true
   gcp:
     sqlInstances:
-      - type: POSTGRES_12
+      - type: POSTGRES_14
         name: {{postgresUserName}}
         tier: db-f1-micro
         diskSize: 10

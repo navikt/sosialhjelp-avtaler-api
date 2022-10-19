@@ -20,6 +20,7 @@ import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.auth.Oauth2Client
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
+import no.nav.sosialhjelp.avtaler.db.DefaultDatabaseContext
 import no.nav.sosialhjelp.avtaler.internal.internalRoutes
 import no.nav.sosialhjelp.avtaler.kommune.kommuneApi
 import java.util.TimeZone
@@ -52,6 +53,8 @@ fun Application.configure() {
 }
 
 fun Application.setupRoutes() {
+    val databaseContext = DefaultDatabaseContext(DatabaseConfiguration(Configuration.dbProperties).dataSource())
+
     installAuthentication(httpClient(engineFactory { StubEngine.tokenX() }))
 
     // Token X
@@ -65,7 +68,7 @@ fun Application.setupRoutes() {
 
     val tokenExchangeClient = Oauth2Client(defaultHttpClient, authProperties)
     val altinnService = AltinnService(AltinnClient(Configuration.altinnProperties, tokenExchangeClient))
-    val avtaleService = AvtaleService(altinnService)
+    val avtaleService = AvtaleService(altinnService, databaseContext)
 
     routing {
 

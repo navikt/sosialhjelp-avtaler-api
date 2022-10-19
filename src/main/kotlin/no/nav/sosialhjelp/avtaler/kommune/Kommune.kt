@@ -5,5 +5,6 @@ import java.time.LocalDateTime
 data class Kommune(
     val orgnr: String,
     val navn: String,
-    val opprettet: LocalDateTime?
+    val avtaleversjon: String? = null,
+    val opprettet: LocalDateTime? = null
 )

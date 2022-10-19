@@ -3,33 +3,38 @@ package no.nav.sosialhjelp.avtaler.avtaler
 import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
-import java.time.LocalDateTime
+import no.nav.sosialhjelp.avtaler.db.DatabaseContext
+import no.nav.sosialhjelp.avtaler.db.transaction
+import no.nav.sosialhjelp.avtaler.kommune.Kommune
 
 private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
 class AvtaleService(
     private val altinnService: AltinnService,
+    val databaseContext: DatabaseContext,
 ) {
-    private val avtaler = mutableListOf(
-        Avtale(orgnr = "0000", navn = "Null kommune", avtaleversjon = "1.0", opprettet = null),
-        Avtale(orgnr = "0001", navn = "En kommune", avtaleversjon = "1.0", opprettet = null)
-    )
 
-    suspend fun hentAvtaler(fnr: String, tjeneste: Avgiver.Tjeneste, token: String?): List<Avtale> {
+    suspend fun hentAvtaler(fnr: String, tjeneste: Avgiver.Tjeneste, token: String?): List<Kommune> {
         val avgivereFiltrert = altinnService.hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
 
         sikkerLog.info {
             "Filtrert avgivere for fnr: $fnr, tjeneste: $tjeneste, avgivere: $avgivereFiltrert"
         }
 
+        val avtaler = transaction(databaseContext) { ctx ->
+            ctx.avtaleStore.hentAvtalerForOrganisasjoner(avgivereFiltrert.map { it.orgnr }).associateBy {
+                it.orgnr
+            }
+        }
+
         return avgivereFiltrert
             .map {
-                Avtale(
+                Kommune(
                     orgnr = it.orgnr,
                     navn = it.navn,
-                    avtaleversjon = "1.0",
-                    opprettet = null,
+                    avtaleversjon = avtaler[it.orgnr]?.avtaleversjon,
+                    opprettet = avtaler[it.orgnr]?.opprettet,
                 )
             }
     }
@@ -39,23 +44,28 @@ class AvtaleService(
         orgnr: String,
         tjeneste: Avgiver.Tjeneste,
         token: String?
-    ): Avtale? = hentAvtaler(fnr = fnr, tjeneste = tjeneste, token = token).associateBy {
+    ): Kommune? = hentAvtaler(fnr = fnr, tjeneste = tjeneste, token = token).associateBy {
         it.orgnr
     }[orgnr]
 
     suspend fun opprettAvtale(avtale: AvtaleRequest, fnrInnsender: String, token: String?): Avtale {
+/*
         if (!altinnService.harTilgangTilSignering(fnrInnsender, avtale.orgnr)) {
             throw AvtaleManglerTilgangException(avtale.orgnr)
         }
 
+ */
         log.info("Oppretter avtale for ${avtale.orgnr}")
-        val nyAvtale = Avtale(
-            orgnr = avtale.orgnr,
-            navn = "",
-            avtaleversjon = "1.0",
-            opprettet = LocalDateTime.now()
-        )
-        nyAvtale.opprettet = LocalDateTime.now()
-        return nyAvtale
+
+        val avtale = transaction(databaseContext) { ctx ->
+            ctx.avtaleStore.lagreAvtale(
+                Avtale(
+                    orgnr = avtale.orgnr,
+                    avtaleversjon = null
+                )
+            )
+        }
+
+        return avtale
     }
 }

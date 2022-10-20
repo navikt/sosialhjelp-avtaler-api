@@ -49,12 +49,6 @@ class AvtaleService(
     }[orgnr]
 
     suspend fun opprettAvtale(avtale: AvtaleRequest, fnrInnsender: String, token: String?): Avtale {
-/*
-        if (!altinnService.harTilgangTilSignering(fnrInnsender, avtale.orgnr)) {
-            throw AvtaleManglerTilgangException(avtale.orgnr)
-        }
-
- */
         log.info("Oppretter avtale for ${avtale.orgnr}")
 
         val avtale = transaction(databaseContext) { ctx ->

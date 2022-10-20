@@ -59,7 +59,7 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
             INSERT INTO avtale_v1 (orgnr,
                                    avtaleversjon,
                                    opprettet)
-            VALUES (:orgnr, :fnr_innsender, :avtaleversjon, :opprettet)
+            VALUES (:orgnr, :avtaleversjon, :opprettet)
             ON CONFLICT DO NOTHING
         """.trimIndent()
         it.update(

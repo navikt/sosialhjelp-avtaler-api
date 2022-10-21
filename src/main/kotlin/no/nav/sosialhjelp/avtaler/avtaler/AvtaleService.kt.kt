@@ -5,7 +5,7 @@ import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
-import no.nav.sosialhjelp.avtaler.kommune.Kommune
+import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
 
 private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
@@ -15,7 +15,7 @@ class AvtaleService(
     val databaseContext: DatabaseContext,
 ) {
 
-    suspend fun hentAvtaler(fnr: String, tjeneste: Avgiver.Tjeneste, token: String?): List<Kommune> {
+    suspend fun hentAvtaler(fnr: String, tjeneste: Avgiver.Tjeneste, token: String?): List<AvtaleResponse> {
         val avgivereFiltrert = altinnService.hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
 
         sikkerLog.info {
@@ -30,7 +30,7 @@ class AvtaleService(
 
         return avgivereFiltrert
             .map {
-                Kommune(
+                AvtaleResponse(
                     orgnr = it.orgnr,
                     navn = it.navn,
                     avtaleversjon = avtaler[it.orgnr]?.avtaleversjon,
@@ -44,7 +44,7 @@ class AvtaleService(
         orgnr: String,
         tjeneste: Avgiver.Tjeneste,
         token: String?
-    ): Kommune? = hentAvtaler(fnr = fnr, tjeneste = tjeneste, token = token).associateBy {
+    ): AvtaleResponse? = hentAvtaler(fnr = fnr, tjeneste = tjeneste, token = token).associateBy {
         it.orgnr
     }[orgnr]
 

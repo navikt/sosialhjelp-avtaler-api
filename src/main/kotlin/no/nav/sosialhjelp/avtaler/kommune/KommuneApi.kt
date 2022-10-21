@@ -10,14 +10,13 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import mu.KotlinLogging
-import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.extractFnr
 
 private val log = KotlinLogging.logger { }
 
-fun Route.kommuneApi(avtaleService: AvtaleService, altinnService: AltinnService) {
+fun Route.kommuneApi(avtaleService: AvtaleService) {
     route("/kommuner") {
         get {
             val kommuner = avtaleService.hentAvtaler(

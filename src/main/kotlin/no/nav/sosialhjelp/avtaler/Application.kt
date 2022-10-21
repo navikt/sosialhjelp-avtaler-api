@@ -77,7 +77,7 @@ fun Application.setupRoutes() {
             route("/api") {
                 authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
                     avtaleApi(avtaleService)
-                    kommuneApi(avtaleService, altinnService)
+                    kommuneApi(avtaleService)
                 }
             }
         }

@@ -8,6 +8,10 @@ object Versions {
     const val jackson_version = "2.13.3"
     const val microutils_version = "2.1.23"
     const val token_support_version = "1.3.9"
+    const val kotliquery_version = "1.9.0"
+    const val flywaydb_version = "9.2.0"
+    const val hikari_version = "5.0.1"
+    const val postgresql_version = "42.5.0"
 }
 
 plugins {
@@ -60,6 +64,12 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jackson_version}")
 
     implementation("io.github.microutils:kotlin-logging:${Versions.microutils_version}")
+
+    // Database
+    implementation("org.postgresql:postgresql:${Versions.postgresql_version}")
+    implementation("org.flywaydb:flyway-core:${Versions.flywaydb_version}")
+    implementation("com.zaxxer:HikariCP:${Versions.hikari_version}")
+    implementation("com.github.seratch:kotliquery:${Versions.kotliquery_version}")
 
     // altinn
     implementation("no.nav.security:token-validation-ktor:${Versions.token_support_version}")

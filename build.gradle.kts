@@ -12,6 +12,7 @@ object Versions {
     const val flywaydb_version = "9.2.0"
     const val hikari_version = "5.0.1"
     const val postgresql_version = "42.5.0"
+    const val digipost_api_client = "15.5"
 }
 
 plugins {
@@ -74,6 +75,9 @@ dependencies {
     // altinn
     implementation("no.nav.security:token-validation-ktor:${Versions.token_support_version}")
     implementation("no.nav.security:token-client-core:${Versions.token_support_version}")
+
+    // digipost
+    implementation("no.digipost:digipost-api-client-java:${Versions.digipost_api_client}")
 
     // test
     testImplementation("io.ktor:ktor-server-tests-jvm:${Versions.ktor_version}")

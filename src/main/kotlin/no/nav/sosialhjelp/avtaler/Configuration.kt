@@ -11,6 +11,7 @@ object Configuration {
 
     private val defaultProperties = ConfigurationMap(
         mapOf(
+            "application.baseUrl" to "http://localhost:5000",
             "userclaim" to "pid",
             "TOKEN_X_CLIENT_ID" to "abc",
             "TOKEN_X_WELL_KNOWN_URL" to "abc",
@@ -22,6 +23,9 @@ object Configuration {
             "altinn.altinnRettigheterAudience" to "",
             "ALTINN_APIKEY" to "dummyverdi",
             "ALTINN_APIGW_APIKEY" to "dummyverdi",
+            "digipost.keyStorePassword" to "KeyStorePassword",
+            "digipost.certificatePassword" to "CertificatePassword",
+            "digipost.onCompletionUrl" to "/opprett-avtale/kvittering"
         )
     )
 
@@ -39,6 +43,8 @@ object Configuration {
 
     private val devProperties = ConfigurationMap(
         mapOf(
+
+            "application.baseUrl" to "https://digisos.dev.nav.no/sosialhjelp/avtaler",
             "application.profile" to "DEV",
             "application.cluster" to "DEV-GCP",
             "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.dev.nav.no/altinn-rettigheter-proxy/ekstern/altinn",
@@ -65,6 +71,7 @@ object Configuration {
     val local: Boolean = profile == Profile.LOCAL
     val dev: Boolean = profile == Profile.DEV
     val prod: Boolean = profile == Profile.PROD
+    val baseUrl: String = this["application.baseUrl"]
 
     val tokenXProperties = TokenXProperties()
     val altinnProperties = AltinnProperties()
@@ -102,5 +109,14 @@ object Configuration {
         val databasePassword: String = this["POSTGRES_PASSWORD"],
         val databaseHost: String = this["POSTGRES_HOST"],
         val databasePort: String = this["POSTGRES_PORT"],
+    )
+
+    data class DigipostProperties(
+        val onCompletionUrl: String = this["applcation.baseUrl"] + this["digipost.onCompletionUrl"],
+        val onRefectionUrl: String = this["digipost.onRefectionUrl"],
+        val onErrorUrl: String = this["digipost.onErrorUrl"],
+        val keyStorePassword: String = this["digipost.keyStorePassword"],
+        val certificatePath: String = this["/path/to/javakeystore.jks"],
+        val certificatePassword: String = this["digipost.certificatePassword"]
     )
 }

@@ -12,7 +12,7 @@ object Versions {
     const val flywaydb_version = "9.2.0"
     const val hikari_version = "5.0.1"
     const val postgresql_version = "42.5.0"
-    const val digipost_api_client = "15.5"
+    const val digipost_signature_api_client = "7.0-RC4"
 }
 
 plugins {
@@ -77,8 +77,7 @@ dependencies {
     implementation("no.nav.security:token-client-core:${Versions.token_support_version}")
 
     // digipost
-    implementation("no.digipost:digipost-api-client-java:${Versions.digipost_api_client}")
-
+    implementation("no.digipost.signature:signature-api-client-java:7.0-RC4")
     // test
     testImplementation("io.ktor:ktor-server-tests-jvm:${Versions.ktor_version}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin_version}")

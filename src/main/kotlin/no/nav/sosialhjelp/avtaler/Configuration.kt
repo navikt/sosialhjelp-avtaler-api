@@ -27,7 +27,7 @@ object Configuration {
             "digipost.certificatePassword" to "CertificatePassword",
             "digipost.onCompletionUrl" to "/opprett-avtale/kvittering",
             "digipost.onErrorUrl" to "/opprett-avtale/feil",
-            "digipost.avtalePdfPath" to "Avtaletekst avtale om tilgjengeliggjøring av sentrale stønadsopplysninger.pdf"
+            "digipost.avtalePdfPath" to "Avtale.pdf"
         )
     )
 

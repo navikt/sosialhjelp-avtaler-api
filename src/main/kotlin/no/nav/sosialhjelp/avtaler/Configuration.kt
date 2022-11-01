@@ -11,7 +11,7 @@ object Configuration {
 
     private val defaultProperties = ConfigurationMap(
         mapOf(
-            "application.baseUrl" to "http://localhost:5000",
+            "application.baseUrl" to "http://localhost:5000/sosialhjelp/avtaler",
             "userclaim" to "pid",
             "TOKEN_X_CLIENT_ID" to "abc",
             "TOKEN_X_WELL_KNOWN_URL" to "abc",
@@ -25,7 +25,9 @@ object Configuration {
             "ALTINN_APIGW_APIKEY" to "dummyverdi",
             "digipost.keyStorePassword" to "KeyStorePassword",
             "digipost.certificatePassword" to "CertificatePassword",
-            "digipost.onCompletionUrl" to "/opprett-avtale/kvittering"
+            "digipost.onCompletionUrl" to "/opprett-avtale/kvittering",
+            "digipost.onErrorUrl" to "/opprett-avtale/feil",
+            "digipost.avtalePdfPath" to "PDF-1-2-testdokument.pdf"
         )
     )
 
@@ -117,6 +119,7 @@ object Configuration {
         val onErrorUrl: String = this["digipost.onErrorUrl"],
         val keyStorePassword: String = this["digipost.keyStorePassword"],
         val certificatePath: String = this["/path/to/javakeystore.jks"],
-        val certificatePassword: String = this["digipost.certificatePassword"]
+        val certificatePassword: String = this["digipost.certificatePassword"],
+        val avtalePdfPath: String = this["digipost.avtalePdfPath"]
     )
 }

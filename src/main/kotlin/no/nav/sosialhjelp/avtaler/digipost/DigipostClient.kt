@@ -32,6 +32,7 @@ class DigipostClient(props: Configuration.DigipostProperties) {
     private val certificatePath = props.certificatePath
     private val certificatePassword = props.certificatePassword
     private val keyStorePassword = props.keyStorePassword
+    private val avtalePdfPath = props.avtalePdfPath
 
     private fun configure(): KeyStoreConfig {
         var keyStoreConfig: KeyStoreConfig
@@ -69,6 +70,6 @@ class DigipostClient(props: Configuration.DigipostProperties) {
     }
 
     private fun getAvtalePdf(): ByteArray? {
-        TODO("Not yet implemented")
+        return this::class.java.getResourceAsStream(avtalePdfPath)?.readAllBytes()
     }
 }

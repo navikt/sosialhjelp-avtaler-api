@@ -13,6 +13,7 @@ object Versions {
     const val hikari_version = "5.0.1"
     const val postgresql_version = "42.5.0"
     const val digipost_signature_api_client = "7.0-RC4"
+    const val google_cloud_libraries = "26.1.3"
 }
 
 plugins {
@@ -77,7 +78,12 @@ dependencies {
     implementation("no.nav.security:token-client-core:${Versions.token_support_version}")
 
     // digipost
-    implementation("no.digipost.signature:signature-api-client-java:7.0-RC4")
+    implementation("no.digipost.signature:signature-api-client-java:${Versions.digipost_signature_api_client}")
+
+    // google cloud secret manager api
+    implementation(platform("com.google.cloud:libraries-bom:${Versions.google_cloud_libraries}"))
+    implementation("com.google.cloud:google-cloud-secretmanager")
+
     // test
     testImplementation("io.ktor:ktor-server-tests-jvm:${Versions.ktor_version}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin_version}")

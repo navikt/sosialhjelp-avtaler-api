@@ -11,18 +11,13 @@ import no.digipost.signature.client.direct.DirectSigner
 import no.digipost.signature.client.direct.ExitUrls
 import no.digipost.signature.client.security.KeyStoreConfig
 import no.nav.sosialhjelp.avtaler.Configuration
+import no.nav.sosialhjelp.avtaler.avtaler.Avtale
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.util.Arrays
 import java.util.Collections
 
 class DigipostClient(props: Configuration.DigipostProperties) {
-    val exitUrls = ExitUrls.of(
-        URI.create(props.onCompletionUrl),
-        URI.create("http://sender.org/onRejection"),
-        URI.create("http://sender.org/onError")
-    )
     private val keyStoreConfig: KeyStoreConfig = configure()
     private val clientConfiguration = ClientConfiguration.builder(keyStoreConfig)
         .trustStore(Certificates.TEST)
@@ -33,6 +28,9 @@ class DigipostClient(props: Configuration.DigipostProperties) {
     private val certificatePassword = props.certificatePassword
     private val keyStorePassword = props.keyStorePassword
     private val avtalePdfPath = props.avtalePdfPath
+    private val onCompletionUrl = props.onCompletionUrl
+    private val onErrorUrl = props.onErrorUrl
+    private val onRejectionUrl = props.onRejectionUrl
 
     private fun configure(): KeyStoreConfig {
         var keyStoreConfig: KeyStoreConfig
@@ -47,12 +45,18 @@ class DigipostClient(props: Configuration.DigipostProperties) {
         return keyStoreConfig
     }
 
-    fun sendTilSignering(fnr: String) {
+    fun sendTilSignering(fnr: String, avtale: Avtale) {
+        val exitUrls = ExitUrls.of(
+            URI.create(onCompletionUrl + avtale.orgnr),
+            URI.create(onRejectionUrl + avtale.orgnr),
+            URI.create(onErrorUrl + avtale.orgnr)
+        )
+
         val client = DirectClient(clientConfiguration)
 
         val avtalePdf: ByteArray? = getAvtalePdf() // Load document bytes
 
-        val documents: List<DirectDocument> = Arrays.asList(
+        val documents: List<DirectDocument> = listOf(
             DirectDocument.builder("Digisos avtale 1 title", avtalePdf).build()
         )
 

@@ -25,8 +25,9 @@ object Configuration {
             "ALTINN_APIGW_APIKEY" to "dummyverdi",
             "digipost.keyStorePassword" to "KeyStorePassword",
             "digipost.certificatePassword" to "CertificatePassword",
-            "digipost.onCompletionUrl" to "/opprett-avtale/kvittering",
-            "digipost.onErrorUrl" to "/opprett-avtale/feil",
+            "digipost.onCompletionUrl" to "/opprett-avtale/kvittering/",
+            "digipost.onErrorUrl" to "/opprett-avtale/feil/",
+            "digipost.onRejectionUrl" to "/opprett-avtale/feil/",
             "digipost.avtalePdfPath" to "Avtale.pdf"
         )
     )
@@ -114,9 +115,9 @@ object Configuration {
     )
 
     data class DigipostProperties(
-        val onCompletionUrl: String = this["applcation.baseUrl"] + this["digipost.onCompletionUrl"],
-        val onRefectionUrl: String = this["digipost.onRefectionUrl"],
-        val onErrorUrl: String = this["digipost.onErrorUrl"],
+        val onCompletionUrl: String = this["application.baseUrl"] + this["digipost.onCompletionUrl"],
+        val onRejectionUrl: String = this["application.baseUrl"] + this["digipost.onRefectionUrl"],
+        val onErrorUrl: String = this["application.baseUrl"] + this["digipost.onErrorUrl"],
         val keyStorePassword: String = this["digipost.keyStorePassword"],
         val certificatePath: String = this["/path/to/javakeystore.jks"],
         val certificatePassword: String = this["digipost.certificatePassword"],

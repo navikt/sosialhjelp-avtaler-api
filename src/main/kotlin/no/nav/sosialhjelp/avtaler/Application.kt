@@ -66,7 +66,7 @@ fun Application.setupRoutes() {
 
     val defaultHttpClient = getDefaultHttpClient()
 
-    val tokenExchangeClient = Oauth2Client(defaultHttpClient, authProperties)
+    val tokenExchangeClient = Oauth2Client(defaultHttpClient, authProperties, Configuration.tokenXProperties)
     val altinnService = AltinnService(AltinnClient(Configuration.altinnProperties, tokenExchangeClient))
     val avtaleService = AvtaleService(altinnService, databaseContext)
 

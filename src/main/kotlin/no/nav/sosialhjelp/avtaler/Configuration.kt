@@ -76,7 +76,8 @@ object Configuration {
         val clientId: String = this["TOKEN_X_CLIENT_ID"],
         val wellKnownUrl: String = this["TOKEN_X_WELL_KNOWN_URL"],
         val userclaim: String = this["userclaim"],
-        val privateJwk: String = this["TOKEN_X_PRIVATE_JWK"]
+        val privateJwk: String = this["TOKEN_X_PRIVATE_JWK"],
+        val tokenXTokenEndpoint: String = this["TOKEN_X_TOKEN_ENDPOINT"],
     )
 
     enum class Profile {
@@ -93,7 +94,6 @@ object Configuration {
         val apiKey: String = this["ALTINN_APIKEY"],
         val apiGWKey: String = this["ALTINN_APIGW_APIKEY"],
         val altinnRettigheterAudience: String = this["altinn.altinnRettigheterAudience"],
-        val tokenXTokenEndpoint: String = this["TOKEN_X_TOKEN_ENDPOINT"],
     )
 
     data class DatabaseProperties(

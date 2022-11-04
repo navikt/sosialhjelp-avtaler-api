@@ -41,11 +41,10 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
     }
     private val baseUrl = props.baseUrl
     private val altinnRettigheterAudience = props.altinnRettigheterAudience
-    private val tokenXEndpointUrl = props.tokenXTokenEndpoint
 
     suspend fun hentAvgivere(fnr: String, tjeneste: Avgiver.Tjeneste, token: String?): List<Avgiver> {
         token?.let {
-            val scopedAccessToken = tokenClient.exchangeToken(token, tokenXEndpointUrl, altinnRettigheterAudience).accessToken
+            val scopedAccessToken = tokenClient.exchangeToken(token, altinnRettigheterAudience).accessToken
 
             val response = client.get("$baseUrl/api/serviceowner/reportees") {
                 url {

@@ -45,6 +45,10 @@ spec:
         - application: "{{this}}"
      {{/each}}
     outbound:
+      external:
+      {{#each outboundExternalHosts}}
+        - host: "{{this}}"
+      {{/each}}
       rules:
       {{#each outboundRulesApplications}}
         - application: "{{this}}"

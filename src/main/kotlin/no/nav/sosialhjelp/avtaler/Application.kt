@@ -64,7 +64,7 @@ fun Application.setupRoutes() {
         .clientAuthMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
         .build()
 
-    val defaultHttpClient = getDefaultHttpClient()
+    val defaultHttpClient = defaultHttpClient()
 
     val tokenExchangeClient = Oauth2Client(defaultHttpClient, authProperties, Configuration.tokenXProperties)
     val altinnService = AltinnService(AltinnClient(Configuration.altinnProperties, tokenExchangeClient))

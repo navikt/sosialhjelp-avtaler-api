@@ -1,44 +1,31 @@
 package no.nav.sosialhjelp.avtaler.altinn
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.DeserializationFeature
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
-import io.ktor.client.request.accept
 import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.request.headers
 import io.ktor.client.statement.request
-import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.contentType
-import io.ktor.serialization.jackson.jackson
 import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.auth.Oauth2Client
+import no.nav.sosialhjelp.avtaler.jsonHeaders
+import no.nav.sosialhjelp.avtaler.defaultHttpClient
 
 private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
 class AltinnClient(props: Configuration.AltinnProperties, private val tokenClient: Oauth2Client) {
 
-    private val client: HttpClient = HttpClient(CIO) {
-        install(ContentNegotiation) {
-            jackson {
-                disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+    private val client: HttpClient = defaultHttpClient()
+        .config {
+            defaultRequest {
+                jsonHeaders()
             }
         }
-        defaultRequest {
-            headers {
-                accept(ContentType.Application.Json)
-                contentType(ContentType.Application.Json)
-            }
-        }
-    }
     private val baseUrl = props.baseUrl
     private val altinnRettigheterAudience = props.altinnRettigheterAudience
 

@@ -22,6 +22,8 @@ object Configuration {
             "altinn.altinnRettigheterAudience" to "",
             "ALTINN_APIKEY" to "dummyverdi",
             "ALTINN_APIGW_APIKEY" to "dummyverdi",
+            "pdl.url" to "",
+            "pdl.audience" to ""
         )
     )
 
@@ -44,6 +46,8 @@ object Configuration {
             "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.dev.nav.no/altinn-rettigheter-proxy/ekstern/altinn",
             "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api-dev",
             "altinn.altinnRettigheterAudience" to "dev-gcp:arbeidsgiver:altinn-rettigheter-proxy",
+            "pdl.url" to "https://pdl-api.dev-fss-pub.nais.io/graphql",
+            "pdl.audience" to "dev-fss:pdl:pdl-api"
         )
     )
 
@@ -94,6 +98,11 @@ object Configuration {
         val apiKey: String = this["ALTINN_APIKEY"],
         val apiGWKey: String = this["ALTINN_APIGW_APIKEY"],
         val altinnRettigheterAudience: String = this["altinn.altinnRettigheterAudience"],
+    )
+
+    data class PdlProperties(
+        val baseUrl: String = this["pdl.url"],
+        val pdlAudience: String = this["pdl.audience"]
     )
 
     data class DatabaseProperties(

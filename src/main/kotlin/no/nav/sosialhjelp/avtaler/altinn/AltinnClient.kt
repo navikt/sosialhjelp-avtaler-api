@@ -3,7 +3,6 @@ package no.nav.sosialhjelp.avtaler.altinn
 import com.fasterxml.jackson.annotation.JsonProperty
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.statement.request
@@ -12,20 +11,14 @@ import io.ktor.http.HttpStatusCode
 import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.auth.Oauth2Client
-import no.nav.sosialhjelp.avtaler.jsonHeaders
-import no.nav.sosialhjelp.avtaler.defaultHttpClient
+import no.nav.sosialhjelp.avtaler.defaultHttpClientWithJsonHeaders
 
 private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
 class AltinnClient(props: Configuration.AltinnProperties, private val tokenClient: Oauth2Client) {
 
-    private val client: HttpClient = defaultHttpClient()
-        .config {
-            defaultRequest {
-                jsonHeaders()
-            }
-        }
+    private val client: HttpClient = defaultHttpClientWithJsonHeaders()
     private val baseUrl = props.baseUrl
     private val altinnRettigheterAudience = props.altinnRettigheterAudience
 

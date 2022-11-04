@@ -9,6 +9,7 @@ import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.accept
 import io.ktor.client.request.headers
 import io.ktor.http.ContentType
@@ -43,6 +44,15 @@ fun defaultHttpClient(): HttpClient {
             }
         }
     }
+}
+
+fun defaultHttpClientWithJsonHeaders(): HttpClient {
+    return defaultHttpClient()
+        .config {
+            defaultRequest {
+                jsonHeaders()
+            }
+        }
 }
 
 fun DefaultRequest.DefaultRequestBuilder.jsonHeaders() {

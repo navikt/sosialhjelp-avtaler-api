@@ -14,7 +14,6 @@ import io.ktor.client.request.accept
 import io.ktor.client.request.headers
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-
 import io.ktor.serialization.jackson.jackson
 
 object HttpClientConfig {

@@ -72,6 +72,7 @@ object Configuration {
 
     val tokenXProperties = TokenXProperties()
     val altinnProperties = AltinnProperties()
+    val pdlProperties = PdlProperties()
     val dbProperties = DatabaseProperties()
 
     operator fun get(key: String): String = config[Key(key, stringType)]
@@ -101,7 +102,7 @@ object Configuration {
     )
 
     data class PdlProperties(
-        val baseUrl: String = this["pdl.url"],
+        val pdlUrl: String = this["pdl.url"],
         val pdlAudience: String = this["pdl.audience"]
     )
 

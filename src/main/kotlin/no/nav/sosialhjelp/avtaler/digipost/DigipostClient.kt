@@ -1,5 +1,6 @@
 package no.nav.sosialhjelp.avtaler.digipost
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import no.digipost.signature.client.Certificates
 import no.digipost.signature.client.ClientConfiguration
 import no.digipost.signature.client.ServiceUri
@@ -12,13 +13,15 @@ import no.digipost.signature.client.direct.ExitUrls
 import no.digipost.signature.client.security.KeyStoreConfig
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
+import no.nav.sosialhjelp.avtaler.secretmanager.AccessSecretVersion
+import no.nav.sosialhjelp.avtaler.secretmanager.DigisosKeyStoreCredentials
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.Collections
 
-class DigipostClient(props: Configuration.DigipostProperties) {
-    private val keyStoreConfig: KeyStoreConfig = configure()
+class DigipostClient(props: Configuration.DigipostProperties, accessSecretVersion: AccessSecretVersion) {
+    private val keyStoreConfig: KeyStoreConfig = configure(accessSecretVersion)
     private val clientConfiguration = ClientConfiguration.builder(keyStoreConfig)
         .trustStore(Certificates.TEST)
         .serviceUri(ServiceUri.DIFI_TEST)
@@ -32,8 +35,10 @@ class DigipostClient(props: Configuration.DigipostProperties) {
     private val onErrorUrl = props.onErrorUrl
     private val onRejectionUrl = props.onRejectionUrl
 
-    private fun configure(): KeyStoreConfig {
-
+    private fun configure(accessSecretVersion: AccessSecretVersion): KeyStoreConfig {
+        val secret = accessSecretVersion.accessSecretVersion()
+        val objectMapper = ObjectMapper()
+        val keystoreCredentials: DigisosKeyStoreCredentials = objectMapper.readValue(secret)
         var keyStoreConfig: KeyStoreConfig
         Files.newInputStream(Paths.get(certificatePath)).use { certificateStream ->
             keyStoreConfig = KeyStoreConfig.fromJavaKeyStore(

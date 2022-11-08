@@ -23,6 +23,8 @@ import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
 import no.nav.sosialhjelp.avtaler.db.DefaultDatabaseContext
 import no.nav.sosialhjelp.avtaler.internal.internalRoutes
 import no.nav.sosialhjelp.avtaler.kommune.kommuneApi
+import no.nav.sosialhjelp.avtaler.pdl.PdlClient
+import no.nav.sosialhjelp.avtaler.pdl.PersonNavnService
 import java.util.TimeZone
 
 private val log = KotlinLogging.logger {}
@@ -64,11 +66,12 @@ fun Application.setupRoutes() {
         .clientAuthMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
         .build()
 
-    val defaultHttpClient = getDefaultHttpClient()
+    val defaultHttpClient = defaultHttpClient()
 
-    val tokenExchangeClient = Oauth2Client(defaultHttpClient, authProperties)
+    val tokenExchangeClient = Oauth2Client(defaultHttpClient, authProperties, Configuration.tokenXProperties)
     val altinnService = AltinnService(AltinnClient(Configuration.altinnProperties, tokenExchangeClient))
     val avtaleService = AvtaleService(altinnService, databaseContext)
+    val personNavnService = PersonNavnService(PdlClient(Configuration.pdlProperties, tokenExchangeClient))
 
     routing {
 

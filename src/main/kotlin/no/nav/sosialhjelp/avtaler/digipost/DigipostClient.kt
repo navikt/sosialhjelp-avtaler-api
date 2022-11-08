@@ -44,9 +44,9 @@ class DigipostClient(props: Configuration.DigipostProperties, accessSecretVersio
         Files.newInputStream(Paths.get(certificatePath)).use { certificateStream ->
             keyStoreConfig = KeyStoreConfig.fromJavaKeyStore(
                 certificateStream,
-                "OrganizationCertificateAlias",
-                keyStorePassword,
-                certificatePassword
+                keystoreCredentials.alias,
+                keystoreCredentials.password,
+                keystoreCredentials.password
             )
         }
         return keyStoreConfig

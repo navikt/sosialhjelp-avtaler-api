@@ -1,6 +1,7 @@
 package no.nav.sosialhjelp.avtaler.digipost
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import no.digipost.signature.client.Certificates
 import no.digipost.signature.client.ClientConfiguration
 import no.digipost.signature.client.ServiceUri
@@ -36,9 +37,9 @@ class DigipostClient(props: Configuration.DigipostProperties, accessSecretVersio
     private val onRejectionUrl = props.onRejectionUrl
 
     private fun configure(accessSecretVersion: AccessSecretVersion): KeyStoreConfig {
-        val secret = accessSecretVersion.accessSecretVersion()
-        val objectMapper = ObjectMapper()
-        val keystoreCredentials: DigisosKeyStoreCredentials = objectMapper.readValue(secret)
+        val secret = accessSecretVersion.accessSecretVersion()?.data?.toStringUtf8()
+        val objectMapper = ObjectMapper().registerKotlinModule()
+        val keystoreCredentials: DigisosKeyStoreCredentials = objectMapper.readValue(secret, DigisosKeyStoreCredentials::class.java)
         var keyStoreConfig: KeyStoreConfig
         Files.newInputStream(Paths.get(certificatePath)).use { certificateStream ->
             keyStoreConfig = KeyStoreConfig.fromJavaKeyStore(

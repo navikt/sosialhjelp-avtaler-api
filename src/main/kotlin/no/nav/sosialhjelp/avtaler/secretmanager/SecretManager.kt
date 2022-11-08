@@ -1,7 +1,7 @@
 package no.nav.sosialhjelp.avtaler.secretmanager
 
-import com.google.cloud.secretmanager.v1.AccessSecretVersionResponse
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient
+import com.google.cloud.secretmanager.v1.SecretPayload
 import com.google.cloud.secretmanager.v1.SecretVersionName
 import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.Configuration
@@ -17,14 +17,14 @@ class AccessSecretVersion(props: Configuration.Virksomhetssertifikat) {
     private val versionId = props.versjonId
 
     @Throws(IOException::class)
-    fun accessSecretVersion(): AccessSecretVersionResponse? {
+    fun accessSecretVersion(): SecretPayload? {
         return accessSecretVersion(projectId, secretId, versionId)
     }
 
     // Access the payload for the given secret version if one exists. The version
     // can be a version number as a string (e.g. "5") or an alias (e.g. "latest").
     @Throws(IOException::class)
-    fun accessSecretVersion(projectId: String?, secretId: String?, versionId: String?): AccessSecretVersionResponse? {
+    fun accessSecretVersion(projectId: String?, secretId: String?, versionId: String?): SecretPayload? {
         // Initialize client that will be used to send requests. This client only needs to be created
         // once, and can be reused for multiple requests. After completing all of your requests, call
         // the "close" method on the client to safely clean up any remaining background resources.
@@ -47,7 +47,7 @@ class AccessSecretVersion(props: Configuration.Virksomhetssertifikat) {
                 throw IOException("Data corruption detected.")
             }
 
-            return response
+            return response.payload
         }
     }
 }

@@ -33,6 +33,7 @@ class DigipostClient(props: Configuration.DigipostProperties) {
     private val onRejectionUrl = props.onRejectionUrl
 
     private fun configure(): KeyStoreConfig {
+
         var keyStoreConfig: KeyStoreConfig
         Files.newInputStream(Paths.get(certificatePath)).use { certificateStream ->
             keyStoreConfig = KeyStoreConfig.fromJavaKeyStore(

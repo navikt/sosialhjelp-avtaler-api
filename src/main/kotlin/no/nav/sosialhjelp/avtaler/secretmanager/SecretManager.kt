@@ -3,19 +3,20 @@ package no.nav.sosialhjelp.avtaler.secretmanager
 import com.google.cloud.secretmanager.v1.SecretManagerServiceClient
 import com.google.cloud.secretmanager.v1.SecretVersionName
 import mu.KotlinLogging
+import no.nav.sosialhjelp.avtaler.Configuration
 import java.io.IOException
 import java.util.zip.CRC32C
 import java.util.zip.Checksum
 
 private val log = KotlinLogging.logger {}
 
-object AccessSecretVersion {
+class AccessSecretVersion(props: Configuration.Virksomhetssertifikat) {
+    private val projectId = props.projectId
+    private val secretId = props.secretId
+    private val versionId = props.versjonId
+
     @Throws(IOException::class)
     fun accessSecretVersion() {
-        // TODO(developer): Replace these variables before running the sample.
-        val projectId = "your-project-id"
-        val secretId = "your-secret-id"
-        val versionId = "your-version-id"
         accessSecretVersion(projectId, secretId, versionId)
     }
 

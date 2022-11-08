@@ -53,6 +53,12 @@ object Configuration {
             "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.dev.nav.no/altinn-rettigheter-proxy/ekstern/altinn",
             "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api-dev",
             "altinn.altinnRettigheterAudience" to "dev-gcp:arbeidsgiver:altinn-rettigheter-proxy",
+            "virksomhetssertifikat.projectId" to "virksomhetssertifikat-dev",
+            "virksomhetssertifikat.secretId" to "test-virksomhetssertifikat-felles-keystore-jceks_2018-2021",
+            "virksomhetssertifikat.versionId" to "3",
+            "virksomhetssertifikat.passordProsjektId" to "virksomhetssertifikat-dev",
+            "virksomhetssertifikat.passordHemmelighetNavn" to "test-keystore-credentials-json",
+            "virksomhetssertifikat.passordHemmelighetVersjon" to "1"
         )
     )
 
@@ -122,5 +128,11 @@ object Configuration {
         val certificatePath: String = this["/path/to/javakeystore.jks"],
         val certificatePassword: String = this["digipost.certificatePassword"],
         val avtalePdfPath: String = this["digipost.avtalePdfPath"]
+    )
+
+    data class Virksomhetssertifikat(
+        val projectId: String = this["virksomhetssertifikat.projectId"],
+        val secretId: String = this["virksomhetssertifikat.secretId"],
+        val versjonId: String = this["virksomhetssertifikat.versjonId"]
     )
 }

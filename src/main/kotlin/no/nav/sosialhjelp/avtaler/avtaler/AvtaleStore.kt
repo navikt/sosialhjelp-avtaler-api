@@ -22,7 +22,8 @@ interface AvtaleStore : Store {
 data class Avtale(
     val orgnr: String,
     val avtaleversjon: String? = null,
-    val opprettet: LocalDateTime = LocalDateTime.now()
+    val opprettet: LocalDateTime = LocalDateTime.now(),
+    val navn_innsender: String? = null
 )
 
 class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleStore,
@@ -54,12 +55,14 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
     }
 
     override fun lagreAvtale(avtale: Avtale): Avtale = session {
+
         @Language("PostgreSQL")
         val sql = """
             INSERT INTO avtale_v1 (orgnr,
                                    avtaleversjon,
-                                   opprettet)
-            VALUES (:orgnr, :avtaleversjon, :opprettet)
+                                   opprettet,
+                                   navn_innsender)
+            VALUES (:orgnr, :avtaleversjon, :opprettet, :navn_innsender)
             ON CONFLICT DO NOTHING
         """.trimIndent()
         it.update(
@@ -68,6 +71,7 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
                 "orgnr" to avtale.orgnr,
                 "avtaleversjon" to avtale.avtaleversjon,
                 "opprettet" to avtale.opprettet,
+                "navn_innsender" to avtale.navn_innsender
             )
         ).validate()
         avtale

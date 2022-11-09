@@ -55,7 +55,7 @@ class AvtaleService(
             ctx.avtaleStore.lagreAvtale(
                 Avtale(
                     orgnr = avtaleRequest.orgnr,
-                    avtaleversjon = null,
+                    avtaleversjon = "1.0",
                     navn_innsender = navnInnsender
                 )
             )

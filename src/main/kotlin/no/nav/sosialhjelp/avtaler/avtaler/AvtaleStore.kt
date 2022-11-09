@@ -22,8 +22,8 @@ interface AvtaleStore : Store {
 data class Avtale(
     val orgnr: String,
     val avtaleversjon: String? = null,
-    val opprettet: LocalDateTime = LocalDateTime.now(),
-    val navn_innsender: String? = null
+    val navn_innsender: String,
+    val opprettet: LocalDateTime = LocalDateTime.now()
 )
 
 class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleStore,
@@ -60,9 +60,10 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
         val sql = """
             INSERT INTO avtale_v1 (orgnr,
                                    avtaleversjon,
-                                   opprettet,
-                                   navn_innsender)
-            VALUES (:orgnr, :avtaleversjon, :opprettet, :navn_innsender)
+                                   navn_innsender,
+                                   opprettet
+                                   )
+            VALUES (:orgnr, :avtaleversjon, :navn_innsender, :opprettet)
             ON CONFLICT DO NOTHING
         """.trimIndent()
         it.update(
@@ -70,8 +71,8 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
             mapOf(
                 "orgnr" to avtale.orgnr,
                 "avtaleversjon" to avtale.avtaleversjon,
-                "opprettet" to avtale.opprettet,
-                "navn_innsender" to avtale.navn_innsender
+                "navn_innsender" to avtale.navn_innsender,
+                "opprettet" to avtale.opprettet
             )
         ).validate()
         avtale
@@ -80,6 +81,7 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
     private fun mapper(row: Row): Avtale = Avtale(
         orgnr = row.string("orgnr"),
         avtaleversjon = row.stringOrNull("avtaleversjon"),
+        navn_innsender = row.string("navn_innsender"),
         opprettet = row.localDateTime("opprettet"),
     )
 }

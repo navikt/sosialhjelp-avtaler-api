@@ -13,6 +13,9 @@
     "api.difitest.signering.posten.no"
   ],
   "inboundRulesApplications": ["sosialhjelp-avtaler-dev"],
+  "outboundExternalHosts": [
+    "pdl-api.dev-fss-pub.nais.io"
+  ],
   "env": {
     "SPRING_PROFILES_ACTIVE": "log-kibana,log-audit",
     "UNLEASH_API_URL": "https://unleash.nais.io/api",

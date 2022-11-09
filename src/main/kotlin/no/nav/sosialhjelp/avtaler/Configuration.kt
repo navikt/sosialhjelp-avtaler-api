@@ -28,7 +28,9 @@ object Configuration {
             "digipost.onCompletionUrl" to "/opprett-avtale/kvittering/",
             "digipost.onErrorUrl" to "/opprett-avtale/feil/",
             "digipost.onRejectionUrl" to "/opprett-avtale/feil/",
-            "digipost.avtalePdfPath" to "Avtale.pdf"
+            "digipost.avtalePdfPath" to "Avtale.pdf",
+            "pdl.url" to "",
+            "pdl.audience" to ""
         )
     )
 
@@ -58,7 +60,9 @@ object Configuration {
             "virksomhetssertifikat.versionId" to "3",
             "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-dev",
             "virksomhetssertifikat.passwordSecretId" to "test-keystore-credentials-json",
-            "virksomhetssertifikat.passwordSecretVersion" to "1"
+            "virksomhetssertifikat.passwordSecretVersion" to "1",
+            "pdl.url" to "https://pdl-api.dev-fss-pub.nais.io/graphql",
+            "pdl.audience" to "dev-fss:pdl:pdl-api"
         )
     )
 
@@ -84,6 +88,7 @@ object Configuration {
 
     val tokenXProperties = TokenXProperties()
     val altinnProperties = AltinnProperties()
+    val pdlProperties = PdlProperties()
     val dbProperties = DatabaseProperties()
 
     operator fun get(key: String): String = config[Key(key, stringType)]
@@ -92,7 +97,8 @@ object Configuration {
         val clientId: String = this["TOKEN_X_CLIENT_ID"],
         val wellKnownUrl: String = this["TOKEN_X_WELL_KNOWN_URL"],
         val userclaim: String = this["userclaim"],
-        val privateJwk: String = this["TOKEN_X_PRIVATE_JWK"]
+        val privateJwk: String = this["TOKEN_X_PRIVATE_JWK"],
+        val tokenXTokenEndpoint: String = this["TOKEN_X_TOKEN_ENDPOINT"],
     )
 
     enum class Profile {
@@ -109,7 +115,11 @@ object Configuration {
         val apiKey: String = this["ALTINN_APIKEY"],
         val apiGWKey: String = this["ALTINN_APIGW_APIKEY"],
         val altinnRettigheterAudience: String = this["altinn.altinnRettigheterAudience"],
-        val tokenXTokenEndpoint: String = this["TOKEN_X_TOKEN_ENDPOINT"],
+    )
+
+    data class PdlProperties(
+        val pdlUrl: String = this["pdl.url"],
+        val pdlAudience: String = this["pdl.audience"]
     )
 
     data class DatabaseProperties(

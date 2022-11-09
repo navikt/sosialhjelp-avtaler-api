@@ -4,33 +4,32 @@ import com.google.cloud.secretmanager.v1.SecretManagerServiceClient
 import com.google.cloud.secretmanager.v1.SecretPayload
 import com.google.cloud.secretmanager.v1.SecretVersionName
 import mu.KotlinLogging
-import no.nav.sosialhjelp.avtaler.Configuration
 import java.io.IOException
 import java.util.zip.CRC32C
 import java.util.zip.Checksum
 
 private val log = KotlinLogging.logger {}
 
-class AccessSecretVersion(props: Configuration.Virksomhetssertifikat) {
-    private val projectId = props.projectId
-    private val secretId = props.secretId
-    private val versionId = props.versjonId
+object AccessSecretVersion {
+    // private val passwordProjectId = props.passwordProjectId
+    // private val passwordSecretId = props.passwordSecretId
+    // private val passwordVersionId = props.passwordSecretVersionId
 
-    @Throws(IOException::class)
+    /*@Throws(IOException::class)
     fun accessSecretVersion(): SecretPayload? {
-        return accessSecretVersion(projectId, secretId, versionId)
-    }
+        return accessSecretVersion(passwordProjectId, passwordSecretId, passwordVersionId)
+    }*/
 
     // Access the payload for the given secret version if one exists. The version
     // can be a version number as a string (e.g. "5") or an alias (e.g. "latest").
     @Throws(IOException::class)
-    fun accessSecretVersion(projectId: String?, secretId: String?, versionId: String?): SecretPayload? {
+    fun accessSecretVersion(passwordProjectId: String?, passwordSecretId: String?, passwordVersionId: String?): SecretPayload? {
         // Initialize client that will be used to send requests. This client only needs to be created
         // once, and can be reused for multiple requests. After completing all of your requests, call
         // the "close" method on the client to safely clean up any remaining background resources.
         SecretManagerServiceClient.create().use { client ->
             val secretVersionName =
-                SecretVersionName.of(projectId, secretId, versionId)
+                SecretVersionName.of(passwordProjectId, passwordSecretId, passwordVersionId)
 
             // Access the secret version.
             val response =

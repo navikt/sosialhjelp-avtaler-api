@@ -56,9 +56,9 @@ object Configuration {
             "virksomhetssertifikat.projectId" to "virksomhetssertifikat-dev",
             "virksomhetssertifikat.secretId" to "test-virksomhetssertifikat-felles-keystore-jceks_2018-2021",
             "virksomhetssertifikat.versionId" to "3",
-            "virksomhetssertifikat.passordProsjektId" to "virksomhetssertifikat-dev",
-            "virksomhetssertifikat.passordHemmelighetNavn" to "test-keystore-credentials-json",
-            "virksomhetssertifikat.passordHemmelighetVersjon" to "1"
+            "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-dev",
+            "virksomhetssertifikat.passwordSecretId" to "test-keystore-credentials-json",
+            "virksomhetssertifikat.passwordSecretVersion" to "1"
         )
     )
 
@@ -124,15 +124,15 @@ object Configuration {
         val onCompletionUrl: String = this["application.baseUrl"] + this["digipost.onCompletionUrl"],
         val onRejectionUrl: String = this["application.baseUrl"] + this["digipost.onRefectionUrl"],
         val onErrorUrl: String = this["application.baseUrl"] + this["digipost.onErrorUrl"],
-        val keyStorePassword: String = this["digipost.keyStorePassword"],
-        val certificatePath: String = this["/path/to/javakeystore.jks"],
-        val certificatePassword: String = this["digipost.certificatePassword"],
         val avtalePdfPath: String = this["digipost.avtalePdfPath"]
     )
 
     data class Virksomhetssertifikat(
         val projectId: String = this["virksomhetssertifikat.projectId"],
         val secretId: String = this["virksomhetssertifikat.secretId"],
-        val versjonId: String = this["virksomhetssertifikat.versjonId"]
+        val versionId: String = this["virksomhetssertifikat.versionId"],
+        val passwordProjectId: String = this["virksomhetssertifikat.passwordProjectId"],
+        val passwordSecretId: String = this["virksomhetssertifikat.passwordSecretId"],
+        val passwordSecretVersionId: String = this["virksomhetssertifikat.passwordSecretVersion"]
     )
 }

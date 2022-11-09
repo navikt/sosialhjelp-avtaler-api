@@ -16,40 +16,43 @@ import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
 import no.nav.sosialhjelp.avtaler.secretmanager.AccessSecretVersion
 import no.nav.sosialhjelp.avtaler.secretmanager.DigisosKeyStoreCredentials
+import java.io.ByteArrayInputStream
 import java.net.URI
-import java.nio.file.Files
-import java.nio.file.Paths
 import java.util.Collections
 
-class DigipostClient(props: Configuration.DigipostProperties, accessSecretVersion: AccessSecretVersion) {
+class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: Configuration.Virksomhetssertifikat) {
+    private val accessSecretVersion: AccessSecretVersion = AccessSecretVersion
     private val keyStoreConfig: KeyStoreConfig = configure(accessSecretVersion)
     private val clientConfiguration = ClientConfiguration.builder(keyStoreConfig)
         .trustStore(Certificates.TEST)
         .serviceUri(ServiceUri.DIFI_TEST)
         .globalSender(Sender("123456789"))
         .build()
-    private val certificatePath = props.certificatePath
-    private val certificatePassword = props.certificatePassword
-    private val keyStorePassword = props.keyStorePassword
     private val avtalePdfPath = props.avtalePdfPath
     private val onCompletionUrl = props.onCompletionUrl
     private val onErrorUrl = props.onErrorUrl
     private val onRejectionUrl = props.onRejectionUrl
+    private val virksomhetPasswordProjectId = virksomhetProps.passwordProjectId
+    private val virksomhetPasswordSecretId = virksomhetProps.passwordSecretId
+    private val virksomhetPasswordVersionId = virksomhetProps.passwordSecretVersionId
+    private val virksomhetProjectId = virksomhetProps.projectId
+    private val virksomhetSecretId = virksomhetProps.secretId
+    private val virksomhetVersionId = virksomhetProps.versionId
 
     private fun configure(accessSecretVersion: AccessSecretVersion): KeyStoreConfig {
-        val secret = accessSecretVersion.accessSecretVersion()?.data?.toStringUtf8()
+        val certificatePassword = accessSecretVersion.accessSecretVersion(virksomhetPasswordProjectId, virksomhetPasswordSecretId, virksomhetPasswordVersionId)?.data?.toStringUtf8()
         val objectMapper = ObjectMapper().registerKotlinModule()
-        val keystoreCredentials: DigisosKeyStoreCredentials = objectMapper.readValue(secret, DigisosKeyStoreCredentials::class.java)
-        var keyStoreConfig: KeyStoreConfig
-        Files.newInputStream(Paths.get(certificatePath)).use { certificateStream ->
-            keyStoreConfig = KeyStoreConfig.fromJavaKeyStore(
-                certificateStream,
-                keystoreCredentials.alias,
-                keystoreCredentials.password,
-                keystoreCredentials.password
-            )
-        }
-        return keyStoreConfig
+        val keystoreCredentials: DigisosKeyStoreCredentials = objectMapper.readValue(certificatePassword, DigisosKeyStoreCredentials::class.java)
+
+        val secretPayload = accessSecretVersion.accessSecretVersion(virksomhetProjectId, virksomhetSecretId, virksomhetVersionId)
+        val inputStream = ByteArrayInputStream(secretPayload!!.data.toByteArray())
+
+        return KeyStoreConfig.fromJavaKeyStore(
+            inputStream,
+            keystoreCredentials.alias,
+            keystoreCredentials.password,
+            keystoreCredentials.password
+        )
     }
 
     fun sendTilSignering(fnr: String, avtale: Avtale) {

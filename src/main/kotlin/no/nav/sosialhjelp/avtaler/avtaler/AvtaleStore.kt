@@ -32,7 +32,7 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
     override fun hentAvtaleForOrganisasjon(orgnr: String): Avtale? = session {
         @Language("PostgreSQL")
         val sql = """
-            SELECT orgnr, avtaleversjon, opprettet
+            SELECT orgnr, avtaleversjon, navn_innsender, opprettet
             FROM avtale_v1
             WHERE orgnr = :orgnr
         """.trimIndent()
@@ -45,7 +45,7 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
         } else {
             @Language("PostgreSQL")
             var sql = """
-            SELECT orgnr, avtaleversjon, opprettet
+            SELECT orgnr, avtaleversjon, navn_innsender, opprettet
             FROM avtale_v1
             WHERE orgnr in (?)
             """.trimIndent()

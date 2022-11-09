@@ -49,7 +49,7 @@ class AvtaleService(
     }[orgnr]
 
     suspend fun opprettAvtale(avtaleRequest: AvtaleRequest, navnInnsender: String): Avtale {
-        log.info("Oppretter avtale for ${avtaleRequest.orgnr}, signert av: $navnInnsender")
+        log.info("Oppretter avtale for ${avtaleRequest.orgnr}")
 
         val avtale = transaction(databaseContext) { ctx ->
             ctx.avtaleStore.lagreAvtale(
@@ -59,6 +59,14 @@ class AvtaleService(
                     navn_innsender = navnInnsender
                 )
             )
+        }
+
+        val verifisiertAvtale = transaction(databaseContext) { ctx ->
+            ctx.avtaleStore.hentAvtaleForOrganisasjon(avtaleRequest.orgnr)
+        }
+
+        sikkerLog.info {
+            "Lagret avtale: $verifisiertAvtale"
         }
 
         return avtale

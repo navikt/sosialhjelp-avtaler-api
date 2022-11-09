@@ -2,6 +2,7 @@ package no.nav.sosialhjelp.avtaler.digipost
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import mu.KotlinLogging
 import no.digipost.signature.client.Certificates
 import no.digipost.signature.client.ClientConfiguration
 import no.digipost.signature.client.ServiceUri
@@ -19,6 +20,8 @@ import no.nav.sosialhjelp.avtaler.secretmanager.DigisosKeyStoreCredentials
 import java.io.ByteArrayInputStream
 import java.net.URI
 import java.util.Collections
+
+private val log = KotlinLogging.logger {}
 
 class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: Configuration.Virksomhetssertifikat) {
     private val accessSecretVersion: AccessSecretVersion = AccessSecretVersion
@@ -46,6 +49,8 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
 
         val secretPayload = accessSecretVersion.accessSecretVersion(virksomhetProjectId, virksomhetSecretId, virksomhetVersionId)
         val inputStream = ByteArrayInputStream(secretPayload!!.data.toByteArray())
+
+        log.info("lengde sertifikat: {}", secretPayload.data.size())
 
         return KeyStoreConfig.fromJavaKeyStore(
             inputStream,

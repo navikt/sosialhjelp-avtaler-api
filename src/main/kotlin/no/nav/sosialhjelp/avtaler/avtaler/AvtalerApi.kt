@@ -13,10 +13,14 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.extractFnr
+import no.nav.sosialhjelp.avtaler.pdl.PersonNavnService
 
 data class AvtaleRequest(val orgnr: String)
 
-fun Route.avtaleApi(avtaleService: AvtaleService) {
+fun Route.avtaleApi(
+    avtaleService: AvtaleService,
+    personNavnService: PersonNavnService
+) {
     route("/avtale") {
         get("/{kommunenr}") {
             val kommunenummer = call.kommunenr()
@@ -34,8 +38,12 @@ fun Route.avtaleApi(avtaleService: AvtaleService) {
         }
 
         post {
-            val orgnr = call.receive<AvtaleRequest>()
-            val avtale = avtaleService.opprettAvtale(orgnr)
+            val avtaleRequest = call.receive<AvtaleRequest>()
+            val fnr = call.extractFnr()
+            val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")
+            val navnInnsender = personNavnService.getFulltNavn(fnr, token)
+
+            val avtale = avtaleService.opprettAvtale(avtaleRequest, navnInnsender)
             call.respond(HttpStatusCode.Created, avtale)
         }
     }

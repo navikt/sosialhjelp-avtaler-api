@@ -48,14 +48,15 @@ class AvtaleService(
         it.orgnr
     }[orgnr]
 
-    suspend fun opprettAvtale(avtaleRequest: AvtaleRequest): Avtale {
+    suspend fun opprettAvtale(avtaleRequest: AvtaleRequest, navnInnsender: String): Avtale {
         log.info("Oppretter avtale for ${avtaleRequest.orgnr}")
 
         val avtale = transaction(databaseContext) { ctx ->
             ctx.avtaleStore.lagreAvtale(
                 Avtale(
                     orgnr = avtaleRequest.orgnr,
-                    avtaleversjon = null
+                    avtaleversjon = "1.0",
+                    navn_innsender = navnInnsender
                 )
             )
         }

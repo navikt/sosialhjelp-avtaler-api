@@ -11,6 +11,7 @@ object Configuration {
 
     private val defaultProperties = ConfigurationMap(
         mapOf(
+            "application.baseUrl" to "http://localhost:5000/sosialhjelp/avtaler",
             "userclaim" to "pid",
             "TOKEN_X_CLIENT_ID" to "abc",
             "TOKEN_X_WELL_KNOWN_URL" to "abc",
@@ -22,6 +23,13 @@ object Configuration {
             "altinn.altinnRettigheterAudience" to "",
             "ALTINN_APIKEY" to "dummyverdi",
             "ALTINN_APIGW_APIKEY" to "dummyverdi",
+            "digipost.keyStorePassword" to "KeyStorePassword",
+            "digipost.certificatePassword" to "CertificatePassword",
+            "digipost.onCompletionUrl" to "/opprett-avtale/kvittering/",
+            "digipost.onErrorUrl" to "/opprett-avtale/feil/",
+            "digipost.onRejectionUrl" to "/opprett-avtale/feil/",
+            "digipost.avtalePdfPath" to "Avtale.pdf",
+            "digipost.navOrgnr" to "889640782",
             "pdl.url" to "",
             "pdl.audience" to ""
         )
@@ -41,11 +49,19 @@ object Configuration {
 
     private val devProperties = ConfigurationMap(
         mapOf(
+
+            "application.baseUrl" to "https://digisos.dev.nav.no/sosialhjelp/avtaler",
             "application.profile" to "DEV",
             "application.cluster" to "DEV-GCP",
             "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.dev.nav.no/altinn-rettigheter-proxy/ekstern/altinn",
             "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api-dev",
             "altinn.altinnRettigheterAudience" to "dev-gcp:arbeidsgiver:altinn-rettigheter-proxy",
+            "virksomhetssertifikat.projectId" to "virksomhetssertifikat-dev",
+            "virksomhetssertifikat.secretId" to "test-virksomhetssertifikat-felles-keystore-jceks_2018-2021",
+            "virksomhetssertifikat.versionId" to "3",
+            "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-dev",
+            "virksomhetssertifikat.passwordSecretId" to "test-keystore-credentials-json",
+            "virksomhetssertifikat.passwordSecretVersion" to "1",
             "pdl.url" to "https://pdl-api.dev-fss-pub.nais.io/graphql",
             "pdl.audience" to "dev-fss:pdl:pdl-api"
         )
@@ -69,6 +85,7 @@ object Configuration {
     val local: Boolean = profile == Profile.LOCAL
     val dev: Boolean = profile == Profile.DEV
     val prod: Boolean = profile == Profile.PROD
+    val baseUrl: String = this["application.baseUrl"]
 
     val tokenXProperties = TokenXProperties()
     val altinnProperties = AltinnProperties()
@@ -112,5 +129,22 @@ object Configuration {
         val databasePassword: String = this["POSTGRES_PASSWORD"],
         val databaseHost: String = this["POSTGRES_HOST"],
         val databasePort: String = this["POSTGRES_PORT"],
+    )
+
+    data class DigipostProperties(
+        val onCompletionUrl: String = this["application.baseUrl"] + this["digipost.onCompletionUrl"],
+        val onRejectionUrl: String = this["application.baseUrl"] + this["digipost.onRefectionUrl"],
+        val onErrorUrl: String = this["application.baseUrl"] + this["digipost.onErrorUrl"],
+        val avtalePdfPath: String = this["digipost.avtalePdfPath"],
+        val navOrgnr: String = this["digipost.navOrgnr"]
+    )
+
+    data class Virksomhetssertifikat(
+        val projectId: String = this["virksomhetssertifikat.projectId"],
+        val secretId: String = this["virksomhetssertifikat.secretId"],
+        val versionId: String = this["virksomhetssertifikat.versionId"],
+        val passwordProjectId: String = this["virksomhetssertifikat.passwordProjectId"],
+        val passwordSecretId: String = this["virksomhetssertifikat.passwordSecretId"],
+        val passwordSecretVersionId: String = this["virksomhetssertifikat.passwordSecretVersion"]
     )
 }

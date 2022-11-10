@@ -9,6 +9,9 @@
   "outboundRulesApplications": [
     "sosialhjelp-avtaler-api-redis"
   ],
+  "outboundExternalHosts": [
+    "api.difitest.signering.posten.no"
+  ],
   "inboundRulesApplications": ["sosialhjelp-avtaler-dev"],
   "outboundExternalHosts": [
     "pdl-api.dev-fss-pub.nais.io"

@@ -15,6 +15,7 @@ import no.digipost.signature.client.direct.ExitUrls
 import no.digipost.signature.client.security.KeyStoreConfig
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
+import no.nav.sosialhjelp.avtaler.exceptions.VirsomhetsertifikatException
 import no.nav.sosialhjelp.avtaler.secretmanager.AccessSecretVersion
 import no.nav.sosialhjelp.avtaler.secretmanager.DigisosKeyStoreCredentials
 import java.io.ByteArrayInputStream
@@ -29,7 +30,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
     private val clientConfiguration = ClientConfiguration.builder(keyStoreConfig)
         .trustStore(Certificates.TEST)
         .serviceUri(ServiceUri.DIFI_TEST)
-        .globalSender(Sender("123456789"))
+        .globalSender(Sender(props.navOrgnr))
         .build()
     private val avtalePdfPath = props.avtalePdfPath
     private val onCompletionUrl = props.onCompletionUrl
@@ -48,7 +49,13 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         val keystoreCredentials: DigisosKeyStoreCredentials = objectMapper.readValue(certificatePassword, DigisosKeyStoreCredentials::class.java)
 
         val secretPayload = accessSecretVersion.accessSecretVersion(virksomhetProjectId, virksomhetSecretId, virksomhetVersionId)
-        val inputStream = ByteArrayInputStream(secretPayload!!.data.toByteArray())
+
+        val inputStream = try {
+            ByteArrayInputStream(secretPayload!!.data.toByteArray())
+        } catch (e: Exception) {
+            log.error("Kunne ikke hente virksomhetssertifikat. SecretPayload er null.")
+            throw VirsomhetsertifikatException("Kunne ikke hente virksomhetssertifikat. SecretPayload er null.", e)
+        }
 
         log.info("lengde sertifikat: {}", secretPayload.data.size())
 
@@ -69,7 +76,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
 
         val client = DirectClient(clientConfiguration)
 
-        val avtalePdf: ByteArray? = getAvtalePdf() // Load document bytes
+        val avtalePdf: ByteArray? = getAvtalePdf()
 
         val documents: List<DirectDocument> = listOf(
             DirectDocument.builder("Digisos avtale 1 title", avtalePdf).build()
@@ -86,6 +93,8 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             .build()
 
         val jobResponse = client.create(job)
+
+        val statusQueryToken = jobResponse.singleSigner.redirectUrl.query
     }
 
     private fun getAvtalePdf(): ByteArray? {

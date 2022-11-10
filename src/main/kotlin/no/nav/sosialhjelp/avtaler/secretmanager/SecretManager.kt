@@ -21,8 +21,7 @@ object AccessSecretVersion {
             val secretVersionName =
                 SecretVersionName.of(passwordProjectId, passwordSecretId, passwordVersionId)
 
-            val response =
-                client.accessSecretVersion(secretVersionName)
+            val response = client.accessSecretVersion(secretVersionName)
 
             val data = response.payload.data.toByteArray()
             val checksum: Checksum = CRC32C()

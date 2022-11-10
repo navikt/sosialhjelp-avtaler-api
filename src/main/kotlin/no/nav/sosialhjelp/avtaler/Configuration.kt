@@ -29,6 +29,7 @@ object Configuration {
             "digipost.onErrorUrl" to "/opprett-avtale/feil/",
             "digipost.onRejectionUrl" to "/opprett-avtale/feil/",
             "digipost.avtalePdfPath" to "Avtale.pdf",
+            "digipost.navOrgnr" to "889640782",
             "pdl.url" to "",
             "pdl.audience" to ""
         )
@@ -134,7 +135,8 @@ object Configuration {
         val onCompletionUrl: String = this["application.baseUrl"] + this["digipost.onCompletionUrl"],
         val onRejectionUrl: String = this["application.baseUrl"] + this["digipost.onRefectionUrl"],
         val onErrorUrl: String = this["application.baseUrl"] + this["digipost.onErrorUrl"],
-        val avtalePdfPath: String = this["digipost.avtalePdfPath"]
+        val avtalePdfPath: String = this["digipost.avtalePdfPath"],
+        val navOrgnr: String = this["digipost.navOrgnr"]
     )
 
     data class Virksomhetssertifikat(

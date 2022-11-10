@@ -34,8 +34,9 @@ fun Route.avtaleApi(avtaleService: AvtaleService) {
         }
 
         post {
+            val fnr = call.extractFnr()
             val orgnr = call.receive<AvtaleRequest>()
-            val avtale = avtaleService.opprettAvtale(orgnr)
+            val avtale = avtaleService.opprettAvtale(orgnr, fnr)
             call.respond(HttpStatusCode.Created, avtale)
         }
     }

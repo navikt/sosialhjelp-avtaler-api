@@ -10,8 +10,11 @@ import no.digipost.signature.client.core.Sender
 import no.digipost.signature.client.direct.DirectClient
 import no.digipost.signature.client.direct.DirectDocument
 import no.digipost.signature.client.direct.DirectJob
+import no.digipost.signature.client.direct.DirectJobResponse
+import no.digipost.signature.client.direct.DirectJobStatus
 import no.digipost.signature.client.direct.DirectSigner
 import no.digipost.signature.client.direct.ExitUrls
+import no.digipost.signature.client.direct.StatusReference
 import no.digipost.signature.client.security.KeyStoreConfig
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
@@ -67,7 +70,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         )
     }
 
-    fun sendTilSignering(fnr: String, avtale: Avtale) {
+    fun sendTilSignering(fnr: String, avtale: Avtale): Boolean {
         val exitUrls = ExitUrls.of(
             URI.create(onCompletionUrl + avtale.orgnr),
             URI.create(onRejectionUrl + avtale.orgnr),
@@ -94,7 +97,37 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
 
         val jobResponse = client.create(job)
 
-        val statusQueryToken = jobResponse.singleSigner.redirectUrl.query
+        val statusQueryToken = getStatusQueryToken(jobResponse.singleSigner.redirectUrl.query)
+        if (statusQueryToken == null) {
+            log.error("RedirectUrl inneholdt ikke StatusQueryToken. Kan ikke sjekke signeringsstatus.")
+            return false
+        }
+        return sjekkOgLagreSigneringsstatus(statusQueryToken, jobResponse, client, avtale)
+    }
+
+    private fun sjekkOgLagreSigneringsstatus(
+        statusQueryToken: String,
+        jobResponse: DirectJobResponse,
+        client: DirectClient,
+        avtale: Avtale
+    ): Boolean {
+        val directJobStatusResponse = client
+            .getStatus(
+                StatusReference.of(jobResponse)
+                    .withStatusQueryToken(statusQueryToken)
+            )
+        if (!directJobStatusResponse.status.equals(DirectJobStatus.COMPLETED_SUCCESSFULLY)) {
+            log.info("Kommune med orgnr ${avtale.orgnr} har ikke signert avtale. Status fra DigiPost: ${directJobStatusResponse.status}")
+            return false
+        }
+
+        log.info("Kommune med orgnr ${avtale.orgnr} har signert avtale")
+        // lagre når PR #14 merges
+        return true
+    }
+
+    private fun getStatusQueryToken(query: String?): String? {
+        return query?.split("=")?.get(1)
     }
 
     private fun getAvtalePdf(): ByteArray? {

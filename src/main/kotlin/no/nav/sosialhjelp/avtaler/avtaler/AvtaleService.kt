@@ -5,6 +5,7 @@ import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
+import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
 
 private val log = KotlinLogging.logger { }
@@ -12,6 +13,7 @@ private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
 class AvtaleService(
     private val altinnService: AltinnService,
+    private val digipostService: DigipostService,
     val databaseContext: DatabaseContext,
 ) {
 
@@ -48,18 +50,24 @@ class AvtaleService(
         it.orgnr
     }[orgnr]
 
-    suspend fun opprettAvtale(avtaleRequest: AvtaleRequest): Avtale {
+    suspend fun opprettAvtale(avtaleRequest: AvtaleRequest, fnr: String): Avtale? {
         log.info("Oppretter avtale for ${avtaleRequest.orgnr}")
 
-        val avtale = transaction(databaseContext) { ctx ->
-            ctx.avtaleStore.lagreAvtale(
-                Avtale(
-                    orgnr = avtaleRequest.orgnr,
-                    avtaleversjon = null
-                )
-            )
+        val avtale = Avtale(
+            orgnr = avtaleRequest.orgnr,
+            avtaleversjon = null
+        )
+
+        val harSignertAvtale = digipostService.sendTilSignering(fnr, avtale)
+
+        if (!harSignertAvtale) {
+            return null
         }
 
-        return avtale
+        return transaction(databaseContext) { ctx ->
+            ctx.avtaleStore.lagreAvtale(
+                avtale
+            )
+        }
     }
 }

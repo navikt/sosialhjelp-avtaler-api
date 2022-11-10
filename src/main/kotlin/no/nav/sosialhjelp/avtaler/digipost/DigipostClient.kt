@@ -44,6 +44,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
     private val virksomhetVersionId = virksomhetProps.versionId
 
     private fun configure(accessSecretVersion: AccessSecretVersion): KeyStoreConfig {
+        log.info("virksomhetPasswordProjectId er ", virksomhetPasswordProjectId)
         val certificatePassword = accessSecretVersion.accessSecretVersion(virksomhetPasswordProjectId, virksomhetPasswordSecretId, virksomhetPasswordVersionId)?.data?.toStringUtf8()
         val objectMapper = ObjectMapper().registerKotlinModule()
         val keystoreCredentials: DigisosKeyStoreCredentials = objectMapper.readValue(certificatePassword, DigisosKeyStoreCredentials::class.java)

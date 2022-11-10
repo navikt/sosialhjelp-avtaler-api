@@ -61,14 +61,6 @@ class AvtaleService(
             )
         }
 
-        val verifisiertAvtale = transaction(databaseContext) { ctx ->
-            ctx.avtaleStore.hentAvtaleForOrganisasjon(avtaleRequest.orgnr)
-        }
-
-        sikkerLog.info {
-            "Lagret avtale: $verifisiertAvtale"
-        }
-
         return avtale
     }
 }

@@ -36,8 +36,12 @@ fun Route.avtaleApi(avtaleService: AvtaleService) {
         }
 
         post("/signer") {
-            val orgnr = call.receive<AvtaleRequest>()
-            val avtale = avtaleService.opprettAvtale(orgnr)
+            val avtaleRequest = call.receive<AvtaleRequest>()
+            val fnr = call.extractFnr()
+            val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")
+            val navnInnsender = personNavnService.getFulltNavn(fnr, token)
+
+            val avtale = avtaleService.opprettAvtale(avtaleRequest, navnInnsender)
             call.respond(HttpStatusCode.Created, avtale)
         }
 

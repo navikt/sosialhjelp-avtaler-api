@@ -79,7 +79,7 @@ fun Application.setupRoutes() {
             internalRoutes()
             route("/api") {
                 authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
-                    avtaleApi(avtaleService)
+                    avtaleApi(avtaleService, personNavnService)
                     kommuneApi(avtaleService)
                 }
             }

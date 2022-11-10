@@ -30,6 +30,12 @@ object Configuration {
             "digipost.onRejectionUrl" to "/opprett-avtale/feil/",
             "digipost.avtalePdfPath" to "Avtale.pdf",
             "digipost.navOrgnr" to "889640782",
+            "virksomhetssertifikat.projectId" to "virksomhetssertifikat-dev",
+            "virksomhetssertifikat.secretId" to "test-virksomhetssertifikat-felles-keystore-jceks_2018-2021",
+            "virksomhetssertifikat.versionId" to "3",
+            "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-dev",
+            "virksomhetssertifikat.passwordSecretId" to "test-keystore-credentials-json",
+            "virksomhetssertifikat.passwordSecretVersion" to "1",
             "pdl.url" to "",
             "pdl.audience" to ""
         )

@@ -49,6 +49,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         val keystoreCredentials: DigisosKeyStoreCredentials = objectMapper.readValue(certificatePassword, DigisosKeyStoreCredentials::class.java)
 
         val secretPayload = accessSecretVersion.accessSecretVersion(virksomhetProjectId, virksomhetSecretId, virksomhetVersionId)
+        val secretCredentials: DigisosKeyStoreCredentials = objectMapper.readValue(secretPayload?.data?.toStringUtf8(), DigisosKeyStoreCredentials::class.java)
 
         val inputStream = try {
             ByteArrayInputStream(secretPayload!!.data.toByteArray())
@@ -63,7 +64,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             inputStream,
             keystoreCredentials.alias,
             keystoreCredentials.password,
-            keystoreCredentials.password
+            secretCredentials.password
         )
     }
 

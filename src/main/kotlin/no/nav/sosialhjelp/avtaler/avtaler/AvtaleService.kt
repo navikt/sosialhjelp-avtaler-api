@@ -62,4 +62,8 @@ class AvtaleService(
 
         return avtale
     }
+
+    fun lagreAvtalestatus(fnr: String, orgnr: AvtaleRequest, status: SigneringsstatusRequest) {
+        TODO("Not yet implemented")
+    }
 }

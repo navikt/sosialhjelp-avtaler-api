@@ -16,6 +16,8 @@ import no.nav.sosialhjelp.avtaler.extractFnr
 
 data class AvtaleRequest(val orgnr: String)
 
+data class SigneringsstatusRequest(val status: String)
+
 fun Route.avtaleApi(avtaleService: AvtaleService) {
     route("/avtale") {
         get("/{kommunenr}") {
@@ -33,10 +35,19 @@ fun Route.avtaleApi(avtaleService: AvtaleService) {
             call.respond(HttpStatusCode.OK, avtale)
         }
 
-        post {
+        post("/signer") {
             val orgnr = call.receive<AvtaleRequest>()
             val avtale = avtaleService.opprettAvtale(orgnr)
             call.respond(HttpStatusCode.Created, avtale)
+        }
+
+        post("/signeringsstatus") {
+            // lagre singeringsstatus i database
+            val status = call.receive<SigneringsstatusRequest>()
+            val orgnr = call.receive<AvtaleRequest>()
+            val fnr = call.extractFnr()
+            avtaleService.lagreAvtalestatus(fnr, orgnr, status)
+            call.respond(HttpStatusCode.OK)
         }
     }
 }

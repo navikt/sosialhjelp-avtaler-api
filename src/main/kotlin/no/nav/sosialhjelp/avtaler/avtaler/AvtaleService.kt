@@ -5,6 +5,7 @@ import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
+import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
 
 private val log = KotlinLogging.logger { }
@@ -12,6 +13,7 @@ private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
 class AvtaleService(
     private val altinnService: AltinnService,
+    private val digipostService: DigipostService,
     val databaseContext: DatabaseContext,
 ) {
 
@@ -48,23 +50,30 @@ class AvtaleService(
         it.orgnr
     }[orgnr]
 
-    suspend fun opprettAvtale(avtaleRequest: AvtaleRequest, navnInnsender: String): Avtale {
+    suspend fun opprettAvtale(fnr: String, avtaleRequest: AvtaleRequest, navnInnsender: String): Avtale {
         log.info("Oppretter avtale for ${avtaleRequest.orgnr}")
 
-        val avtale = transaction(databaseContext) { ctx ->
-            ctx.avtaleStore.lagreAvtale(
-                Avtale(
-                    orgnr = avtaleRequest.orgnr,
-                    avtaleversjon = "1.0",
-                    navn_innsender = navnInnsender
-                )
-            )
-        }
+        val avtale = Avtale(
+            orgnr = avtaleRequest.orgnr,
+            avtaleversjon = "1.0",
+            navn_innsender = navnInnsender
+        )
+        digipostService.sendTilSignering(fnr, avtale)
 
         return avtale
     }
 
-    fun lagreAvtalestatus(fnr: String, orgnr: AvtaleRequest, status: SigneringsstatusRequest) {
-        TODO("Not yet implemented")
+    suspend fun lagreAvtalestatus(navnInnsender: String, avtaleRequest: AvtaleRequest, status: SigneringsstatusRequest) {
+        if (status.equals("SIGNERT")) {
+            val avtale = transaction(databaseContext) { ctx ->
+                ctx.avtaleStore.lagreAvtale(
+                    Avtale(
+                        orgnr = avtaleRequest.orgnr,
+                        avtaleversjon = "1.0",
+                        navn_innsender = navnInnsender
+                    )
+                )
+            }
+        }
     }
 }

@@ -92,9 +92,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             .builder("Digisos: avtalesignering", documents, signers, exitUrls)
             .build()
 
-        val jobResponse = client.create(job)
-
-        val statusQueryToken = jobResponse.singleSigner.redirectUrl.query
+        client.create(job)
     }
 
     private fun getAvtalePdf(): ByteArray? {

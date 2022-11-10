@@ -91,6 +91,8 @@ object Configuration {
     val altinnProperties = AltinnProperties()
     val pdlProperties = PdlProperties()
     val dbProperties = DatabaseProperties()
+    val digipostProperties = DigipostProperties()
+    val virksomhetssertifikatProperties = VirksomhetssertifikatProperties()
 
     operator fun get(key: String): String = config[Key(key, stringType)]
 
@@ -139,7 +141,7 @@ object Configuration {
         val navOrgnr: String = this["digipost.navOrgnr"]
     )
 
-    data class Virksomhetssertifikat(
+    data class VirksomhetssertifikatProperties(
         val projectId: String = this["virksomhetssertifikat.projectId"],
         val secretId: String = this["virksomhetssertifikat.secretId"],
         val versionId: String = this["virksomhetssertifikat.versionId"],

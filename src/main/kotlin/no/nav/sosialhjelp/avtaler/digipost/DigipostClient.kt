@@ -24,7 +24,7 @@ import java.util.Collections
 
 private val log = KotlinLogging.logger {}
 
-class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: Configuration.Virksomhetssertifikat) {
+class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: Configuration.VirksomhetssertifikatProperties) {
     private val accessSecretVersion: AccessSecretVersion = AccessSecretVersion
     private val keyStoreConfig: KeyStoreConfig = configure(accessSecretVersion)
     private val clientConfiguration = ClientConfiguration.builder(keyStoreConfig)

@@ -35,6 +35,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         .serviceUri(ServiceUri.DIFI_TEST)
         .globalSender(Sender(props.navOrgnr))
         .build()
+    private val client = DirectClient(clientConfiguration)
     private val avtalePdfPath = props.avtalePdfPath
     private val onCompletionUrl = props.onCompletionUrl
     private val onErrorUrl = props.onErrorUrl
@@ -70,15 +71,12 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         )
     }
 
-    fun sendTilSignering(fnr: String, avtale: Avtale): Boolean {
+    fun sendTilSignering(fnr: String, avtale: Avtale): URI? {
         val exitUrls = ExitUrls.of(
             URI.create(onCompletionUrl + avtale.orgnr),
             URI.create(onRejectionUrl + avtale.orgnr),
             URI.create(onErrorUrl + avtale.orgnr)
         )
-
-        val client = DirectClient(clientConfiguration)
-
         val avtalePdf: ByteArray? = getAvtalePdf()
 
         val documents: List<DirectDocument> = listOf(
@@ -97,25 +95,19 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
 
         val jobResponse = client.create(job)
 
-        val statusQueryToken = getStatusQueryToken(jobResponse.singleSigner.redirectUrl.query)
-        if (statusQueryToken == null) {
-            log.error("RedirectUrl inneholdt ikke StatusQueryToken. Kan ikke sjekke signeringsstatus.")
-            return false
-        }
-        return sjekkOgLagreSigneringsstatus(statusQueryToken, jobResponse, client, avtale)
+        return jobResponse.singleSigner.signerUrl
     }
 
-    private fun sjekkOgLagreSigneringsstatus(
-        statusQueryToken: String,
-        jobResponse: DirectJobResponse,
-        client: DirectClient,
-        avtale: Avtale
-    ): Boolean {
+    fun sjekkSigneringstatus(fnr: String, avtale: Avtale, statusQueryToken: String): Boolean {
+
+        val jobResponse: DirectJobResponse? = DirectJobResponse(1, signeringsjobbbreferanse, statusurl, null)
+
         val directJobStatusResponse = client
             .getStatus(
                 StatusReference.of(jobResponse)
                     .withStatusQueryToken(statusQueryToken)
             )
+
         if (!directJobStatusResponse.status.equals(DirectJobStatus.COMPLETED_SUCCESSFULLY)) {
             log.info("Kommune med orgnr ${avtale.orgnr} har ikke signert avtale. Status fra DigiPost: ${directJobStatusResponse.status}")
             return false

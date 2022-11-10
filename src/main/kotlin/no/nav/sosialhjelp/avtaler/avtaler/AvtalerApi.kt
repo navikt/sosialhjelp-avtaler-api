@@ -33,11 +33,19 @@ fun Route.avtaleApi(avtaleService: AvtaleService) {
             call.respond(HttpStatusCode.OK, avtale)
         }
 
-        post {
+        post("/signeringsstatus") {
             val fnr = call.extractFnr()
             val orgnr = call.receive<AvtaleRequest>()
-            val avtale = avtaleService.opprettAvtale(orgnr, fnr)
+
+            val avtale = avtaleService.sjekkSigneringstatusForAvtale(orgnr, fnr, statusQueryParam)
             call.respond(HttpStatusCode.Created, avtale)
+        }
+
+        post("/signer") {
+            val fnr = call.extractFnr()
+            val orgnr = call.receive<AvtaleRequest>()
+            val redirectUrl = avtaleService.opprettAvtale(orgnr, fnr)
+            call.respond(HttpStatusCode.Created, redirectUrl)
         }
     }
 }

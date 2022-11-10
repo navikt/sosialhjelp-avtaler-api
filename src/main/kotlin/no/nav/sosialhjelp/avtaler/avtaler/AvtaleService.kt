@@ -7,6 +7,7 @@ import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
+import java.net.URI
 
 private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
@@ -50,15 +51,23 @@ class AvtaleService(
         it.orgnr
     }[orgnr]
 
-    suspend fun opprettAvtale(avtaleRequest: AvtaleRequest, fnr: String): Avtale? {
+    suspend fun opprettAvtale(avtaleRequest: AvtaleRequest, fnr: String): URI? {
         log.info("Oppretter avtale for ${avtaleRequest.orgnr}")
+        val avtale = Avtale(
+            orgnr = avtaleRequest.orgnr,
+            avtaleversjon = null
+        )
+        return digipostService.sendTilSignering(fnr, avtale)
+    }
+
+    suspend fun sjekkSigneringstatusForAvtale(avtaleRequest: AvtaleRequest, fnr: String, statusQueryParam: String): Avtale? {
 
         val avtale = Avtale(
             orgnr = avtaleRequest.orgnr,
             avtaleversjon = null
         )
 
-        val harSignertAvtale = digipostService.sendTilSignering(fnr, avtale)
+        val harSignertAvtale = digipostService.sjekkSigneringstatus(fnr, avtale, statusQueryParam)
 
         if (!harSignertAvtale) {
             return null

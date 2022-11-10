@@ -26,12 +26,6 @@ private val log = KotlinLogging.logger {}
 
 class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: Configuration.VirksomhetssertifikatProperties) {
     private val accessSecretVersion: AccessSecretVersion = AccessSecretVersion
-    private val keyStoreConfig: KeyStoreConfig = configure(accessSecretVersion)
-    private val clientConfiguration = ClientConfiguration.builder(keyStoreConfig)
-        .trustStore(Certificates.TEST)
-        .serviceUri(ServiceUri.DIFI_TEST)
-        .globalSender(Sender(props.navOrgnr))
-        .build()
     private val avtalePdfPath = props.avtalePdfPath
     private val onCompletionUrl = props.onCompletionUrl
     private val onErrorUrl = props.onErrorUrl
@@ -42,9 +36,14 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
     private val virksomhetProjectId = virksomhetProps.projectId
     private val virksomhetSecretId = virksomhetProps.secretId
     private val virksomhetVersionId = virksomhetProps.versionId
+    private val keyStoreConfig: KeyStoreConfig = configure(accessSecretVersion)
+    private val clientConfiguration = ClientConfiguration.builder(keyStoreConfig)
+        .trustStore(Certificates.TEST)
+        .serviceUri(ServiceUri.DIFI_TEST)
+        .globalSender(Sender(props.navOrgnr))
+        .build()
 
     private fun configure(accessSecretVersion: AccessSecretVersion): KeyStoreConfig {
-        log.info("virksomhetPasswordProjectId er ", virksomhetPasswordProjectId)
         val certificatePassword = accessSecretVersion.accessSecretVersion(virksomhetPasswordProjectId, virksomhetPasswordSecretId, virksomhetPasswordVersionId)?.data?.toStringUtf8()
         val objectMapper = ObjectMapper().registerKotlinModule()
         val keystoreCredentials: DigisosKeyStoreCredentials = objectMapper.readValue(certificatePassword, DigisosKeyStoreCredentials::class.java)

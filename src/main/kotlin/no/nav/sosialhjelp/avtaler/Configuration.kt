@@ -135,7 +135,7 @@ object Configuration {
 
     data class DigipostProperties(
         val onCompletionUrl: String = this["application.baseUrl"] + this["digipost.onCompletionUrl"],
-        val onRejectionUrl: String = this["application.baseUrl"] + this["digipost.onRefectionUrl"],
+        val onRejectionUrl: String = this["application.baseUrl"] + this["digipost.onRejectionUrl"],
         val onErrorUrl: String = this["application.baseUrl"] + this["digipost.onErrorUrl"],
         val avtalePdfPath: String = this["digipost.avtalePdfPath"],
         val navOrgnr: String = this["digipost.navOrgnr"]

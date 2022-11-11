@@ -42,8 +42,8 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
             val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")
             val navnInnsender = personNavnService.getFulltNavn(fnr, token)
 
-            val avtale = avtaleService.opprettAvtale(fnr, avtaleRequest, navnInnsender)
-            call.respond(HttpStatusCode.Created, avtale)
+            val signeringsurl = avtaleService.signerAvtale(fnr, avtaleRequest, navnInnsender)
+            call.respond(HttpStatusCode.Created, signeringsurl)
         }
 
         post("/signeringsstatus") {
@@ -54,8 +54,8 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
             val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")
             val navnInnsender = personNavnService.getFulltNavn(fnr, token)
 
-            avtaleService.lagreAvtalestatus(navnInnsender, orgnr, status)
-            call.respond(HttpStatusCode.OK)
+            val avtale = avtaleService.lagreAvtalestatus(navnInnsender, orgnr, status)
+            call.respond(HttpStatusCode.OK, avtale)
         }
     }
 }

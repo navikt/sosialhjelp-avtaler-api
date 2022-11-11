@@ -7,6 +7,7 @@ import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
+import java.net.URI
 
 private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
@@ -50,30 +51,31 @@ class AvtaleService(
         it.orgnr
     }[orgnr]
 
-    suspend fun opprettAvtale(fnr: String, avtaleRequest: AvtaleRequest, navnInnsender: String): Avtale {
-        log.info("Oppretter avtale for ${avtaleRequest.orgnr}")
+    fun signerAvtale(fnr: String, avtaleRequest: AvtaleRequest, navnInnsender: String): URI {
+        log.info("Sender avtale til e-signering for ${avtaleRequest.orgnr}")
 
         val avtale = Avtale(
             orgnr = avtaleRequest.orgnr,
             avtaleversjon = "1.0",
             navn_innsender = navnInnsender
         )
-        digipostService.sendTilSignering(fnr, avtale)
-
-        return avtale
+        return digipostService.sendTilSignering(fnr, avtale)
     }
 
-    suspend fun lagreAvtalestatus(navnInnsender: String, avtaleRequest: AvtaleRequest, status: SigneringsstatusRequest) {
+    suspend fun lagreAvtalestatus(navnInnsender: String, avtaleRequest: AvtaleRequest, status: SigneringsstatusRequest): Avtale {
+        log.info("Oppretter avtale for ${avtaleRequest.orgnr}")
+        val avtale = Avtale(
+            orgnr = avtaleRequest.orgnr,
+            avtaleversjon = "1.0",
+            navn_innsender = navnInnsender
+        )
+
         if (status.equals("SIGNERT")) {
-            val avtale = transaction(databaseContext) { ctx ->
-                ctx.avtaleStore.lagreAvtale(
-                    Avtale(
-                        orgnr = avtaleRequest.orgnr,
-                        avtaleversjon = "1.0",
-                        navn_innsender = navnInnsender
-                    )
-                )
+            transaction(databaseContext) { ctx ->
+                ctx.avtaleStore.lagreAvtale(avtale)
             }
+            log.info("Lagret avtale for ${avtaleRequest.orgnr}")
         }
+        return avtale
     }
 }

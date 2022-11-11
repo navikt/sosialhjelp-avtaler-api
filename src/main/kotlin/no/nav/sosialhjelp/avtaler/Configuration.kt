@@ -25,7 +25,7 @@ object Configuration {
             "ALTINN_APIGW_APIKEY" to "dummyverdi",
             "digipost.keyStorePassword" to "KeyStorePassword",
             "digipost.certificatePassword" to "CertificatePassword",
-            "digipost.onCompletionUrl" to "/opprett-avtale/kvittering/",
+            "digipost.onCompletionUrl" to "/opprett-avtale/suksess/",
             "digipost.onErrorUrl" to "/opprett-avtale/feil/",
             "digipost.onRejectionUrl" to "/opprett-avtale/feil/",
             "digipost.avtalePdfPath" to "Avtale.pdf",

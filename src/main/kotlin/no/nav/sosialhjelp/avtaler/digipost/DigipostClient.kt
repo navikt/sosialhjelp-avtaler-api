@@ -44,17 +44,11 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         .build()
 
     private fun configure(accessSecretVersion: AccessSecretVersion): KeyStoreConfig {
-/*        "virksomhetssertifikat.projectId" to "virksomhetssertifikat-dev",
-        "virksomhetssertifikat.secretId" to "test-virksomhetssertifikat-felles-keystore-jceks_2018-2021",
-        "virksomhetssertifikat.versionId" to "3",
-        "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-dev",
-        "virksomhetssertifikat.passwordSecretId" to "test-keystore-credentials-json",
-        "virksomhetssertifikat.passwordSecretVersion" to "1",*/
-        val certificatePassword = accessSecretVersion.accessSecretVersion("virksomhetssertifikat-dev", "test-keystore-credentials-json", "1")?.data?.toStringUtf8()
+        val certificatePassword = accessSecretVersion.accessSecretVersion(virksomhetPasswordProjectId, virksomhetPasswordSecretId, virksomhetPasswordVersionId)?.data?.toStringUtf8()
         val objectMapper = ObjectMapper().registerKotlinModule()
         val keystoreCredentials: DigisosKeyStoreCredentials = objectMapper.readValue(certificatePassword, DigisosKeyStoreCredentials::class.java)
 
-        val secretPayload = accessSecretVersion.accessSecretVersion("virksomhetssertifikat-dev", "test-virksomhetssertifikat-felles-keystore-jceks_2018-2021", "3")
+        val secretPayload = accessSecretVersion.accessSecretVersion(virksomhetProjectId, virksomhetSecretId, virksomhetVersionId)
 
         val inputStream = try {
             ByteArrayInputStream(secretPayload!!.data.toByteArray())
@@ -64,8 +58,6 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         }
 
         log.info("lengde sertifikat: {}", secretPayload.data.size())
-        log.info("lengde keystore pwd: {}", keystoreCredentials.password.length)
-        log.info("lengde keystore alias: {}", keystoreCredentials.alias.length)
 
         return KeyStoreConfig.fromJavaKeyStore(
             inputStream,

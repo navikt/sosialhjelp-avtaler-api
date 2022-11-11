@@ -19,7 +19,9 @@ import no.nav.sosialhjelp.avtaler.exceptions.VirsomhetsertifikatException
 import no.nav.sosialhjelp.avtaler.secretmanager.AccessSecretVersion
 import no.nav.sosialhjelp.avtaler.secretmanager.DigisosKeyStoreCredentials
 import java.io.ByteArrayInputStream
+import java.io.InputStream
 import java.net.URI
+import java.security.KeyStore
 import java.util.Collections
 
 private val log = KotlinLogging.logger {}
@@ -44,6 +46,9 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         .build()
 
     private fun configure(accessSecretVersion: AccessSecretVersion): KeyStoreConfig {
+        // KeyStore.getInstance("JCEKS")
+        // ks.load(keyStoreStream, keyStorePassword.toCharArray())
+
         val certificatePassword = accessSecretVersion.accessSecretVersion(virksomhetPasswordProjectId, virksomhetPasswordSecretId, virksomhetPasswordVersionId)?.data?.toStringUtf8()
         val objectMapper = ObjectMapper().registerKotlinModule()
         val keystoreCredentials: DigisosKeyStoreCredentials = objectMapper.readValue(certificatePassword, DigisosKeyStoreCredentials::class.java)
@@ -59,12 +64,23 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
 
         log.info("lengde sertifikat: {}", secretPayload.data.size())
 
-        return KeyStoreConfig.fromJavaKeyStore(
+        return fromJavaKeyStore(
             inputStream,
             keystoreCredentials.alias,
             keystoreCredentials.password,
             keystoreCredentials.password
         )
+    }
+
+    fun fromJavaKeyStore(
+        javaKeyStore: InputStream?,
+        alias: String?,
+        keyStorePassword: String,
+        privatekeyPassword: String
+    ): KeyStoreConfig {
+        val ks: KeyStore = KeyStore.getInstance("JCEKS")
+        ks.load(javaKeyStore, keyStorePassword.toCharArray())
+        return KeyStoreConfig(ks, alias, keyStorePassword, privatekeyPassword)
     }
 
     fun sendTilSignering(fnr: String, avtale: Avtale): URI {

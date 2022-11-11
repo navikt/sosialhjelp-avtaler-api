@@ -58,6 +58,8 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         }
 
         log.info("lengde sertifikat: {}", secretPayload.data.size())
+        log.info("lengde keystore pwd: {}", keystoreCredentials.password.length)
+        log.info("lengde keystore alias: {}", keystoreCredentials.alias.length)
 
         return KeyStoreConfig.fromJavaKeyStore(
             inputStream,

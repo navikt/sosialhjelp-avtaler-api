@@ -30,6 +30,7 @@ spec:
   tokenx:
     enabled: true
   gcp:
+    secretmanager.host: secretmanager.googleapis.com
     sqlInstances:
       - type: POSTGRES_14
         name: {{postgresUserName}}

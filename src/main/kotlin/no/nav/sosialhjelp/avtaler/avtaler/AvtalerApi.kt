@@ -17,10 +17,9 @@ import no.nav.sosialhjelp.avtaler.pdl.PersonNavnService
 
 data class AvtaleRequest(val orgnr: String)
 
-fun Route.avtaleApi(
-    avtaleService: AvtaleService,
-    personNavnService: PersonNavnService
-) {
+data class SigneringsstatusRequest(val status: String)
+
+fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnService) {
     route("/avtale") {
         get("/{kommunenr}") {
             val kommunenummer = call.kommunenr()
@@ -37,14 +36,26 @@ fun Route.avtaleApi(
             call.respond(HttpStatusCode.OK, avtale)
         }
 
-        post {
+        post("/signer") {
             val avtaleRequest = call.receive<AvtaleRequest>()
             val fnr = call.extractFnr()
             val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")
             val navnInnsender = personNavnService.getFulltNavn(fnr, token)
 
-            val avtale = avtaleService.opprettAvtale(avtaleRequest, navnInnsender)
-            call.respond(HttpStatusCode.Created, avtale)
+            val signeringsurl = avtaleService.signerAvtale(fnr, avtaleRequest, navnInnsender)
+            call.respond(HttpStatusCode.Created, signeringsurl)
+        }
+
+        post("/signeringsstatus") {
+            // lagre singeringsstatus i database
+            val status = call.receive<SigneringsstatusRequest>()
+            val orgnr = call.receive<AvtaleRequest>()
+            val fnr = call.extractFnr()
+            val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")
+            val navnInnsender = personNavnService.getFulltNavn(fnr, token)
+
+            val avtale = avtaleService.lagreAvtalestatus(navnInnsender, orgnr, status)
+            call.respond(HttpStatusCode.OK, avtale)
         }
     }
 }

@@ -24,14 +24,8 @@ import java.util.Collections
 
 private val log = KotlinLogging.logger {}
 
-class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: Configuration.Virksomhetssertifikat) {
+class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: Configuration.VirksomhetssertifikatProperties) {
     private val accessSecretVersion: AccessSecretVersion = AccessSecretVersion
-    private val keyStoreConfig: KeyStoreConfig = configure(accessSecretVersion)
-    private val clientConfiguration = ClientConfiguration.builder(keyStoreConfig)
-        .trustStore(Certificates.TEST)
-        .serviceUri(ServiceUri.DIFI_TEST)
-        .globalSender(Sender(props.navOrgnr))
-        .build()
     private val avtalePdfPath = props.avtalePdfPath
     private val onCompletionUrl = props.onCompletionUrl
     private val onErrorUrl = props.onErrorUrl
@@ -42,6 +36,12 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
     private val virksomhetProjectId = virksomhetProps.projectId
     private val virksomhetSecretId = virksomhetProps.secretId
     private val virksomhetVersionId = virksomhetProps.versionId
+    private val keyStoreConfig: KeyStoreConfig = configure(accessSecretVersion)
+    private val clientConfiguration = ClientConfiguration.builder(keyStoreConfig)
+        .trustStore(Certificates.TEST)
+        .serviceUri(ServiceUri.DIFI_TEST)
+        .globalSender(Sender(props.navOrgnr))
+        .build()
 
     private fun configure(accessSecretVersion: AccessSecretVersion): KeyStoreConfig {
         val certificatePassword = accessSecretVersion.accessSecretVersion(virksomhetPasswordProjectId, virksomhetPasswordSecretId, virksomhetPasswordVersionId)?.data?.toStringUtf8()
@@ -67,7 +67,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         )
     }
 
-    fun sendTilSignering(fnr: String, avtale: Avtale) {
+    fun sendTilSignering(fnr: String, avtale: Avtale): URI {
         val exitUrls = ExitUrls.of(
             URI.create(onCompletionUrl + avtale.orgnr),
             URI.create(onRejectionUrl + avtale.orgnr),
@@ -92,9 +92,12 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             .builder("Digisos: avtalesignering", documents, signers, exitUrls)
             .build()
 
-        val jobResponse = client.create(job)
-
-        val statusQueryToken = jobResponse.singleSigner.redirectUrl.query
+        val directJobResponse = client.create(job)
+        if (directJobResponse.singleSigner.signerUrl == null) {
+            log.error("Signer URL fra digipost er null.")
+            throw DigipostException("Signer URL fra Digipost er null.")
+        }
+        return directJobResponse.singleSigner.signerUrl
     }
 
     private fun getAvtalePdf(): ByteArray? {

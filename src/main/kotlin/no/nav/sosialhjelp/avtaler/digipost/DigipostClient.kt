@@ -106,6 +106,6 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
     }
 
     private fun getAvtalePdf(): ByteArray {
-        return this::class.java.getResource("Avtale.pdf")!!.openStream().readAllBytes()
+        return this::class.java.getResource("/avtaler/Avtale.pdf")!!.openStream().readAllBytes()
     }
 }

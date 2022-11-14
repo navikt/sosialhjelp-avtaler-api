@@ -35,7 +35,7 @@ object Configuration {
             "virksomhetssertifikat.versionId" to "3",
             "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-dev",
             "virksomhetssertifikat.passwordSecretId" to "test-keystore-credentials-json",
-            "virksomhetssertifikat.passwordSecretVersion" to "1",
+            "virksomhetssertifikat.passwordSecretVersion" to "2",
             "pdl.url" to "",
             "pdl.audience" to ""
         )

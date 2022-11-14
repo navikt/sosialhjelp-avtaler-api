@@ -77,6 +77,10 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         val client = DirectClient(clientConfiguration)
 
         val avtalePdf: ByteArray? = getAvtalePdf()
+        if (avtalePdf == null || avtalePdf.isEmpty()) {
+            log.error("Kunne ikke laste inn avtale.pdf")
+            throw DigipostException("Kunne ikke laste inn avtale.pdf. Er null eller tom.")
+        }
 
         val documents: List<DirectDocument> = listOf(
             DirectDocument.builder("Digisos avtale 1 title", avtalePdf).build()

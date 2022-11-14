@@ -27,7 +27,6 @@ private val log = KotlinLogging.logger {}
 
 class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: Configuration.VirksomhetssertifikatProperties) {
     private val accessSecretVersion: AccessSecretVersion = AccessSecretVersion
-    private val avtalePdfPath = props.avtalePdfPath
     private val onCompletionUrl = props.onCompletionUrl
     private val onErrorUrl = props.onErrorUrl
     private val onRejectionUrl = props.onRejectionUrl

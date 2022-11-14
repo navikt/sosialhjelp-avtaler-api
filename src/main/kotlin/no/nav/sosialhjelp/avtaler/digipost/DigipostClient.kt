@@ -75,11 +75,12 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         )
 
         val client = DirectClient(clientConfiguration)
-
-        val avtalePdf: ByteArray? = getAvtalePdf()
-        if (avtalePdf == null || avtalePdf.isEmpty()) {
+        val avtalePdf: ByteArray
+        try {
+            avtalePdf = getAvtalePdf()
+        } catch (e: NullPointerException) {
             log.error("Kunne ikke laste inn avtale.pdf")
-            throw DigipostException("Kunne ikke laste inn avtale.pdf. Er null eller tom.")
+            throw e
         }
 
         val documents: List<DirectDocument> = listOf(
@@ -104,7 +105,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         return directJobResponse.singleSigner.signerUrl
     }
 
-    private fun getAvtalePdf(): ByteArray? {
-        return this::class.java.getResourceAsStream(avtalePdfPath)?.readAllBytes()
+    private fun getAvtalePdf(): ByteArray {
+        return this::class.java.getResource(avtalePdfPath)!!.openStream().readAllBytes()
     }
 }

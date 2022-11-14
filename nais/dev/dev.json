@@ -10,12 +10,11 @@
     "sosialhjelp-avtaler-api-redis"
   ],
   "outboundExternalHosts": [
-    "api.difitest.signering.posten.no"
+    "api.difitest.signering.posten.no",
+    "pdl-api.dev-fss-pub.nais.io",
+    "secretmanager.googleapis.com"
   ],
   "inboundRulesApplications": ["sosialhjelp-avtaler-dev"],
-  "outboundExternalHosts": [
-    "pdl-api.dev-fss-pub.nais.io"
-  ],
   "env": {
     "SPRING_PROFILES_ACTIVE": "log-kibana,log-audit",
     "UNLEASH_API_URL": "https://unleash.nais.io/api",

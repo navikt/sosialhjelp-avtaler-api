@@ -35,7 +35,7 @@ object Configuration {
             "virksomhetssertifikat.versionId" to "3",
             "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-dev",
             "virksomhetssertifikat.passwordSecretId" to "test-keystore-credentials-json",
-            "virksomhetssertifikat.passwordSecretVersion" to "1",
+            "virksomhetssertifikat.passwordSecretVersion" to "2",
             "pdl.url" to "",
             "pdl.audience" to ""
         )
@@ -67,7 +67,7 @@ object Configuration {
             "virksomhetssertifikat.versionId" to "3",
             "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-dev",
             "virksomhetssertifikat.passwordSecretId" to "test-keystore-credentials-json",
-            "virksomhetssertifikat.passwordSecretVersion" to "1",
+            "virksomhetssertifikat.passwordSecretVersion" to "2",
             "pdl.url" to "https://pdl-api.dev-fss-pub.nais.io/graphql",
             "pdl.audience" to "dev-fss:pdl:pdl-api"
         )

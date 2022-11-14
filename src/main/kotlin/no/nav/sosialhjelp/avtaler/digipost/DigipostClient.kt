@@ -6,6 +6,7 @@ import mu.KotlinLogging
 import no.digipost.signature.client.Certificates
 import no.digipost.signature.client.ClientConfiguration
 import no.digipost.signature.client.ServiceUri
+import no.digipost.signature.client.core.DocumentType
 import no.digipost.signature.client.core.Sender
 import no.digipost.signature.client.direct.DirectClient
 import no.digipost.signature.client.direct.DirectDocument
@@ -84,7 +85,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         }
 
         val documents: List<DirectDocument> = listOf(
-            DirectDocument.builder("Digisos avtale 1 title", avtalePdf).build()
+            DirectDocument.builder("Digisos avtale 1 title", avtalePdf).type(DocumentType.PDF).build()
         )
 
         val signers: List<DirectSigner> = Collections.singletonList(

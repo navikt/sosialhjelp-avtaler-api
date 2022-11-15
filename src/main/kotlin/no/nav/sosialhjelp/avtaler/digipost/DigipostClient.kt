@@ -11,6 +11,7 @@ import no.digipost.signature.client.core.Sender
 import no.digipost.signature.client.direct.DirectClient
 import no.digipost.signature.client.direct.DirectDocument
 import no.digipost.signature.client.direct.DirectJob
+import no.digipost.signature.client.direct.DirectJobResponse
 import no.digipost.signature.client.direct.DirectSigner
 import no.digipost.signature.client.direct.ExitUrls
 import no.digipost.signature.client.security.KeyStoreConfig
@@ -57,7 +58,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             throw VirsomhetsertifikatException("Kunne ikke hente virksomhetssertifikat. SecretPayload er null.", e)
         }
 
-        log.info("lengde sertifikat: {}", secretPayload.data.size())
+        log.info("Hentet sertifikat med lengde: ${secretPayload.data.size()}")
 
         return KeyStoreConfig.fromJavaKeyStore(
             inputStream,
@@ -97,7 +98,14 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             .builder("Digisos: avtalesignering", documents, signers, exitUrls)
             .build()
 
-        val directJobResponse = client.create(job)
+        val directJobResponse: DirectJobResponse
+        try {
+            directJobResponse = client.create(job)
+        } catch (e: Exception) {
+            log.error("Kunne ikke opprette signeringsjobb")
+            throw e
+        }
+
         if (directJobResponse.singleSigner.signerUrl == null) {
             log.error("Signer URL fra digipost er null.")
             throw DigipostException("Signer URL fra Digipost er null.")

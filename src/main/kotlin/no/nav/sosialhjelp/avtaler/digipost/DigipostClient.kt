@@ -43,6 +43,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         .serviceUri(ServiceUri.DIFI_TEST)
         .globalSender(Sender(props.navOrgnr))
         .build()
+    val client = DirectClient(clientConfiguration)
 
     private fun configure(accessSecretVersion: AccessSecretVersion): KeyStoreConfig {
         val certificatePassword = accessSecretVersion.accessSecretVersion(virksomhetPasswordProjectId, virksomhetPasswordSecretId, virksomhetPasswordVersionId)?.data?.toStringUtf8()
@@ -75,7 +76,6 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             URI.create(onErrorUrl + avtale.orgnr)
         )
 
-        val client = DirectClient(clientConfiguration)
         val avtalePdf: ByteArray
         try {
             avtalePdf = getAvtalePdf()
@@ -99,6 +99,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             .builder(avtaleTittel, documents, signers, exitUrls)
             .build()
 
+        logMasseGreier(job)
         val directJobResponse: DirectJobResponse
         try {
             directJobResponse = client.create(job)
@@ -112,6 +113,13 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             throw DigipostException("Signer URL fra Digipost er null.")
         }
         return directJobResponse.singleSigner.signerUrl
+    }
+
+    private fun logMasseGreier(job: DirectJob) {
+        log.info("DEBUGGER DIRECTJOB: Documents.size: ${job.documents.size}")
+        log.info("DEBUGGER DIRECTJOB: fnr.length: ${job.signers[0].personalIdentificationNumber.length}")
+        log.info("DEBUGGER CONFIG: clientConfiguration.globalSender: ${clientConfiguration.globalSender}")
+        log.info("DEBUGGER CONFIG: clientConfiguration.keyStoreConfig.alias: ${clientConfiguration.keyStoreConfig.alias}")
     }
 
     private fun getAvtalePdf(): ByteArray {

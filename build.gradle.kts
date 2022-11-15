@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 object Versions {
     const val konfig_version = "1.6.10.0"
@@ -91,4 +92,8 @@ dependencies {
     // test
     testImplementation("io.ktor:ktor-server-tests-jvm:${Versions.ktor_version}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin_version}")
+}
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "17"
 }

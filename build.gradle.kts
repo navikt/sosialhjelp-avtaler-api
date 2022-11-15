@@ -41,6 +41,7 @@ repositories {
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.7.21")
     implementation("ch.qos.logback:logback-classic:${Versions.logback_version}")
 
     implementation("com.natpryce:konfig:${Versions.konfig_version}")

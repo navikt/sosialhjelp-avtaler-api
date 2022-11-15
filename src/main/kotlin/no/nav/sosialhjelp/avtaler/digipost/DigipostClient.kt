@@ -84,8 +84,9 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             throw e
         }
 
+        val avtaleTittel = "Avtale om påkobling til innsynsflate NKS"
         val documents: List<DirectDocument> = listOf(
-            DirectDocument.builder("Digisos avtale 1 title", avtalePdf).type(DocumentType.PDF).build()
+            DirectDocument.builder(avtaleTittel, avtalePdf).type(DocumentType.PDF).build()
         )
 
         val signers: List<DirectSigner> = Collections.singletonList(
@@ -95,7 +96,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         )
 
         val job = DirectJob
-            .builder("Digisos: avtalesignering", documents, signers, exitUrls)
+            .builder(avtaleTittel, documents, signers, exitUrls)
             .build()
 
         val directJobResponse: DirectJobResponse

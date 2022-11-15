@@ -84,6 +84,7 @@ dependencies {
     implementation("org.springframework:spring-oxm:5.3.23") {
         exclude(group = "org.glassfish.jaxb", module = "jaxb-runtime")
     }
+    implementation("jakarta.xml.bind:jakarta.xml.bind-api:4.0.0")
 
     // google cloud secret manager api
     implementation(platform("com.google.cloud:libraries-bom:${Versions.google_cloud_libraries}"))

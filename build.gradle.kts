@@ -79,13 +79,14 @@ dependencies {
 
     // digipost
     implementation("no.digipost.signature:signature-api-client-java:${Versions.digipost_signature_api_client}")
+    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.1")
+    implementation("org.springframework:spring-oxm:5.3.23") {
+        exclude(group = "org.glassfish.jaxb", module = "jaxb-runtime")
+    }
 
     // google cloud secret manager api
     implementation(platform("com.google.cloud:libraries-bom:${Versions.google_cloud_libraries}"))
     implementation("com.google.cloud:google-cloud-secretmanager")
-
-    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.1")
-    implementation("org.springframework:spring-oxm:5.3.23")
 
     // test
     testImplementation("io.ktor:ktor-server-tests-jvm:${Versions.ktor_version}")

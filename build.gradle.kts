@@ -84,6 +84,8 @@ dependencies {
     implementation(platform("com.google.cloud:libraries-bom:${Versions.google_cloud_libraries}"))
     implementation("com.google.cloud:google-cloud-secretmanager")
 
+    implementation("org.glassfish.jaxb:jaxb-runtime:4.0.1")
+
     // test
     testImplementation("io.ktor:ktor-server-tests-jvm:${Versions.ktor_version}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin_version}")

@@ -118,7 +118,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
     private fun logMasseGreier(job: DirectJob) {
         log.info("DEBUGGER DIRECTJOB: Documents.size: ${job.documents.size}")
         log.info("DEBUGGER DIRECTJOB: fnr.length: ${job.signers[0].personalIdentificationNumber.length}")
-        log.info("DEBUGGER CONFIG: clientConfiguration.globalSender: ${clientConfiguration.globalSender}")
+        log.info("DEBUGGER CONFIG: clientConfiguration.globalSender: ${clientConfiguration.globalSender.get().organizationNumber}")
         log.info("DEBUGGER CONFIG: clientConfiguration.keyStoreConfig.alias: ${clientConfiguration.keyStoreConfig.alias}")
     }
 

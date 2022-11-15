@@ -85,6 +85,7 @@ dependencies {
     implementation("com.google.cloud:google-cloud-secretmanager")
 
     implementation("org.glassfish.jaxb:jaxb-runtime:4.0.1")
+    implementation("org.springframework:spring-oxm:5.3.23")
 
     // test
     testImplementation("io.ktor:ktor-server-tests-jvm:${Versions.ktor_version}")

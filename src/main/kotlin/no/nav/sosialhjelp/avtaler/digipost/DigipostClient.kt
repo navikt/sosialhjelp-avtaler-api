@@ -11,7 +11,6 @@ import no.digipost.signature.client.core.Sender
 import no.digipost.signature.client.direct.DirectClient
 import no.digipost.signature.client.direct.DirectDocument
 import no.digipost.signature.client.direct.DirectJob
-import no.digipost.signature.client.direct.DirectJobResponse
 import no.digipost.signature.client.direct.DirectSigner
 import no.digipost.signature.client.direct.ExitUrls
 import no.digipost.signature.client.security.KeyStoreConfig
@@ -100,13 +99,8 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             .build()
 
         logMasseGreier(job)
-        val directJobResponse: DirectJobResponse
-        try {
-            directJobResponse = client.create(job)
-        } catch (e: Exception) {
-            log.error("Kunne ikke opprette signeringsjobb")
-            throw e
-        }
+
+        val directJobResponse = client.create(job)
 
         if (directJobResponse.singleSigner.signerUrl == null) {
             log.error("Signer URL fra digipost er null.")

@@ -6,6 +6,7 @@ import mu.KotlinLogging
 import no.digipost.signature.client.Certificates
 import no.digipost.signature.client.ClientConfiguration
 import no.digipost.signature.client.ServiceUri
+import no.digipost.signature.client.core.DocumentType
 import no.digipost.signature.client.core.Sender
 import no.digipost.signature.client.direct.DirectClient
 import no.digipost.signature.client.direct.DirectDocument
@@ -26,7 +27,6 @@ private val log = KotlinLogging.logger {}
 
 class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: Configuration.VirksomhetssertifikatProperties) {
     private val accessSecretVersion: AccessSecretVersion = AccessSecretVersion
-    private val avtalePdfPath = props.avtalePdfPath
     private val onCompletionUrl = props.onCompletionUrl
     private val onErrorUrl = props.onErrorUrl
     private val onRejectionUrl = props.onRejectionUrl
@@ -75,11 +75,16 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         )
 
         val client = DirectClient(clientConfiguration)
-
-        val avtalePdf: ByteArray? = getAvtalePdf()
+        val avtalePdf: ByteArray
+        try {
+            avtalePdf = getAvtalePdf()
+        } catch (e: NullPointerException) {
+            log.error("Kunne ikke laste inn avtale.pdf")
+            throw e
+        }
 
         val documents: List<DirectDocument> = listOf(
-            DirectDocument.builder("Digisos avtale 1 title", avtalePdf).build()
+            DirectDocument.builder("Digisos avtale 1 title", avtalePdf).type(DocumentType.PDF).build()
         )
 
         val signers: List<DirectSigner> = Collections.singletonList(
@@ -100,7 +105,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         return directJobResponse.singleSigner.signerUrl
     }
 
-    private fun getAvtalePdf(): ByteArray? {
-        return this::class.java.getResourceAsStream(avtalePdfPath)?.readAllBytes()
+    private fun getAvtalePdf(): ByteArray {
+        return this::class.java.getResource("/avtaler/Avtale.pdf")!!.openStream().readAllBytes()
     }
 }

@@ -28,7 +28,6 @@ object Configuration {
             "digipost.onCompletionUrl" to "/opprett-avtale/suksess/",
             "digipost.onErrorUrl" to "/opprett-avtale/feil/",
             "digipost.onRejectionUrl" to "/opprett-avtale/feil/",
-            "digipost.avtalePdfPath" to "Avtale.pdf",
             "digipost.navOrgnr" to "889640782",
             "virksomhetssertifikat.projectId" to "virksomhetssertifikat-dev",
             "virksomhetssertifikat.secretId" to "test-virksomhetssertifikat-felles-keystore-jceks_2018-2021",
@@ -143,7 +142,6 @@ object Configuration {
         val onCompletionUrl: String = this["application.baseUrl"] + this["digipost.onCompletionUrl"],
         val onRejectionUrl: String = this["application.baseUrl"] + this["digipost.onRejectionUrl"],
         val onErrorUrl: String = this["application.baseUrl"] + this["digipost.onErrorUrl"],
-        val avtalePdfPath: String = this["digipost.avtalePdfPath"],
         val navOrgnr: String = this["digipost.navOrgnr"]
     )
 

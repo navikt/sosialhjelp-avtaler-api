@@ -41,6 +41,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         .trustStore(Certificates.TEST)
         .serviceUri(ServiceUri.DIFI_TEST)
         .globalSender(Sender(props.navOrgnr))
+        .enableRequestAndResponseLogging()
         .build()
     val client = DirectClient(clientConfiguration)
 

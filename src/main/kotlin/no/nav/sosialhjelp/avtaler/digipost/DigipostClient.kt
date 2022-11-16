@@ -40,7 +40,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
     private val clientConfiguration = ClientConfiguration.builder(keyStoreConfig)
         .trustStore(Certificates.TEST)
         .serviceUri(ServiceUri.DIFI_TEST)
-        .globalSender(Sender("889640782"))
+        .globalSender(Sender(props.navOrgnr))
         .enableRequestAndResponseLogging()
         .build()
     private val client = DirectClient(clientConfiguration)
@@ -98,8 +98,6 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         val job = DirectJob
             .builder(avtaleTittel, documents, signers, exitUrls)
             .build()
-
-        log.info("ClientConfiguration.organizationNumber: ${clientConfiguration.globalSender.get().organizationNumber}")
 
         val directJobResponse = client.create(job)
         if (directJobResponse.singleSigner.signerUrl == null) {

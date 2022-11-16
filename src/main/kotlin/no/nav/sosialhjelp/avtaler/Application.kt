@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod
 import io.ktor.serialization.jackson.jackson
+import io.ktor.serialization.kotlinx.xml.xml
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
@@ -52,6 +53,7 @@ fun Application.configure() {
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         }
+        xml()
     }
     install(IgnoreTrailingSlash)
 }

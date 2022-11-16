@@ -62,6 +62,7 @@ dependencies {
     implementation("io.ktor:ktor-client-mock:${Versions.ktor_version}")
 
     implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor_version}")
+    implementation("io.ktor:ktor-serialization-kotlinx-xml:${Versions.ktor_version}")
     implementation("io.ktor:ktor-serialization-jackson-jvm:${Versions.ktor_version}")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${Versions.jackson_version}")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jackson_version}")

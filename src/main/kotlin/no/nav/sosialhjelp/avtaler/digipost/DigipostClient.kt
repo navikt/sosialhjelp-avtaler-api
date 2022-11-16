@@ -7,10 +7,12 @@ import no.digipost.signature.client.Certificates
 import no.digipost.signature.client.ClientConfiguration
 import no.digipost.signature.client.ServiceUri
 import no.digipost.signature.client.core.DocumentType
+import no.digipost.signature.client.core.IdentifierInSignedDocuments
 import no.digipost.signature.client.core.Sender
 import no.digipost.signature.client.direct.DirectClient
 import no.digipost.signature.client.direct.DirectDocument
 import no.digipost.signature.client.direct.DirectJob
+import no.digipost.signature.client.direct.DirectJobResponse
 import no.digipost.signature.client.direct.DirectSigner
 import no.digipost.signature.client.direct.ExitUrls
 import no.digipost.signature.client.security.KeyStoreConfig
@@ -22,6 +24,7 @@ import no.nav.sosialhjelp.avtaler.secretmanager.DigisosKeyStoreCredentials
 import java.io.ByteArrayInputStream
 import java.net.URI
 import java.util.Collections
+import java.util.UUID
 
 private val log = KotlinLogging.logger {}
 
@@ -41,6 +44,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         .trustStore(Certificates.TEST)
         .serviceUri(ServiceUri.DIFI_TEST)
         .globalSender(Sender(props.navOrgnr))
+        .enableRequestAndResponseLogging()
         .build()
 
     private fun configure(accessSecretVersion: AccessSecretVersion): KeyStoreConfig {
@@ -94,11 +98,23 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
                 .build()
         )
 
-        val job = DirectJob
-            .builder(avtaleTittel, documents, signers, exitUrls)
+        val directJob: DirectJob = DirectJob.builder(
+            avtaleTittel,
+            documents,
+            signers,
+            exitUrls
+        )
+            .withReference(UUID.randomUUID().toString())
+            .withIdentifierInSignedDocuments(IdentifierInSignedDocuments.PERSONAL_IDENTIFICATION_NUMBER_AND_NAME)
             .build()
 
-        val directJobResponse = client.create(job)
+        val directJobResponse: DirectJobResponse = try {
+            client.create(directJob)
+        } catch (e: java.lang.Exception) {
+            e.printStackTrace()
+            throw DigipostException("opprette signeringsjob feilet")
+        }
+
         if (directJobResponse.singleSigner.signerUrl == null) {
             log.error("Signer URL fra digipost er null.")
             throw DigipostException("Signer URL fra Digipost er null.")

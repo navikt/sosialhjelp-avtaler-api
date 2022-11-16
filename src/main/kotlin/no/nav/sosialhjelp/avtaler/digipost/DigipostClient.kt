@@ -106,7 +106,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             log.error("Signer URL fra digipost er null.")
             throw DigipostException("Signer URL fra Digipost er null.")
         }
-        return directJobResponse.singleSigner.signerUrl
+        return directJobResponse.singleSigner.redirectUrl
     }
 
     private fun getAvtalePdf(): ByteArray {

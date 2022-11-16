@@ -6,14 +6,8 @@ import mu.KotlinLogging
 import no.digipost.signature.client.Certificates
 import no.digipost.signature.client.ClientConfiguration
 import no.digipost.signature.client.ServiceUri
-import no.digipost.signature.client.core.DocumentType
-import no.digipost.signature.client.core.IdentifierInSignedDocuments
 import no.digipost.signature.client.core.Sender
 import no.digipost.signature.client.direct.DirectClient
-import no.digipost.signature.client.direct.DirectDocument
-import no.digipost.signature.client.direct.DirectJob
-import no.digipost.signature.client.direct.DirectJobResponse
-import no.digipost.signature.client.direct.DirectSigner
 import no.digipost.signature.client.direct.ExitUrls
 import no.digipost.signature.client.security.KeyStoreConfig
 import no.nav.sosialhjelp.avtaler.Configuration
@@ -23,8 +17,6 @@ import no.nav.sosialhjelp.avtaler.secretmanager.AccessSecretVersion
 import no.nav.sosialhjelp.avtaler.secretmanager.DigisosKeyStoreCredentials
 import java.io.ByteArrayInputStream
 import java.net.URI
-import java.util.Collections
-import java.util.UUID
 
 private val log = KotlinLogging.logger {}
 
@@ -79,6 +71,8 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         )
 
         val client = DirectClient(clientConfiguration)
+        log.info("client: ", client)
+        /*
         val avtalePdf: ByteArray
         try {
             avtalePdf = getAvtalePdf()
@@ -119,7 +113,12 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             log.error("Signer URL fra digipost er null.")
             throw DigipostException("Signer URL fra Digipost er null.")
         }
+
+
         return directJobResponse.singleSigner.signerUrl
+
+         */
+        return URI("https://www.nav.no/sosialhjelp")
     }
 
     private fun getAvtalePdf(): ByteArray {

@@ -8,9 +8,6 @@ import no.digipost.signature.client.ClientConfiguration
 import no.digipost.signature.client.ServiceUri
 import no.digipost.signature.client.core.DocumentType
 import no.digipost.signature.client.core.Sender
-import no.digipost.signature.client.core.exceptions.BrokerNotAuthorizedException
-import no.digipost.signature.client.core.exceptions.SignatureException
-import no.digipost.signature.client.core.exceptions.UnexpectedResponseException
 import no.digipost.signature.client.direct.DirectClient
 import no.digipost.signature.client.direct.DirectDocument
 import no.digipost.signature.client.direct.DirectJob
@@ -77,30 +74,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             URI.create(onErrorUrl + avtale.orgnr)
         )
 
-        val client: DirectClient
-        try {
-            client = DirectClient(clientConfiguration)
-        } catch (brokerNotAuthorized: BrokerNotAuthorizedException) {
-            // Broker is not authorized to perform action. Contact Digitaliseringsdirektoratet in order to set up access rights.
-            log.error("Digipostclient feil brokerNotAuthorized")
-
-            throw DigipostException("brokerNotAuthorized.")
-        } catch (unexpectedResponse: UnexpectedResponseException) {
-            // The server returned an unexpected response.
-            val httpStatusCode = unexpectedResponse.getActualStatus()
-
-            // errorCode and errorMesage will normally contain information returned by the server. May be null.
-            val errorCode = unexpectedResponse.getErrorCode()
-            val errorMessage = unexpectedResponse.getErrorMessage()
-            log.error("Digipostclient feil http:$httpStatusCode  code: $errorCode, feil: $errorMessage")
-            throw DigipostException("client fra Digipost er null.")
-        } catch (e: SignatureException) {
-            log.error("Digipostclient feil signatureException: $e")
-            throw DigipostException("client fra Digipost er null.")
-
-            // An unexpected exception was thrown, inspect e.getMessage().
-        }
-
+        val client = DirectClient(clientConfiguration)
         val avtalePdf: ByteArray
         try {
             avtalePdf = getAvtalePdf()

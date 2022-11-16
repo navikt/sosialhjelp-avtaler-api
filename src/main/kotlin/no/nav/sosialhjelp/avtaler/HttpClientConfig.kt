@@ -15,6 +15,7 @@ import io.ktor.client.request.headers
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import io.ktor.serialization.jackson.jackson
+import io.ktor.serialization.kotlinx.xml.xml
 
 object HttpClientConfig {
     fun httpClient(engine: HttpClientEngine = CIO.create()): HttpClient = HttpClient(engine) {
@@ -25,6 +26,7 @@ object HttpClientConfig {
                 disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             }
+            xml()
         }
         install(HttpTimeout)
     }

@@ -79,6 +79,7 @@ dependencies {
 
     // digipost
     implementation("no.digipost.signature:signature-api-client-java:${Versions.digipost_signature_api_client}")
+    implementation("com.sun.xml.bind:jaxb-impl:2.3.7")
 
     // google cloud secret manager api
     implementation(platform("com.google.cloud:libraries-bom:${Versions.google_cloud_libraries}"))

@@ -62,19 +62,19 @@ class AvtaleService(
         return digipostService.sendTilSignering(fnr, avtale)
     }
 
-    suspend fun lagreAvtalestatus(navnInnsender: String, avtaleRequest: AvtaleRequest, status: SigneringsstatusRequest): Avtale {
-        log.info("Oppretter avtale for ${avtaleRequest.orgnr}")
+    suspend fun lagreAvtalestatus(navnInnsender: String, orgnr: String, status: String): Avtale {
+        log.info("Oppretter avtale for $orgnr")
         val avtale = Avtale(
-            orgnr = avtaleRequest.orgnr,
+            orgnr = orgnr,
             avtaleversjon = "1.0",
             navn_innsender = navnInnsender
         )
 
-        if (status.equals("SIGNERT")) {
+        if (status == "SIGNERT") {
             transaction(databaseContext) { ctx ->
                 ctx.avtaleStore.lagreAvtale(avtale)
             }
-            log.info("Lagret avtale for ${avtaleRequest.orgnr}")
+            log.info("Lagret avtale for $orgnr")
         }
         return avtale
     }

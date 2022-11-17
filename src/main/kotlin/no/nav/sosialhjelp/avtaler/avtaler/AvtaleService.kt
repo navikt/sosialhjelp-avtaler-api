@@ -70,7 +70,7 @@ class AvtaleService(
             navn_innsender = navnInnsender
         )
 
-        if (status == "SIGNERT") {
+        if (status == "SUKSESS") {
             transaction(databaseContext) { ctx ->
                 ctx.avtaleStore.lagreAvtale(avtale)
             }

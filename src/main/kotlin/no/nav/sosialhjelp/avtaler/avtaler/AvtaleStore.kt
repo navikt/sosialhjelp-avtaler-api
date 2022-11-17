@@ -55,6 +55,7 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
     }
 
     override fun lagreAvtale(avtale: Avtale): Avtale = session {
+
         @Language("PostgreSQL")
         val sql = """
             INSERT INTO avtale_v1 (orgnr,

@@ -17,7 +17,7 @@ import no.nav.sosialhjelp.avtaler.pdl.PersonNavnService
 
 data class AvtaleRequest(val orgnr: String)
 
-data class SigneringsstatusRequest(val status: String)
+data class SigneringsstatusRequest(val orgnr: String, val status: String)
 
 fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnService) {
     route("/avtale") {
@@ -48,13 +48,12 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
 
         post("/signeringsstatus") {
             // lagre singeringsstatus i database
-            val status = call.receive<SigneringsstatusRequest>()
-            val orgnr = call.receive<AvtaleRequest>()
+            val signeringsstatusRequest = call.receive<SigneringsstatusRequest>()
             val fnr = call.extractFnr()
             val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")
             val navnInnsender = personNavnService.getFulltNavn(fnr, token)
 
-            val avtale = avtaleService.lagreAvtalestatus(navnInnsender, orgnr, status)
+            val avtale = avtaleService.lagreAvtalestatus(navnInnsender, signeringsstatusRequest.orgnr, signeringsstatusRequest.status)
             call.respond(HttpStatusCode.OK, avtale)
         }
     }

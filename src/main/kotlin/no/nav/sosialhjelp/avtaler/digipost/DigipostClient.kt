@@ -41,7 +41,9 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         .trustStore(Certificates.TEST)
         .serviceUri(ServiceUri.DIFI_TEST)
         .globalSender(Sender(props.navOrgnr))
+        .enableRequestAndResponseLogging()
         .build()
+    private val client = DirectClient(clientConfiguration)
 
     private fun configure(accessSecretVersion: AccessSecretVersion): KeyStoreConfig {
         val certificatePassword = accessSecretVersion.accessSecretVersion(virksomhetPasswordProjectId, virksomhetPasswordSecretId, virksomhetPasswordVersionId)?.data?.toStringUtf8()
@@ -57,7 +59,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             throw VirsomhetsertifikatException("Kunne ikke hente virksomhetssertifikat. SecretPayload er null.", e)
         }
 
-        log.info("lengde sertifikat: {}", secretPayload.data.size())
+        log.info("Hentet sertifikat med lengde: ${secretPayload.data.size()}")
 
         return KeyStoreConfig.fromJavaKeyStore(
             inputStream,
@@ -74,7 +76,6 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             URI.create(onErrorUrl + avtale.orgnr)
         )
 
-        val client = DirectClient(clientConfiguration)
         val avtalePdf: ByteArray
         try {
             avtalePdf = getAvtalePdf()
@@ -103,7 +104,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             log.error("Signer URL fra digipost er null.")
             throw DigipostException("Signer URL fra Digipost er null.")
         }
-        return directJobResponse.singleSigner.signerUrl
+        return directJobResponse.singleSigner.redirectUrl
     }
 
     private fun getAvtalePdf(): ByteArray {

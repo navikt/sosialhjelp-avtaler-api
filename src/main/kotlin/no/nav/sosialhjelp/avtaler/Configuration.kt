@@ -55,7 +55,7 @@ object Configuration {
     private val devProperties = ConfigurationMap(
         mapOf(
 
-            "application.baseUrl" to "https://digisos.dev.nav.no/sosialhjelp/avtaler",
+            "application.baseUrl" to "https://digisos.nav.no/sosialhjelp/avtaler",
             "application.profile" to "DEV",
             "application.cluster" to "DEV-GCP",
             "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.dev.nav.no/altinn-rettigheter-proxy/ekstern/altinn",
@@ -73,7 +73,22 @@ object Configuration {
     )
 
     private val prodProperties = ConfigurationMap(
-        mapOf()
+        mapOf(
+            "application.baseUrl" to "https://nav.no/sosialhjelp/avtaler",
+            "application.profile" to "PROD",
+            "application.cluster" to "PROD-GCP",
+            "altinn.altinnUrl" to "http://altinn-rettigheter-proxy.arbeidsgiver.svc.cluster.local", // dobbeltsjekk denne
+            "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api",
+            "altinn.altinnRettigheterAudience" to "prod-gcp:arbeidsgiver:altinn-rettigheter-proxy",
+            "virksomhetssertifikat.projectId" to "virksomhetssertifikat",
+            "virksomhetssertifikat.secretId" to "virksomhetssertifikat-felles-keystore-jceks_2018-2021",
+            "virksomhetssertifikat.versionId" to "3",
+            "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat",
+            "virksomhetssertifikat.passwordSecretId" to "keystore-credentials-json",
+            "virksomhetssertifikat.passwordSecretVersion" to "2",
+            "pdl.url" to "https://pdl-api.prod-fss-pub.nais.io/graphql",
+            "pdl.audience" to "prod-fss:pdl:pdl-api"
+        )
     )
 
     private val resourceProperties =
@@ -90,7 +105,6 @@ object Configuration {
     val local: Boolean = profile == Profile.LOCAL
     val dev: Boolean = profile == Profile.DEV
     val prod: Boolean = profile == Profile.PROD
-    val baseUrl: String = this["application.baseUrl"]
 
     val tokenXProperties = TokenXProperties()
     val altinnProperties = AltinnProperties()

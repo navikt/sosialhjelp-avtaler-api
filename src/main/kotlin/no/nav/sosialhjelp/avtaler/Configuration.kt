@@ -46,9 +46,7 @@ object Configuration {
             "application.cluster" to "LOCAL",
             "TOKEN_X_WELL_KNOWN_URL" to "http://host.docker.internal:8080/default/.well-known/openid-configuration",
             "TOKEN_X_CLIENT_ID" to "local",
-            "userclaim" to "sub",
-            "REDIS_HOST" to "localhost",
-            "REDIS_PASSWORD" to "",
+            "userclaim" to "sub"
         )
     )
 

@@ -1,0 +1,33 @@
+{
+  "applicationName": "sosialhjelp-avtaler-api",
+  "postgresUserName": "sosialhjelp-avtaler-api-db",
+  "postgresDatabaseName": "avtalerapidb",
+  "namespace": "teamdigisos",
+  "ingress": [
+    "https://digisos.nav.no/sosialhjelp/avtaler-api"
+  ],
+  "outboundRulesApplications": [
+    "sosialhjelp-avtaler-api-redis"
+  ],
+  "outboundExternalHosts": [
+    "api.signering.posten.no",
+    "pdl-api.prod-fss-pub.nais.io",
+    "secretmanager.googleapis.com"
+  ],
+  "inboundRulesApplications": ["sosialhjelp-avtaler"],
+  "env": {
+    "SPRING_PROFILES_ACTIVE": "log-kibana,log-audit",
+    "UNLEASH_API_URL": "https://unleash.nais.io/api",
+    "UNLEASH_INSTANCE_ID": "prod-gcp",
+    "REDIS_HOST": "sosialhjelp-avtaler-api-redis.teamdigisos.svc.cluster.local",
+    "XSRF_DOMAIN": "nav.no"
+  },
+  "minReplicas": "1",
+  "maxReplicas": "1",
+  "cpuLimit": "400m",
+  "memoryLimit": "1Gi",
+  "cpuRequest": "15m",
+  "memoryRequest": "512Mi",
+  "prometheusEnabled": true,
+  "tokenXEnabled": true
+}

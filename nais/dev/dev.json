@@ -6,9 +6,6 @@
   "ingress": [
     "https://digisos.dev.nav.no/sosialhjelp/avtaler-api"
   ],
-  "outboundRulesApplications": [
-    "sosialhjelp-avtaler-api-redis"
-  ],
   "outboundExternalHosts": [
     "api.difitest.signering.posten.no",
     "pdl-api.dev-fss-pub.nais.io",
@@ -19,7 +16,6 @@
     "SPRING_PROFILES_ACTIVE": "log-kibana,log-audit",
     "UNLEASH_API_URL": "https://unleash.nais.io/api",
     "UNLEASH_INSTANCE_ID": "dev-gcp",
-    "REDIS_HOST": "sosialhjelp-avtaler-api-redis.teamdigisos.svc.cluster.local",
     "XSRF_DOMAIN": "dev.nav.no"
   },
   "minReplicas": "1",

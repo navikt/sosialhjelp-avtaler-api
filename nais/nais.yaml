@@ -25,7 +25,6 @@ spec:
     min: {{minReplicas}}
     max: {{maxReplicas}}
   envFrom:
-    - secret: redis-password-avtaler-api
     - secret: sosialhjelp-xsrf-secret
   tokenx:
     enabled: true

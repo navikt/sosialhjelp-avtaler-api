@@ -55,10 +55,6 @@ spec:
       {{/each}}
         - application: altinn-rettigheter-proxy
           namespace: arbeidsgiver
-  ingresses:
-{{#each ingress}}
-    - "{{this}}"
-{{/each}}
   resources:
     limits:
       cpu: {{cpuLimit}}

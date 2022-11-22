@@ -3,9 +3,6 @@
   "postgresUserName": "sosialhjelp-avtaler-api-db-dev",
   "postgresDatabaseName": "avtalerapidb-dev",
   "namespace": "teamdigisos",
-  "ingress": [
-    "https://digisos.dev.nav.no/sosialhjelp/avtaler-api"
-  ],
   "outboundExternalHosts": [
     "api.difitest.signering.posten.no",
     "pdl-api.dev-fss-pub.nais.io",

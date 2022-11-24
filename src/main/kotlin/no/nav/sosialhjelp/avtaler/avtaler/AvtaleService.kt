@@ -6,6 +6,7 @@ import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
+import no.nav.sosialhjelp.avtaler.enhetsregisteret.EnhetsregisteretService
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
 import java.net.URI
 
@@ -15,11 +16,22 @@ private val sikkerLog = KotlinLogging.logger("tjenestekall")
 class AvtaleService(
     private val altinnService: AltinnService,
     private val digipostService: DigipostService,
+    private val enhetsregisteretService: EnhetsregisteretService,
     val databaseContext: DatabaseContext,
 ) {
 
     suspend fun hentAvtaler(fnr: String, tjeneste: Avgiver.Tjeneste, token: String?): List<AvtaleResponse> {
         val avgivereFiltrert = altinnService.hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
+            .filter { avgiver ->
+                val orgnr = avgiver.orgnr
+                val enhet = enhetsregisteretService.hentOrganisasjonsenhet(orgnr)
+                if (enhet == null) {
+                    false
+                } else {
+                    log.info("Hentet enhet med orgnr: $orgnr")
+                    enhet.organisasjonsform.erKommune()
+                }
+            }
 
         sikkerLog.info {
             "Filtrert avgivere for fnr: $fnr, tjeneste: $tjeneste, avgivere: $avgivereFiltrert"

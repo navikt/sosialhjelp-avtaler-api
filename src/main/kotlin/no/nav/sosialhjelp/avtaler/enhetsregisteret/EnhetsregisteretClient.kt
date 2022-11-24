@@ -1,14 +1,10 @@
 package no.nav.sosialhjelp.avtaler.enhetsregisteret
 
-import com.fasterxml.jackson.databind.DeserializationFeature
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.ResponseException
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.get
 import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.jackson.jackson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
@@ -16,15 +12,9 @@ import no.nav.sosialhjelp.avtaler.Configuration
 
 private val log = KotlinLogging.logger { }
 
-class EnhetsregisteretClient(props: Configuration.EnhetsregistertetProperties) {
+class EnhetsregisteretClient(props: Configuration.EnhetsregistertetProperties, httpClient: HttpClient) {
     private val baseUrl = props.baseUrl
-    private val client = HttpClient(CIO) {
-        install(ContentNegotiation) {
-            jackson {
-                disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
-            }
-        }
-    }
+    private val client = httpClient
 
     suspend fun hentOrganisasjonsenhet(orgnr: String): Organisasjonsenhet? =
         hentEnhetHelper("$baseUrl/enheter/$orgnr")

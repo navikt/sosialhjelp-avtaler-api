@@ -89,6 +89,7 @@ dependencies {
     implementation("com.google.cloud:google-cloud-secretmanager:${Versions.google_cloud_secretmanager}")
 
     // test
+    testImplementation("io.ktor:ktor-client-mock:${Versions.ktor_version}")
     testImplementation("io.ktor:ktor-server-tests-jvm:${Versions.ktor_version}")
     testImplementation("io.kotest:kotest-assertions-core-jvm:${Versions.kotestVersion}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin_version}")

@@ -75,7 +75,7 @@ fun Application.setupRoutes() {
     val tokenExchangeClient = Oauth2Client(defaultHttpClient, authProperties, Configuration.tokenXProperties)
     val altinnService = AltinnService(AltinnClient(Configuration.altinnProperties, tokenExchangeClient))
     val digipostService = DigipostService(DigipostClient(Configuration.digipostProperties, Configuration.virksomhetssertifikatProperties))
-    val enhetsregisteretService = EnhetsregisteretService(EnhetsregisteretClient(Configuration.enhetsregistertetProperties))
+    val enhetsregisteretService = EnhetsregisteretService(EnhetsregisteretClient(Configuration.enhetsregistertetProperties, defaultHttpClient()))
     val avtaleService = AvtaleService(altinnService, digipostService, enhetsregisteretService, databaseContext)
     val personNavnService = PersonNavnService(PdlClient(Configuration.pdlProperties, tokenExchangeClient))
 

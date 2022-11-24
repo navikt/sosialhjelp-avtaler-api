@@ -3,6 +3,7 @@ object Versions {
     const val konfig_version = "1.6.10.0"
     const val ktor_version = "2.1.3"
     const val kotlin_version = "1.7.20"
+    const val kotestVersion = "5.4.2"
     const val ktlint = "0.45.2"
     const val logback_version = "1.4.4"
     const val jackson_version = "2.14.0"
@@ -89,5 +90,6 @@ dependencies {
 
     // test
     testImplementation("io.ktor:ktor-server-tests-jvm:${Versions.ktor_version}")
+    testImplementation("io.kotest:kotest-assertions-core-jvm:${Versions.kotestVersion}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin_version}")
 }

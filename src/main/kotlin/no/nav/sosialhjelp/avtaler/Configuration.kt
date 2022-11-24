@@ -29,6 +29,7 @@ object Configuration {
             "digipost.onErrorUrl" to "/opprett-avtale/feil/",
             "digipost.onRejectionUrl" to "/opprett-avtale/feil/",
             "digipost.navOrgnr" to "889640782",
+            "enhetsregisteret_base_url" to "https://data.brreg.no/enhetsregisteret/api",
             "virksomhetssertifikat.projectId" to "virksomhetssertifikat-dev",
             "virksomhetssertifikat.secretId" to "test-virksomhetssertifikat-felles-keystore-jceks_2018-2021",
             "virksomhetssertifikat.versionId" to "3",
@@ -47,8 +48,11 @@ object Configuration {
             "TOKEN_X_WELL_KNOWN_URL" to "http://host.docker.internal:8080/default/.well-known/openid-configuration",
             "TOKEN_X_CLIENT_ID" to "local",
             "userclaim" to "sub",
-            "REDIS_HOST" to "localhost",
-            "REDIS_PASSWORD" to "",
+            "POSTGRES_DATABASE" to "",
+            "POSTGRES_USERNAME" to "",
+            "POSTGRES_PASSWORD" to "",
+            "POSTGRES_HOST" to "",
+            "POSTGRES_PORT" to ""
         )
     )
 
@@ -99,6 +103,7 @@ object Configuration {
     val dbProperties = DatabaseProperties()
     val digipostProperties = DigipostProperties()
     val virksomhetssertifikatProperties = VirksomhetssertifikatProperties()
+    val enhetsregistertetProperties = EnhetsregistertetProperties()
 
     operator fun get(key: String): String = config[Key(key, stringType)]
 

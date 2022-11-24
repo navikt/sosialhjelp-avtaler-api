@@ -1,6 +1,6 @@
 package no.nav.sosialhjelp.avtaler.enhetsregisteret
 
-data class Kommune(
+data class Organisasjonsenhet(
     val organisasjonsnummer: String,
     val navn: String,
     val organisasjonsform: Organisasjonsform,

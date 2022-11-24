@@ -26,10 +26,10 @@ class EnhetsregisteretClient(props: Configuration.EnhetsregistertetProperties) {
         }
     }
 
-    suspend fun hentOrganisasjonsenhet(orgnr: String): Kommune? =
+    suspend fun hentOrganisasjonsenhet(orgnr: String): Organisasjonsenhet? =
         hentEnhetHelper("$baseUrl/enheter/$orgnr")
 
-    private suspend fun hentEnhetHelper(url: String): Kommune? {
+    private suspend fun hentEnhetHelper(url: String): Organisasjonsenhet? {
         try {
             log.info { "Henter enhet med url: $url" }
             return withContext(Dispatchers.IO) {

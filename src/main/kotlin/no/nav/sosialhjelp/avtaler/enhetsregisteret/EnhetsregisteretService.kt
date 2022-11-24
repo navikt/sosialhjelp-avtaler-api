@@ -7,7 +7,7 @@ private val log = KotlinLogging.logger { }
 class EnhetsregisteretService(
     private val enhetsregisteretClient: EnhetsregisteretClient,
 ) {
-    suspend fun hentOrganisasjonsenhet(orgnr: String): Kommune? {
+    suspend fun hentOrganisasjonsenhet(orgnr: String): Organisasjonsenhet? {
         log.info { "Henter organisasjonsenhet med orgnr: $orgnr" }
 
         val enhet = enhetsregisteretClient.hentOrganisasjonsenhet(orgnr)

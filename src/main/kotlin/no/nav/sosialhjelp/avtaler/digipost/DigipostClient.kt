@@ -11,8 +11,10 @@ import no.digipost.signature.client.core.Sender
 import no.digipost.signature.client.direct.DirectClient
 import no.digipost.signature.client.direct.DirectDocument
 import no.digipost.signature.client.direct.DirectJob
+import no.digipost.signature.client.direct.DirectJobResponse
 import no.digipost.signature.client.direct.DirectSigner
 import no.digipost.signature.client.direct.ExitUrls
+import no.digipost.signature.client.direct.StatusReference
 import no.digipost.signature.client.security.KeyStoreConfig
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
@@ -25,6 +27,7 @@ import java.util.Collections
 
 private val log = KotlinLogging.logger {}
 
+data class DigipostResponse(val redirectUrl: URI, val signerUrl: URI, val reference: String)
 class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: Configuration.VirksomhetssertifikatProperties) {
     private val accessSecretVersion: AccessSecretVersion = AccessSecretVersion
     private val onCompletionUrl = props.onCompletionUrl
@@ -69,7 +72,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         )
     }
 
-    fun sendTilSignering(fnr: String, avtale: Avtale): URI {
+    fun sendTilSignering(fnr: String, avtale: Avtale): DigipostResponse {
         val exitUrls = ExitUrls.of(
             URI.create(onCompletionUrl + avtale.orgnr),
             URI.create(onRejectionUrl + avtale.orgnr),
@@ -104,7 +107,13 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             log.error("Signer URL fra digipost er null.")
             throw DigipostException("Signer URL fra Digipost er null.")
         }
-        return directJobResponse.singleSigner.redirectUrl
+        return DigipostResponse(directJobResponse.singleSigner.redirectUrl, directJobResponse.singleSigner.signerUrl, directJobResponse.reference)
+    }
+
+    fun sjekkSigneringsstatus(statusQueryToken: String, jobReference: String, signerUrl: URI): String? {
+        val directJobResponse = DirectJobResponse(1, jobReference, signerUrl, null)
+        val directJobStatusResponse = client.getStatus(StatusReference.of(directJobResponse).withStatusQueryToken(statusQueryToken))
+        return directJobStatusResponse.status.toString()
     }
 
     private fun getAvtalePdf(): ByteArray {

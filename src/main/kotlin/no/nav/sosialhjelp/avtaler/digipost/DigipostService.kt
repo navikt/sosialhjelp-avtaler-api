@@ -1,10 +1,9 @@
 package no.nav.sosialhjelp.avtaler.digipost
 
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
-import java.net.URI
 
 class DigipostService(private val digipostClient: DigipostClient) {
-    fun sendTilSignering(fnr: String, avtale: Avtale): URI {
+    fun sendTilSignering(fnr: String, avtale: Avtale): DigipostResponse {
         return digipostClient.sendTilSignering(fnr, avtale)
     }
 }

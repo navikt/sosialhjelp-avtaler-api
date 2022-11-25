@@ -5,6 +5,7 @@ import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
+import no.nav.sosialhjelp.avtaler.digipost.DigipostResponse
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.enhetsregisteret.EnhetsregisteretService
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
@@ -71,17 +72,24 @@ class AvtaleService(
             avtaleversjon = "1.0",
             navn_innsender = navnInnsender
         )
-        return digipostService.sendTilSignering(fnr, avtale)
+        val digipostResponse = digipostService.sendTilSignering(fnr, avtale)
+
+        lagreDigipostResponse(digipostResponse)
+
+        return digipostResponse.redirectUrl
     }
 
-    suspend fun lagreAvtalestatus(navnInnsender: String, orgnr: String, status: String): Avtale {
+    private fun lagreDigipostResponse(digipostResponse: DigipostResponse) {
+        // lagre signerUrl og jobReference + orgnr elns i egen tabell? som kanksje kan slettes ved status suksess?
+    }
+
+    suspend fun lagreAvtalestatus(navnInnsender: String, orgnr: String, statusQueryToken: String): Avtale {
         log.info("Oppretter avtale for $orgnr")
         val avtale = Avtale(
             orgnr = orgnr,
             avtaleversjon = "1.0",
             navn_innsender = navnInnsender
         )
-
         if (status == "SUKSESS") {
             transaction(databaseContext) { ctx ->
                 ctx.avtaleStore.lagreAvtale(avtale)

@@ -1,11 +1,10 @@
 name: Deploy til prod
 on:
-  workflow_dispatch:
-#  workflow_run:
-#    workflows: [ "Build image" ]    # Venter på at bygget for prod er ferdig
-#    branches: [ main ]
-#    types:
-#      - completed
+  workflow_run:
+    workflows: [ "Build image" ]    # Venter på at bygget for prod er ferdig
+    branches: [ main ]
+    types:
+      - completed
 
 jobs:
   deploy:

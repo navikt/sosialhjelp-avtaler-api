@@ -7,6 +7,7 @@ import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
+import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.IgnoreTrailingSlash
 import io.ktor.server.routing.route
@@ -17,8 +18,17 @@ import no.nav.sosialhjelp.avtaler.HttpClientConfig.httpClient
 import no.nav.sosialhjelp.avtaler.altinn.AltinnClient
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.auth.Oauth2Client
+import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
+import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
 import no.nav.sosialhjelp.avtaler.db.DefaultDatabaseContext
+import no.nav.sosialhjelp.avtaler.digipost.DigipostClient
+import no.nav.sosialhjelp.avtaler.digipost.DigipostService
+import no.nav.sosialhjelp.avtaler.enhetsregisteret.EnhetsregisteretClient
+import no.nav.sosialhjelp.avtaler.enhetsregisteret.EnhetsregisteretService
 import no.nav.sosialhjelp.avtaler.internal.internalRoutes
+import no.nav.sosialhjelp.avtaler.kommune.kommuneApi
+import no.nav.sosialhjelp.avtaler.pdl.PdlClient
+import no.nav.sosialhjelp.avtaler.pdl.PersonNavnService
 import java.util.TimeZone
 
 private val log = KotlinLogging.logger {}

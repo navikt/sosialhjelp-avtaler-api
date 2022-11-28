@@ -64,21 +64,21 @@ fun Application.setupRoutes() {
 
     val tokenExchangeClient = Oauth2Client(defaultHttpClient, authProperties, Configuration.tokenXProperties)
     val altinnService = AltinnService(AltinnClient(Configuration.altinnProperties, tokenExchangeClient))
-//    val digipostService = DigipostService(DigipostClient(Configuration.digipostProperties, Configuration.virksomhetssertifikatProperties))
-//    val enhetsregisteretService = EnhetsregisteretService(EnhetsregisteretClient(Configuration.enhetsregistertetProperties, defaultHttpClient()))
-//    val avtaleService = AvtaleService(altinnService, digipostService, enhetsregisteretService, databaseContext)
-//    val personNavnService = PersonNavnService(PdlClient(Configuration.pdlProperties, tokenExchangeClient))
+    val digipostService = DigipostService(DigipostClient(Configuration.digipostProperties, Configuration.virksomhetssertifikatProperties))
+    val enhetsregisteretService = EnhetsregisteretService(EnhetsregisteretClient(Configuration.enhetsregistertetProperties, defaultHttpClient()))
+    val avtaleService = AvtaleService(altinnService, digipostService, enhetsregisteretService, databaseContext)
+    val personNavnService = PersonNavnService(PdlClient(Configuration.pdlProperties, tokenExchangeClient))
 
     routing {
 
         route("/sosialhjelp/avtaler-api") {
             internalRoutes()
-//            route("/api") {
-//                authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
-//                    avtaleApi(avtaleService, personNavnService)
-//                    kommuneApi(avtaleService)
-//                }
-//            }
+            route("/api") {
+                authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
+                    avtaleApi(avtaleService, personNavnService)
+                    kommuneApi(avtaleService)
+                }
+            }
         }
     }
 }

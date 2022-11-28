@@ -85,12 +85,12 @@ object Configuration {
             "altinn.altinnUrl" to "http://altinn-rettigheter-proxy.arbeidsgiver.svc.cluster.local", // dobbeltsjekk denne
             "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api",
             "altinn.altinnRettigheterAudience" to "prod-gcp:arbeidsgiver:altinn-rettigheter-proxy",
-            "virksomhetssertifikat.projectId" to "virksomhetssertifikat",
-            "virksomhetssertifikat.secretId" to "virksomhetssertifikat-felles-keystore-jceks_2018-2021",
-            "virksomhetssertifikat.versionId" to "3",
-            "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat",
-            "virksomhetssertifikat.passwordSecretId" to "keystore-credentials-json",
-            "virksomhetssertifikat.passwordSecretVersion" to "2",
+            "virksomhetssertifikat.projectId" to "virksomhetssertifikat-prod",
+            "virksomhetssertifikat.secretId" to "virksomhetssertifikat-digisos-keystore-jceks_2021-2024",
+            "virksomhetssertifikat.versionId" to "1",
+            "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-prod",
+            "virksomhetssertifikat.passwordSecretId" to "digisos-keystore-credentials-json",
+            "virksomhetssertifikat.passwordSecretVersion" to "1",
             "pdl.url" to "https://pdl-api.prod-fss-pub.nais.io/graphql",
             "pdl.audience" to "prod-fss:pdl:pdl-api"
         )

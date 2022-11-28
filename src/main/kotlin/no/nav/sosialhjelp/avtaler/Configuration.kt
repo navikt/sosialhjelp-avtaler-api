@@ -29,6 +29,7 @@ object Configuration {
             "digipost.onErrorUrl" to "/opprett-avtale/feil/",
             "digipost.onRejectionUrl" to "/opprett-avtale/feil/",
             "digipost.navOrgnr" to "889640782",
+            "enhetsregisteret_base_url" to "https://data.brreg.no/enhetsregisteret/api",
             "virksomhetssertifikat.projectId" to "virksomhetssertifikat-dev",
             "virksomhetssertifikat.secretId" to "test-virksomhetssertifikat-felles-keystore-jceks_2018-2021",
             "virksomhetssertifikat.versionId" to "3",
@@ -46,7 +47,12 @@ object Configuration {
             "application.cluster" to "LOCAL",
             "TOKEN_X_WELL_KNOWN_URL" to "http://host.docker.internal:8080/default/.well-known/openid-configuration",
             "TOKEN_X_CLIENT_ID" to "local",
-            "userclaim" to "sub"
+            "userclaim" to "sub",
+            "POSTGRES_DATABASE" to "",
+            "POSTGRES_USERNAME" to "",
+            "POSTGRES_PASSWORD" to "",
+            "POSTGRES_HOST" to "",
+            "POSTGRES_PORT" to ""
         )
     )
 
@@ -58,6 +64,7 @@ object Configuration {
             "application.cluster" to "DEV-GCP",
             "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.dev.nav.no/altinn-rettigheter-proxy/ekstern/altinn",
             "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api-dev",
+            "enhetsregisteret_base_url" to "https://data.brreg.no/enhetsregisteret/api",
             "altinn.altinnRettigheterAudience" to "dev-gcp:arbeidsgiver:altinn-rettigheter-proxy",
             "virksomhetssertifikat.projectId" to "virksomhetssertifikat-dev",
             "virksomhetssertifikat.secretId" to "test-virksomhetssertifikat-felles-keystore-jceks_2018-2021",
@@ -110,6 +117,7 @@ object Configuration {
     val dbProperties = DatabaseProperties()
     val digipostProperties = DigipostProperties()
     val virksomhetssertifikatProperties = VirksomhetssertifikatProperties()
+    val enhetsregistertetProperties = EnhetsregistertetProperties()
 
     operator fun get(key: String): String = config[Key(key, stringType)]
 
@@ -164,5 +172,9 @@ object Configuration {
         val passwordProjectId: String = this["virksomhetssertifikat.passwordProjectId"],
         val passwordSecretId: String = this["virksomhetssertifikat.passwordSecretId"],
         val passwordSecretVersionId: String = this["virksomhetssertifikat.passwordSecretVersion"]
+    )
+
+    data class EnhetsregistertetProperties(
+        val baseUrl: String = this["enhetsregisteret_base_url"]
     )
 }

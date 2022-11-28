@@ -4,6 +4,7 @@
   "postgresDatabaseName": "avtalerapidb",
   "namespace": "teamdigisos",
   "outboundExternalHosts": [
+    "data.brreg.no",
     "api.signering.posten.no",
     "pdl-api.prod-fss-pub.nais.io",
     "secretmanager.googleapis.com"

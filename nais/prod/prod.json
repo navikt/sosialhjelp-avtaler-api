@@ -1,20 +1,20 @@
 {
-  "applicationName": "sosialhjelp-avtaler-api-dev",
-  "postgresUserName": "sosialhjelp-avtaler-api-db-dev",
-  "postgresDatabaseName": "avtalerapidb-dev",
+  "applicationName": "sosialhjelp-avtaler-api",
+  "postgresUserName": "sosialhjelp-avtaler-api-db",
+  "postgresDatabaseName": "avtalerapidb",
   "namespace": "teamdigisos",
   "outboundExternalHosts": [
     "data.brreg.no",
-    "api.difitest.signering.posten.no",
-    "pdl-api.dev-fss-pub.nais.io",
+    "api.signering.posten.no",
+    "pdl-api.prod-fss-pub.nais.io",
     "secretmanager.googleapis.com"
   ],
-  "inboundRulesApplications": ["sosialhjelp-avtaler-dev"],
+  "inboundRulesApplications": ["sosialhjelp-avtaler"],
   "env": {
     "SPRING_PROFILES_ACTIVE": "log-kibana,log-audit",
     "UNLEASH_API_URL": "https://unleash.nais.io/api",
-    "UNLEASH_INSTANCE_ID": "dev-gcp",
-    "XSRF_DOMAIN": "dev.nav.no"
+    "UNLEASH_INSTANCE_ID": "prod-gcp",
+    "XSRF_DOMAIN": "nav.no"
   },
   "minReplicas": "1",
   "maxReplicas": "1",

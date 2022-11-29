@@ -78,7 +78,22 @@ object Configuration {
     )
 
     private val prodProperties = ConfigurationMap(
-        mapOf()
+        mapOf(
+            "application.baseUrl" to "https://nav.no/sosialhjelp/avtaler",
+            "application.profile" to "PROD",
+            "application.cluster" to "PROD-GCP",
+            "altinn.altinnUrl" to "http://altinn-rettigheter-proxy.arbeidsgiver.svc.cluster.local", // dobbeltsjekk denne
+            "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api",
+            "altinn.altinnRettigheterAudience" to "prod-gcp:arbeidsgiver:altinn-rettigheter-proxy",
+            "virksomhetssertifikat.projectId" to "virksomhetssertifikat-prod",
+            "virksomhetssertifikat.secretId" to "virksomhetssertifikat-digisos-keystore-jceks_2021-2024",
+            "virksomhetssertifikat.versionId" to "1",
+            "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-prod",
+            "virksomhetssertifikat.passwordSecretId" to "digisos-keystore-credentials-json",
+            "virksomhetssertifikat.passwordSecretVersion" to "1",
+            "pdl.url" to "https://pdl-api.prod-fss-pub.nais.io/graphql",
+            "pdl.audience" to "prod-fss:pdl:pdl-api"
+        )
     )
 
     private val resourceProperties =
@@ -95,7 +110,6 @@ object Configuration {
     val local: Boolean = profile == Profile.LOCAL
     val dev: Boolean = profile == Profile.DEV
     val prod: Boolean = profile == Profile.PROD
-    val baseUrl: String = this["application.baseUrl"]
 
     val tokenXProperties = TokenXProperties()
     val altinnProperties = AltinnProperties()

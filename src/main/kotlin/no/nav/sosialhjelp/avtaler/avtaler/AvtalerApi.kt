@@ -53,7 +53,7 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
             val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")
             val navnInnsender = personNavnService.getFulltNavn(fnr, token)
 
-            avtaleService.lagreAvtalestatus(navnInnsender, signeringsstatusRequest.orgnr, signeringsstatusRequest.statusQueryToken)
+            avtaleService.sjekkAvtaleStatus(navnInnsender, signeringsstatusRequest.orgnr, signeringsstatusRequest.statusQueryToken)
             val avtaleResponse = avtaleService.hentAvtale(
                 fnr = call.extractFnr(),
                 orgnr = signeringsstatusRequest.orgnr,

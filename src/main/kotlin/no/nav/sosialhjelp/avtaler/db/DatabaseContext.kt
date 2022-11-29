@@ -4,6 +4,8 @@ import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.DatabaseConfiguration
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleStore
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleStorePostgres
+import no.nav.sosialhjelp.avtaler.digipost.DigipostJobbDataStore
+import no.nav.sosialhjelp.avtaler.digipost.DigipostJobbDataStorePostgres
 import javax.sql.DataSource
 
 interface DatabaseContext {
@@ -19,9 +21,11 @@ class DefaultDatabaseContext(override val dataSource: DataSource = DatabaseConfi
 }
 
 interface DatabaseSessionContext {
+    val digipostJobbDataStore: DigipostJobbDataStore
     val avtaleStore: AvtaleStore
 }
 
 class DefaultDatabaseSessionContext(sessionFactory: SessionFactory) : DatabaseSessionContext {
     override val avtaleStore = AvtaleStorePostgres(sessionFactory)
+    override val digipostJobbDataStore = DigipostJobbDataStorePostgres(sessionFactory)
 }

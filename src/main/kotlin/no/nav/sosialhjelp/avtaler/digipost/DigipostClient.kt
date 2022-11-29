@@ -12,6 +12,7 @@ import no.digipost.signature.client.direct.DirectClient
 import no.digipost.signature.client.direct.DirectDocument
 import no.digipost.signature.client.direct.DirectJob
 import no.digipost.signature.client.direct.DirectJobResponse
+import no.digipost.signature.client.direct.DirectJobStatus
 import no.digipost.signature.client.direct.DirectSigner
 import no.digipost.signature.client.direct.ExitUrls
 import no.digipost.signature.client.direct.StatusReference
@@ -110,10 +111,10 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         return DigipostResponse(directJobResponse.singleSigner.redirectUrl, directJobResponse.singleSigner.signerUrl, directJobResponse.reference)
     }
 
-    fun sjekkSigneringsstatus(statusQueryToken: String, jobReference: String, signerUrl: URI): String? {
+    fun sjekkSigneringsstatus(statusQueryToken: String, jobReference: String, signerUrl: URI): DirectJobStatus {
         val directJobResponse = DirectJobResponse(1, jobReference, signerUrl, null)
         val directJobStatusResponse = client.getStatus(StatusReference.of(directJobResponse).withStatusQueryToken(statusQueryToken))
-        return directJobStatusResponse.status.toString()
+        return directJobStatusResponse.status
     }
 
     private fun getAvtalePdf(): ByteArray {

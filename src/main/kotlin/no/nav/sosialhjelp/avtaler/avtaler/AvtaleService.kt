@@ -81,7 +81,6 @@ class AvtaleService(
     }
 
     private suspend fun lagreDigipostResponse(orgnr: String, digipostResponse: DigipostResponse) {
-        // lagre signerUrl og jobReference + orgnr elns i egen tabell? som kanksje kan slettes ved status suksess?
         val digipostJobbData = DigipostJobbData(
             orgnr = orgnr,
             directJobReference = digipostResponse.reference,

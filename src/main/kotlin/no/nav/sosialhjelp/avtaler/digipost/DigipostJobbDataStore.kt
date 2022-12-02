@@ -48,7 +48,7 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
 
     private fun mapper(row: Row): DigipostJobbData = DigipostJobbData(
         orgnr = row.string("orgnr"),
-        directJobReference = row.string("direct_job_reference"),
+        directJobReference = row.long("direct_job_reference"),
         signerUrl = URI(row.string("signer_url"))
     )
 }

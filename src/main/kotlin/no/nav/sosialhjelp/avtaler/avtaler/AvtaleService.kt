@@ -84,8 +84,7 @@ class AvtaleService(
         val digipostJobbData = DigipostJobbData(
             orgnr = orgnr,
             directJobReference = digipostResponse.reference,
-            signerUrl = digipostResponse.signerUrl,
-            statusQueryToken = null
+            signerUrl = digipostResponse.signerUrl
         )
         transaction(databaseContext) { ctx ->
             ctx.digipostJobbDataStore.lagreDigipostResponse(digipostJobbData)
@@ -99,10 +98,7 @@ class AvtaleService(
             navn_innsender = navnInnsender
         )
         val digipostJobbData = hentDigipostJobb(orgnr)
-        if (digipostJobbData == null) {
-            log.info("Kunne ikke hente signeringsstatus for orgnr $orgnr")
-            return avtale
-        }
+            ?: return avtale.also { log.info("Kunne ikke hente signeringsstatus for orgnr $orgnr") }
 
         val avtaleErSignert = digipostService.erSigneringsstatusCompleted(
             statusQueryToken,
@@ -111,8 +107,7 @@ class AvtaleService(
         )
 
         if (!avtaleErSignert) {
-            log.info("Avtale for orgnr $orgnr er ikke signert")
-            return avtale
+            return avtale.also { log.info("Avtale for orgnr $orgnr er ikke signert") }
         }
         return lagreAvtalestatus(avtale)
     }
@@ -123,8 +118,6 @@ class AvtaleService(
         }
 
     private suspend fun lagreAvtalestatus(avtale: Avtale): Avtale {
-        log.info("Oppretter avtale for ${avtale.orgnr}")
-
         transaction(databaseContext) { ctx ->
             ctx.avtaleStore.lagreAvtale(avtale)
         }

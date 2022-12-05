@@ -22,9 +22,9 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
             INSERT INTO digipost_jobb_data (orgnr,
                                             direct_job_reference,
                                             signer_url)
-            VALUES (:orgnr, :direct_job_id, :signer_url)
+            VALUES (:orgnr, :direct_job_reference, :signer_url)
             ON CONFLICT (orgnr) 
-            DO UPDATE SET direct_job_reference = :direct_job_id, signer_url = :signer_url
+            DO UPDATE SET direct_job_reference = :direct_job_reference, signer_url = :signer_url
         """.trimIndent()
 
         it.update(

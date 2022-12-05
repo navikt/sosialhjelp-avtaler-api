@@ -84,7 +84,7 @@ class AvtaleService(
         val digipostJobbData = DigipostJobbData(
             orgnr = orgnr,
             directJobReference = digipostResponse.reference,
-            signerUrl = digipostResponse.signerUrl
+            statusUrl = digipostResponse.signerUrl
         )
         transaction(databaseContext) { ctx ->
             ctx.digipostJobbDataStore.lagreDigipostResponse(digipostJobbData)
@@ -104,7 +104,7 @@ class AvtaleService(
         val avtaleErSignert = digipostService.erSigneringsstatusCompleted(
             statusQueryToken,
             digipostJobbData.directJobReference,
-            digipostJobbData.signerUrl
+            digipostJobbData.statusUrl
         )
 
         if (!avtaleErSignert) {

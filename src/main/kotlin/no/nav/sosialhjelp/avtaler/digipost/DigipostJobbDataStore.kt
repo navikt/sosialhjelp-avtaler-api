@@ -21,10 +21,10 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
         val sql = """
             INSERT INTO digipost_jobb_data (orgnr,
                                             direct_job_reference,
-                                            signer_url)
-            VALUES (:orgnr, :direct_job_reference, :signer_url)
+                                            status_url)
+            VALUES (:orgnr, :direct_job_reference, :status_url)
             ON CONFLICT (orgnr) 
-            DO UPDATE SET direct_job_reference = :direct_job_reference, signer_url = :signer_url
+            DO UPDATE SET direct_job_reference = :direct_job_reference, status_url = :status_url
         """.trimIndent()
 
         it.update(
@@ -32,7 +32,7 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
             mapOf(
                 "orgnr" to digipostJobbData.orgnr,
                 "direct_job_reference" to digipostJobbData.directJobReference,
-                "signer_url" to digipostJobbData.signerUrl.toString()
+                "status_url" to digipostJobbData.statusUrl.toString()
             )
         )
         digipostJobbData
@@ -51,6 +51,6 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
     private fun mapper(row: Row): DigipostJobbData = DigipostJobbData(
         orgnr = row.string("orgnr"),
         directJobReference = row.string("direct_job_reference"),
-        signerUrl = URI(row.string("signer_url"))
+        statusUrl = URI(row.string("status_url"))
     )
 }

@@ -1,3 +1,5 @@
+DROP TABLE IF EXISTS digipost_jobb_data;
+
 CREATE TABLE IF NOT EXISTS digipost_jobb_data
 (
     orgnr                      ORGNR     NOT NULL PRIMARY KEY,

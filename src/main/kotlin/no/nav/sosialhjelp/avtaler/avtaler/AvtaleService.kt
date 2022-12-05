@@ -83,7 +83,7 @@ class AvtaleService(
     private suspend fun lagreDigipostResponse(orgnr: String, digipostResponse: DigipostResponse) {
         val digipostJobbData = DigipostJobbData(
             orgnr = orgnr,
-            directJobReference = digipostResponse.jobId,
+            directJobReference = digipostResponse.reference,
             signerUrl = digipostResponse.signerUrl
         )
         transaction(databaseContext) { ctx ->

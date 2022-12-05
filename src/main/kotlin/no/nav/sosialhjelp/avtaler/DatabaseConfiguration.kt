@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.seconds
 
 private val log = KotlinLogging.logger { }
 
-class DatabaseConfiguration(private val props: Configuration.DatabaseProperties) {
+class DatabaseConfiguration(private val props: Configuration.DatabaseProperties, private val miljo: Configuration.Profile) {
     fun dataSource(): DataSource {
 
         if (!waitForDB(10.minutes)) {
@@ -30,8 +30,9 @@ class DatabaseConfiguration(private val props: Configuration.DatabaseProperties)
             connectionTimeout = 1000
             maxLifetime = 30001
         }
-
-        val flyway = Flyway.configure().dataSource(dataSource).load()
+        val cleanDbOnValidationError = miljo != Configuration.Profile.PROD
+        val flyway = Flyway.configure().cleanOnValidationError(cleanDbOnValidationError)
+            .dataSource(dataSource).load()
         flyway.migrate()
 
         return dataSource

@@ -1,1 +1,0 @@
-ALTER TABLE digipost_jobb_data ALTER COLUMN direct_job_reference TYPE bigint USING (direct_job_reference::bigint);;

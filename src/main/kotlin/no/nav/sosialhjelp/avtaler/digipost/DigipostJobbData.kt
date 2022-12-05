@@ -4,6 +4,6 @@ import java.net.URI
 
 data class DigipostJobbData(
     val orgnr: String,
-    val directJobReference: Long,
+    val directJobReference: String,
     val signerUrl: URI
 )

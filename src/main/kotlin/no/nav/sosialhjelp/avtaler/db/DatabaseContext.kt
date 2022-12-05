@@ -14,7 +14,7 @@ interface DatabaseContext {
     fun createSessionContext(sessionFactory: SessionFactory): DatabaseSessionContext
 }
 
-class DefaultDatabaseContext(override val dataSource: DataSource = DatabaseConfiguration(Configuration.dbProperties).dataSource()) :
+class DefaultDatabaseContext(override val dataSource: DataSource = DatabaseConfiguration(Configuration.dbProperties, Configuration.profile).dataSource()) :
     DatabaseContext {
     override fun createSessionContext(sessionFactory: SessionFactory): DatabaseSessionContext =
         DefaultDatabaseSessionContext(sessionFactory)

@@ -32,7 +32,7 @@ class DatabaseConfiguration(private val props: Configuration.DatabaseProperties,
         }
         val isDevOrLocal = miljo != Configuration.Profile.PROD
         val flyway = Flyway.configure()
-            .cleanDisabled(isDevOrLocal)
+            .cleanDisabled(!isDevOrLocal)
             .cleanOnValidationError(isDevOrLocal)
             .dataSource(dataSource).load()
         flyway.migrate()

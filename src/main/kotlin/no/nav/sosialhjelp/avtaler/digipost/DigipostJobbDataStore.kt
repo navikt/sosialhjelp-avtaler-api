@@ -30,7 +30,7 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
             mapOf(
                 "orgnr" to digipostJobbData.orgnr,
                 "direct_job_reference" to digipostJobbData.directJobReference,
-                "signer_url" to digipostJobbData.signerUrl
+                "signer_url" to digipostJobbData.signerUrl.toString()
             )
         )
         digipostJobbData

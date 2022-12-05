@@ -30,8 +30,10 @@ class DatabaseConfiguration(private val props: Configuration.DatabaseProperties,
             connectionTimeout = 1000
             maxLifetime = 30001
         }
-        val cleanDbOnValidationError = miljo != Configuration.Profile.PROD
-        val flyway = Flyway.configure().cleanOnValidationError(cleanDbOnValidationError)
+        val isDevOrLocal = miljo != Configuration.Profile.PROD
+        val flyway = Flyway.configure()
+            .cleanDisabled(isDevOrLocal)
+            .cleanOnValidationError(isDevOrLocal)
             .dataSource(dataSource).load()
         flyway.migrate()
 

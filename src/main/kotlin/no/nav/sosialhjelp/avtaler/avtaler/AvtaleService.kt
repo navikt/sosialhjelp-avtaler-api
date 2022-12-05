@@ -5,6 +5,8 @@ import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
+import no.nav.sosialhjelp.avtaler.digipost.DigipostJobbData
+import no.nav.sosialhjelp.avtaler.digipost.DigipostResponse
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.enhetsregisteret.EnhetsregisteretService
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
@@ -63,7 +65,7 @@ class AvtaleService(
         it.orgnr
     }[orgnr]
 
-    fun signerAvtale(fnr: String, avtaleRequest: AvtaleRequest, navnInnsender: String): URI {
+    suspend fun signerAvtale(fnr: String, avtaleRequest: AvtaleRequest, navnInnsender: String): URI {
         log.info("Sender avtale til e-signering for ${avtaleRequest.orgnr}")
 
         val avtale = Avtale(
@@ -71,23 +73,57 @@ class AvtaleService(
             avtaleversjon = "1.0",
             navn_innsender = navnInnsender
         )
-        return digipostService.sendTilSignering(fnr, avtale)
+        val digipostResponse = digipostService.sendTilSignering(fnr, avtale)
+
+        lagreDigipostResponse(avtaleRequest.orgnr, digipostResponse)
+
+        return digipostResponse.redirectUrl
     }
 
-    suspend fun lagreAvtalestatus(navnInnsender: String, orgnr: String, status: String): Avtale {
-        log.info("Oppretter avtale for $orgnr")
+    private suspend fun lagreDigipostResponse(orgnr: String, digipostResponse: DigipostResponse) {
+        val digipostJobbData = DigipostJobbData(
+            orgnr = orgnr,
+            directJobReference = digipostResponse.reference,
+            statusUrl = digipostResponse.signerUrl
+        )
+        transaction(databaseContext) { ctx ->
+            ctx.digipostJobbDataStore.lagreDigipostResponse(digipostJobbData)
+        }
+        log.info("Lagret digipostdata for orgnr $orgnr med jobbreferanse ${digipostResponse.reference}")
+    }
+
+    suspend fun sjekkAvtaleStatus(navnInnsender: String, orgnr: String, statusQueryToken: String): Avtale {
         val avtale = Avtale(
             orgnr = orgnr,
             avtaleversjon = "1.0",
             navn_innsender = navnInnsender
         )
+        val digipostJobbData = hentDigipostJobb(orgnr)
+            ?: return avtale.also { log.info("Kunne ikke hente signeringsstatus for orgnr $orgnr") }
 
-        if (status == "SUKSESS") {
-            transaction(databaseContext) { ctx ->
-                ctx.avtaleStore.lagreAvtale(avtale)
-            }
-            log.info("Lagret avtale for $orgnr")
+        val avtaleErSignert = digipostService.erSigneringsstatusCompleted(
+            statusQueryToken,
+            digipostJobbData.directJobReference,
+            digipostJobbData.statusUrl
+        )
+
+        if (!avtaleErSignert) {
+            return avtale.also { log.info("Avtale for orgnr $orgnr er ikke signert") }
         }
+        return lagreAvtalestatus(avtale)
+    }
+
+    private suspend fun hentDigipostJobb(orgnr: String): DigipostJobbData? =
+        transaction(databaseContext) { ctx ->
+            ctx.digipostJobbDataStore.hentDigipostJobb(orgnr)
+        }
+
+    private suspend fun lagreAvtalestatus(avtale: Avtale): Avtale {
+        transaction(databaseContext) { ctx ->
+            ctx.avtaleStore.lagreAvtale(avtale)
+        }
+
+        log.info("Lagret avtale for ${avtale.orgnr}")
         return avtale
     }
 }

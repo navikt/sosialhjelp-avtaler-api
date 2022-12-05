@@ -11,8 +11,11 @@ import no.digipost.signature.client.core.Sender
 import no.digipost.signature.client.direct.DirectClient
 import no.digipost.signature.client.direct.DirectDocument
 import no.digipost.signature.client.direct.DirectJob
+import no.digipost.signature.client.direct.DirectJobResponse
+import no.digipost.signature.client.direct.DirectJobStatus
 import no.digipost.signature.client.direct.DirectSigner
 import no.digipost.signature.client.direct.ExitUrls
+import no.digipost.signature.client.direct.StatusReference
 import no.digipost.signature.client.security.KeyStoreConfig
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
@@ -22,9 +25,11 @@ import no.nav.sosialhjelp.avtaler.secretmanager.DigisosKeyStoreCredentials
 import java.io.ByteArrayInputStream
 import java.net.URI
 import java.util.Collections
+import java.util.UUID
 
 private val log = KotlinLogging.logger {}
 
+data class DigipostResponse(val redirectUrl: URI, val signerUrl: URI, val reference: String)
 class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: Configuration.VirksomhetssertifikatProperties) {
     private val accessSecretVersion: AccessSecretVersion = AccessSecretVersion
     private val onCompletionUrl = props.onCompletionUrl
@@ -69,7 +74,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         )
     }
 
-    fun sendTilSignering(fnr: String, avtale: Avtale): URI {
+    fun sendTilSignering(fnr: String, avtale: Avtale): DigipostResponse {
         val exitUrls = ExitUrls.of(
             URI.create(onCompletionUrl + avtale.orgnr),
             URI.create(onRejectionUrl + avtale.orgnr),
@@ -97,14 +102,21 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
 
         val job = DirectJob
             .builder(avtaleTittel, documents, signers, exitUrls)
+            .withReference(UUID.randomUUID().toString())
             .build()
 
         val directJobResponse = client.create(job)
-        if (directJobResponse.singleSigner.signerUrl == null) {
-            log.error("Signer URL fra digipost er null.")
-            throw DigipostException("Signer URL fra Digipost er null.")
+        if (directJobResponse.singleSigner.redirectUrl == null) {
+            log.error("Redirect URL fra digipost er null.")
+            throw DigipostException("Redirect URL fra Digipost er null.")
         }
-        return directJobResponse.singleSigner.redirectUrl
+        return DigipostResponse(directJobResponse.singleSigner.redirectUrl, directJobResponse.statusUrl, directJobResponse.reference)
+    }
+
+    fun sjekkSigneringsstatus(statusQueryToken: String, jobReference: String, statusUrl: URI): DirectJobStatus {
+        val directJobResponse = DirectJobResponse(1, jobReference, statusUrl, null)
+        val directJobStatusResponse = client.getStatus(StatusReference.of(directJobResponse).withStatusQueryToken(statusQueryToken))
+        return directJobStatusResponse.status
     }
 
     private fun getAvtalePdf(): ByteArray {

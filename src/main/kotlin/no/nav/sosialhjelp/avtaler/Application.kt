@@ -59,7 +59,7 @@ fun Application.configure() {
 }
 
 fun Application.setupRoutes() {
-    val databaseContext = DefaultDatabaseContext(DatabaseConfiguration(Configuration.dbProperties).dataSource())
+    val databaseContext = DefaultDatabaseContext(DatabaseConfiguration(Configuration.dbProperties, Configuration.profile).dataSource())
 
     installAuthentication(httpClient(engineFactory { StubEngine.tokenX() }))
 

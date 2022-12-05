@@ -89,6 +89,7 @@ class AvtaleService(
         transaction(databaseContext) { ctx ->
             ctx.digipostJobbDataStore.lagreDigipostResponse(digipostJobbData)
         }
+        log.info("Lagret digipostdata for orgnr $orgnr med jobbreferanse ${digipostResponse.reference}")
     }
 
     suspend fun sjekkAvtaleStatus(navnInnsender: String, orgnr: String, statusQueryToken: String): Avtale {

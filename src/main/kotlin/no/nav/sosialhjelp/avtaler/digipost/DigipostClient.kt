@@ -106,11 +106,11 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             .build()
 
         val directJobResponse = client.create(job)
-        if (directJobResponse.singleSigner.signerUrl == null) {
+        if (directJobResponse.singleSigner.redirectUrl == null) {
             log.error("Signer URL fra digipost er null.")
             throw DigipostException("Signer URL fra Digipost er null.")
         }
-        return DigipostResponse(directJobResponse.singleSigner.redirectUrl, directJobResponse.singleSigner.signerUrl, directJobResponse.reference)
+        return DigipostResponse(directJobResponse.singleSigner.redirectUrl, directJobResponse.statusUrl, directJobResponse.reference)
     }
 
     fun sjekkSigneringsstatus(statusQueryToken: String, jobReference: String, signerUrl: URI): DirectJobStatus {

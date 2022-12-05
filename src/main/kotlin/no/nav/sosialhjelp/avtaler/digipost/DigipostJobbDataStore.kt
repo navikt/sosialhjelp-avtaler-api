@@ -23,8 +23,10 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
                                             direct_job_reference,
                                             signer_url)
             VALUES (:orgnr, :direct_job_id, :signer_url)
-            ON CONFLICT DO NOTHING
+            ON CONFLICT (orgnr) 
+            DO UPDATE SET direct_job_reference = :direct_job_id, signer_url = :signer_url
         """.trimIndent()
+
         it.update(
             sql,
             mapOf(

@@ -62,7 +62,7 @@ object Configuration {
             "application.baseUrl" to "https://digisos.dev.nav.no/sosialhjelp/avtaler",
             "application.profile" to "DEV",
             "application.cluster" to "DEV-GCP",
-            "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.dev.nav.no/altinn-rettigheter-proxy/ekstern/altinn",
+            "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.dev.nav.no/altinn-rettigheter-proxy",
             "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api-dev",
             "enhetsregisteret_base_url" to "http://sosialhjelp-mock-alt-api-mock/sosialhjelp/mock-alt-api/enhetsregisteret/api",
             "altinn.altinnRettigheterAudience" to "dev-gcp:arbeidsgiver:altinn-rettigheter-proxy",
@@ -82,7 +82,7 @@ object Configuration {
             "application.baseUrl" to "https://nav.no/sosialhjelp/avtaler",
             "application.profile" to "PROD",
             "application.cluster" to "PROD-GCP",
-            "altinn.altinnUrl" to "http://altinn-rettigheter-proxy.arbeidsgiver.svc.cluster.local", // dobbeltsjekk denne
+            "altinn.altinnUrl" to "http://altinn-rettigheter-proxy.arbeidsgiver.svc.cluster.local/altinn-rettigheter-proxy", // dobbeltsjekk denne
             "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api",
             "altinn.altinnRettigheterAudience" to "prod-gcp:arbeidsgiver:altinn-rettigheter-proxy",
             "virksomhetssertifikat.projectId" to "virksomhetssertifikat-prod",

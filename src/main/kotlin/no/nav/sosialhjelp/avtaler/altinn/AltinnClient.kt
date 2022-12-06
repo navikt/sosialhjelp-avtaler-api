@@ -26,7 +26,7 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
         token?.let {
             val scopedAccessToken = tokenClient.exchangeToken(token, altinnRettigheterAudience).accessToken
 
-            val response = client.get("$baseUrl/api/serviceowner/reportees") {
+            val response = client.get("$baseUrl/ekstern/altinn/api/serviceowner/reportees") {
                 url {
                     parameters.append("ForceEIAuthentication", "")
                     parameters.append("subject", fnr)
@@ -50,7 +50,7 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
 
     suspend fun hentRettigheter(fnr: String, orgnr: String): Set<Avgiver.Tjeneste> {
 
-        val response = client.get("$baseUrl/api/serviceowner/authorization/rights") {
+        val response = client.get("$baseUrl/ekstern/altinn/api/serviceowner/authorization/rights") {
             url {
                 parameters.append("ForceEIAuthentication", "true")
                 parameters.append("subject", fnr)

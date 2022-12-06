@@ -71,3 +71,5 @@ spec:
   azure:
     application:
       enabled: true
+  secureLogs:
+    enabled: true

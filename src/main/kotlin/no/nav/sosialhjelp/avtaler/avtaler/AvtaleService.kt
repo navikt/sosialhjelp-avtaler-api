@@ -35,7 +35,7 @@ class AvtaleService(
                 }
             }
 
-        sikkerLog.info("Filtrert avgivere for fnr: $fnr, tjeneste: $tjeneste, avgivere: $avgivereFiltrert")
+        sikkerLog.info("Filtrert avgivere for fnr: -, tjeneste: $tjeneste, avgivere: $avgivereFiltrert")
 
         val avtaler = transaction(databaseContext) { ctx ->
             ctx.avtaleStore.hentAvtalerForOrganisasjoner(avgivereFiltrert.map { it.orgnr }).associateBy {

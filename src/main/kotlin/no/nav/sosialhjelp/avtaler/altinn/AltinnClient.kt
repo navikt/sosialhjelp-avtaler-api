@@ -5,7 +5,6 @@ import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.client.request.header
-import io.ktor.client.statement.request
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import mu.KotlinLogging
@@ -37,7 +36,7 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
                     header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
                 }
             }
-            sikkerLog.info { "Hentet avgivere med url: ${response.request.url}" }
+            sikkerLog.info { "Hentet avgivere med url: -" }
             if (response.status == HttpStatusCode.OK) {
                 return response.body() ?: emptyList()
             }
@@ -46,25 +45,6 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
         }
         log.warn("Ingen access token i request, kan ikke hente ny token til altinn-proxy")
         return emptyList()
-    }
-
-    suspend fun hentRettigheter(fnr: String, orgnr: String): Set<Avgiver.Tjeneste> {
-
-        val response = client.get("$baseUrl/ekstern/altinn/api/serviceowner/authorization/rights") {
-            url {
-                parameters.append("ForceEIAuthentication", "true")
-                parameters.append("subject", fnr)
-                parameters.append("reportee", orgnr)
-                parameters.append("\$filter", Avgiver.Tjeneste.FILTER)
-            }
-        }
-
-        sikkerLog.info { "Hentet rettigheter med url: ${response.request.url}" }
-        if (response.status == HttpStatusCode.OK) {
-            return response.body<HentRettigheterResponse?>()?.tilSet() ?: emptySet()
-        }
-        log.warn { "Kunne ikke hente rettigheter, status: ${response.status}" }
-        return emptySet()
     }
 
     private data class Rettighet(

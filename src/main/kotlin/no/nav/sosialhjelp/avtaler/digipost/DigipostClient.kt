@@ -107,7 +107,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
 
         val directJobResponse = client.create(job)
         if (directJobResponse.singleSigner.redirectUrl == null) {
-            log.error("Redirect URL fra digipost er null.")
+            log.error("Kan ikke redirecte bruker til e-signering. Redirect URL fra Digipost er null.")
             throw DigipostException("Redirect URL fra Digipost er null.")
         }
         return DigipostResponse(directJobResponse.singleSigner.redirectUrl, directJobResponse.statusUrl, directJobResponse.reference)

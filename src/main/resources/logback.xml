@@ -11,4 +11,9 @@
     <logger name="io.netty" level="INFO"/>
     <logger name="com.zaxxer.hikari" level="INFO"/>
     <logger name="no.digipost.signature.client.http.requestresponse" level="DEBUG"/>
+
+    <logger name="tjenestekall" level="INFO" additivity="false">
+        <appender-ref ref="secureLog" />
+    </logger>
+
 </configuration>

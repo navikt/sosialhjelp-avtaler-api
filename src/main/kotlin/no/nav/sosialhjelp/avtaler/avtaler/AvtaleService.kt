@@ -35,9 +35,7 @@ class AvtaleService(
                 }
             }
 
-        sikkerLog.info {
-            "Filtrert avgivere for fnr: $fnr, tjeneste: $tjeneste, avgivere: $avgivereFiltrert"
-        }
+        sikkerLog.info("Filtrert avgivere for fnr: $fnr, tjeneste: $tjeneste, avgivere: $avgivereFiltrert")
 
         val avtaler = transaction(databaseContext) { ctx ->
             ctx.avtaleStore.hentAvtalerForOrganisasjoner(avgivereFiltrert.map { it.orgnr }).associateBy {
@@ -66,7 +64,7 @@ class AvtaleService(
     }[orgnr]
 
     suspend fun signerAvtale(fnr: String, avtaleRequest: AvtaleRequest, navnInnsender: String): URI {
-        log.info("Sender avtale til e-signering for ${avtaleRequest.orgnr}")
+        log.info("Sender avtale til e-signering for orgnummer ${avtaleRequest.orgnr}")
 
         val avtale = Avtale(
             orgnr = avtaleRequest.orgnr,
@@ -89,7 +87,7 @@ class AvtaleService(
         transaction(databaseContext) { ctx ->
             ctx.digipostJobbDataStore.lagreDigipostResponse(digipostJobbData)
         }
-        log.info("Lagret digipostdata for orgnr $orgnr med jobbreferanse ${digipostResponse.reference}")
+        log.info("Lagret DigipostJobbData for orgnr $orgnr")
     }
 
     suspend fun sjekkAvtaleStatus(navnInnsender: String, orgnr: String, statusQueryToken: String): Avtale {
@@ -99,7 +97,7 @@ class AvtaleService(
             navn_innsender = navnInnsender
         )
         val digipostJobbData = hentDigipostJobb(orgnr)
-            ?: return avtale.also { log.info("Kunne ikke hente signeringsstatus for orgnr $orgnr") }
+            ?: return avtale.also { log.error("Kunne ikke hente signeringsstatus for orgnr $orgnr") }
 
         val avtaleErSignert = digipostService.erSigneringsstatusCompleted(
             statusQueryToken,
@@ -123,7 +121,7 @@ class AvtaleService(
             ctx.avtaleStore.lagreAvtale(avtale)
         }
 
-        log.info("Lagret avtale for ${avtale.orgnr}")
+        log.info("Lagret signert avtale for ${avtale.orgnr}")
         return avtale
     }
 }

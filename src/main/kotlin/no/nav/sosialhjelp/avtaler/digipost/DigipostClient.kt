@@ -7,6 +7,7 @@ import no.digipost.signature.client.Certificates
 import no.digipost.signature.client.ClientConfiguration
 import no.digipost.signature.client.ServiceUri
 import no.digipost.signature.client.core.DocumentType
+import no.digipost.signature.client.core.PollingQueue
 import no.digipost.signature.client.core.Sender
 import no.digipost.signature.client.direct.DirectClient
 import no.digipost.signature.client.direct.DirectDocument
@@ -45,7 +46,7 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
     private val clientConfiguration = ClientConfiguration.builder(keyStoreConfig)
         .trustStore(Certificates.TEST)
         .serviceUri(ServiceUri.DIFI_TEST)
-        .globalSender(Sender(props.navOrgnr))
+        .globalSender(Sender(props.navOrgnr, PollingQueue.of("digisos-avtaler")))
         .enableRequestAndResponseLogging()
         .build()
     private val client = DirectClient(clientConfiguration)

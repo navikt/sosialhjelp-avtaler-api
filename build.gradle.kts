@@ -6,6 +6,7 @@ object Versions {
     const val kotestVersion = "5.5.4"
     const val ktlint = "0.45.2"
     const val logback_version = "1.4.4"
+    const val logback_encoder_version = "7.2"
     const val jackson_version = "2.14.0"
     const val microutils_version = "3.0.4"
     const val token_support_version = "2.1.7"
@@ -44,7 +45,6 @@ repositories {
 }
 
 dependencies {
-    implementation("ch.qos.logback:logback-classic:${Versions.logback_version}")
 
     implementation("com.natpryce:konfig:${Versions.konfig_version}")
 
@@ -69,6 +69,8 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:${Versions.jackson_version}")
 
     implementation("io.github.microutils:kotlin-logging:${Versions.microutils_version}")
+    implementation("ch.qos.logback:logback-classic:${Versions.logback_version}")
+    runtimeOnly("net.logstash.logback:logstash-logback-encoder:${Versions.logback_encoder_version}")
 
     // Database
     implementation("org.postgresql:postgresql:${Versions.postgresql_version}")

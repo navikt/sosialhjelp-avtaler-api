@@ -32,11 +32,12 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
                     parameters.append("subject", fnr)
                     parameters.append("serviceCode", tjeneste.kode)
                     parameters.append("serviceEdition", tjeneste.versjon.toString())
-                    parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active'")
+                    parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active' and OrganizationForm eq 'KOMM'")
                     parameters.append("\$top", "200")
                     header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
                 }
             }
+            log.info("DEBUG altinn: $response")
             sikkerLog.info { "Hentet avgivere med url: ${response.request.url}" }
             if (response.status == HttpStatusCode.OK) {
                 return response.body() ?: emptyList()

@@ -32,7 +32,7 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
                     parameters.append("subject", fnr)
                     parameters.append("serviceCode", tjeneste.kode)
                     parameters.append("serviceEdition", tjeneste.versjon.toString())
-                    parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active'")
+                    parameters.append("\$filter", "Type eq 'KOMM' and Status eq 'Active'")
                     parameters.append("\$top", "200")
                     header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
                 }

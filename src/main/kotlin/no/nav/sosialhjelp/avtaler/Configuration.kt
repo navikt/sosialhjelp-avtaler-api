@@ -87,7 +87,7 @@ object Configuration {
             "altinn.altinnRettigheterAudience" to "prod-gcp:arbeidsgiver:altinn-rettigheter-proxy",
             "virksomhetssertifikat.projectId" to "virksomhetssertifikat-prod",
             "virksomhetssertifikat.secretId" to "virksomhetssertifikat-digisos-keystore-jceks_2021-2024",
-            "virksomhetssertifikat.versionId" to "1",
+            "virksomhetssertifikat.versionId" to "2",
             "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-prod",
             "virksomhetssertifikat.passwordSecretId" to "digisos-keystore-credentials-json",
             "virksomhetssertifikat.passwordSecretVersion" to "1",

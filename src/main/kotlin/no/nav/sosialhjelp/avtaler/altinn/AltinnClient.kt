@@ -37,7 +37,6 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
                     header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
                 }
             }
-            log.info("DEBUG altinn: $response")
             sikkerLog.info { "Hentet avgivere med url: ${response.request.url}" }
             if (response.status == HttpStatusCode.OK) {
                 return response.body() ?: emptyList()

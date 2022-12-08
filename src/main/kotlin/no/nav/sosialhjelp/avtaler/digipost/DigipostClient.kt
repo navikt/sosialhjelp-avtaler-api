@@ -30,7 +30,7 @@ import java.util.UUID
 private val log = KotlinLogging.logger {}
 
 data class DigipostResponse(val redirectUrl: URI, val signerUrl: URI, val reference: String)
-class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: Configuration.VirksomhetssertifikatProperties) {
+class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: Configuration.VirksomhetssertifikatProperties, profile: Configuration.Profile) {
     private val accessSecretVersion: AccessSecretVersion = AccessSecretVersion
     private val onCompletionUrl = props.onCompletionUrl
     private val onErrorUrl = props.onErrorUrl
@@ -43,8 +43,8 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
     private val virksomhetVersionId = virksomhetProps.versionId
     private val keyStoreConfig: KeyStoreConfig = configure(accessSecretVersion)
     private val clientConfiguration = ClientConfiguration.builder(keyStoreConfig)
-        .trustStore(Certificates.TEST)
-        .serviceUri(ServiceUri.DIFI_TEST)
+        .trustStore(if (profile == Configuration.Profile.PROD) Certificates.PRODUCTION else Certificates.TEST)
+        .serviceUri(if (profile == Configuration.Profile.PROD) ServiceUri.PRODUCTION else ServiceUri.DIFI_TEST)
         .globalSender(Sender(props.navOrgnr))
         .enableRequestAndResponseLogging()
         .build()

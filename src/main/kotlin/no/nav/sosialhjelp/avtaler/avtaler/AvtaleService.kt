@@ -124,4 +124,17 @@ class AvtaleService(
         log.info("Lagret signert avtale for ${avtale.orgnr}")
         return avtale
     }
+
+    fun signerTestAvtale(fnr: String): URI {
+        log.info("Sender test-avtale til e-signering. Denne burde fjernes.")
+
+        val avtale = Avtale(
+            orgnr = "avtaleRequest.orgnr",
+            avtaleversjon = "1.0",
+            navn_innsender = "navnInnsender"
+        )
+        val digipostResponse = digipostService.sendTilSignering(fnr, avtale)
+
+        return digipostResponse.redirectUrl
+    }
 }

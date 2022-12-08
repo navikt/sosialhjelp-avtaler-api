@@ -66,6 +66,14 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
             }
             call.respond(HttpStatusCode.OK, avtaleResponse)
         }
+
+        post("/intern-test-signering") {
+            val fnr = call.extractFnr()
+            val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")
+
+            val signeringsurl = avtaleService.signerTestAvtale(fnr)
+            call.respond(HttpStatusCode.Created, signeringsurl)
+        }
     }
 }
 

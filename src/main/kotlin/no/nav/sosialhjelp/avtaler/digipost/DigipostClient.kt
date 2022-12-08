@@ -119,6 +119,45 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         return directJobStatusResponse.status
     }
 
+    fun sendTilTestSignering(fnr: String, avtale: Avtale): DigipostResponse {
+        val exitUrls = ExitUrls.of(
+            URI.create(onCompletionUrl + avtale.orgnr),
+            URI.create(onRejectionUrl + avtale.orgnr),
+            URI.create(onErrorUrl + avtale.orgnr)
+        )
+
+        val avtalePdf: ByteArray
+        try {
+            avtalePdf = this::class.java.getResource("/avtaler/test.pdf")!!.openStream().readAllBytes()
+        } catch (e: NullPointerException) {
+            log.error("Kunne ikke laste inn avtale.pdf")
+            throw e
+        }
+
+        val avtaleTittel = "Avtale test"
+        val documents: List<DirectDocument> = listOf(
+            DirectDocument.builder(avtaleTittel, avtalePdf).type(DocumentType.PDF).build()
+        )
+
+        val signers: List<DirectSigner> = Collections.singletonList(
+            DirectSigner
+                .withPersonalIdentificationNumber(fnr)
+                .build()
+        )
+
+        val job = DirectJob
+            .builder(avtaleTittel, documents, signers, exitUrls)
+            .withReference(UUID.randomUUID().toString())
+            .build()
+
+        val directJobResponse = client.create(job)
+        if (directJobResponse.singleSigner.redirectUrl == null) {
+            log.error("Kan ikke redirecte bruker til e-signering. Redirect URL fra Digipost er null.")
+            throw DigipostException("Redirect URL fra Digipost er null.")
+        }
+        return DigipostResponse(directJobResponse.singleSigner.redirectUrl, directJobResponse.statusUrl, directJobResponse.reference)
+    }
+
     private fun getAvtalePdf(): ByteArray {
         return this::class.java.getResource("/avtaler/Avtale.pdf")!!.openStream().readAllBytes()
     }

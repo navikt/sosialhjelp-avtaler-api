@@ -90,7 +90,7 @@ object Configuration {
             "virksomhetssertifikat.versionId" to "2",
             "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-prod",
             "virksomhetssertifikat.passwordSecretId" to "digisos-keystore-credentials-json",
-            "virksomhetssertifikat.passwordSecretVersion" to "1",
+            "virksomhetssertifikat.passwordSecretVersion" to "2",
             "pdl.url" to "https://pdl-api.prod-fss-pub.nais.io/graphql",
             "pdl.audience" to "prod-fss:pdl:pdl-api"
         )

@@ -7,8 +7,8 @@ data class Avgiver(
     val navn: String,
     @JsonProperty("OrganizationNumber")
     val orgnr: String,
-    @JsonProperty("ParentOrganizationNumber")
-    val parentOrgnr: String?,
+    @JsonProperty("OrganizationForm")
+    val organisasjonsform: Organisasjonsform
 ) {
     enum class Tjeneste(val kode: String, val versjon: Int) {
         /**

@@ -8,8 +8,11 @@ data class Avgiver(
     @JsonProperty("OrganizationNumber")
     val orgnr: String,
     @JsonProperty("OrganizationForm")
-    val organisasjonsform: Organisasjonsform?
+    val organisasjonsform: String?
 ) {
+    fun erKommune(): Boolean {
+        return organisasjonsform == "KOMM"
+    }
     enum class Tjeneste(val kode: String, val versjon: Int) {
         /**
          * "Signering av avtale fra Digisos"

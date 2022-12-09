@@ -23,8 +23,7 @@ class AvtaleService(
     suspend fun hentAvtaler(fnr: String, tjeneste: Avgiver.Tjeneste, token: String?): List<AvtaleResponse> {
         val avgivereFiltrert = altinnService.hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
             .filter { avgiver ->
-                avgiver.organisasjonsform != null && avgiver.organisasjonsform.erKommune()
-                    .also { log.info("Hentet enhet med orgnr: ${avgiver.orgnr}") }
+                avgiver.erKommune().also { log.info("Hentet enhet med orgnr: ${avgiver.orgnr}") }
             }
         sikkerLog.info("Filtrert avgivere for fnr: $fnr, tjeneste: $tjeneste, avgivere: $avgivereFiltrert")
 

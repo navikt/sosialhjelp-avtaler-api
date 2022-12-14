@@ -9,6 +9,7 @@ import no.nav.sosialhjelp.avtaler.digipost.DigipostJobbData
 import no.nav.sosialhjelp.avtaler.digipost.DigipostResponse
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
+import java.io.InputStream
 import java.net.URI
 
 private val log = KotlinLogging.logger { }
@@ -99,6 +100,14 @@ class AvtaleService(
             return avtale.also { log.info("Avtale for orgnr $orgnr er ikke signert") }
         }
         return lagreAvtalestatus(avtale)
+    }
+
+    suspend fun hentSignertAvtale(orgnr: String, statusQueryToken: String): InputStream? {
+        log.info("Henter signert avtale for orgnr $orgnr")
+        val digipostJobbData = hentDigipostJobb(orgnr)
+            ?: return null.also { log.error("Kunne ikke hente signert avtale for orgnr $orgnr") }
+
+        return digipostService.hentSignertDokument(statusQueryToken, digipostJobbData.directJobReference, digipostJobbData.statusUrl)
     }
 
     private suspend fun hentDigipostJobb(orgnr: String): DigipostJobbData? =

@@ -36,6 +36,18 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
             call.respond(HttpStatusCode.OK, avtale)
         }
 
+        get("/signert-avtale") {
+            val signeringsstatusRequest = call.receive<SigneringsstatusRequest>()
+            val signertAvtale =
+                avtaleService.hentSignertAvtale(signeringsstatusRequest.orgnr, signeringsstatusRequest.token)
+
+            if (signertAvtale == null) {
+                call.response.status(HttpStatusCode.NotFound)
+                return@get
+            }
+            call.respond(HttpStatusCode.OK, signertAvtale)
+        }
+
         post("/signer") {
             val avtaleRequest = call.receive<AvtaleRequest>()
             val fnr = call.extractFnr()

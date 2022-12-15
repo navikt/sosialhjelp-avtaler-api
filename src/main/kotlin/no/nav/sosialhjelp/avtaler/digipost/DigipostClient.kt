@@ -114,9 +114,12 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         return DigipostResponse(directJobResponse.singleSigner.redirectUrl, directJobResponse.statusUrl, directJobResponse.reference)
     }
 
-    fun sjekkSigneringsstatus(statusQueryToken: String, jobReference: String, statusUrl: URI): DirectJobStatus {
-        val directJobResponse = DirectJobResponse(1, jobReference, statusUrl, null)
-        val directJobStatusResponse = client.getStatus(StatusReference.of(directJobResponse).withStatusQueryToken(statusQueryToken))
+    fun sjekkSigneringsstatus(digipostJobbData: DigipostJobbData): DirectJobStatus {
+        val directJobResponse = DirectJobResponse(1, digipostJobbData.directJobReference, digipostJobbData.statusUrl, null)
+        val directJobStatusResponse = client.getStatus(
+            StatusReference.of(directJobResponse)
+                .withStatusQueryToken(digipostJobbData.statusQueryToken)
+        )
         return directJobStatusResponse.status
     }
 

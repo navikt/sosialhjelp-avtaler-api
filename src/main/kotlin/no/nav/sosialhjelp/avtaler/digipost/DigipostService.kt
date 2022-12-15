@@ -10,8 +10,8 @@ class DigipostService(private val digipostClient: DigipostClient) {
         return digipostClient.sendTilSignering(fnr, avtale)
     }
 
-    fun erSigneringsstatusCompleted(statusQueryToken: String, directJobReference: String, statusUrl: URI): Boolean {
-        return digipostClient.sjekkSigneringsstatus(statusQueryToken, directJobReference, statusUrl) == DirectJobStatus.COMPLETED_SUCCESSFULLY
+    fun erSigneringsstatusCompleted(digipostJobbData: DigipostJobbData): Boolean {
+        return digipostClient.sjekkSigneringsstatus(digipostJobbData) == DirectJobStatus.COMPLETED_SUCCESSFULLY
     }
 
     fun hentSignertDokument(statusQueryToken: String, directJobReference: String, statusUrl: URI): InputStream? {

@@ -88,14 +88,11 @@ class AvtaleService(
             avtaleversjon = "1.0",
             navn_innsender = navnInnsender
         )
-        val digipostJobbData = hentDigipostJobb(orgnr)
-            ?: return avtale.also { log.error("Kunne ikke hente signeringsstatus for orgnr $orgnr") }
+        val digipostJobbData = hentDigipostJobb(orgnr)?.copy(
+            statusQueryToken = statusQueryToken
+        ) ?: return avtale.also { log.error("Kunne ikke hente signeringsstatus for orgnr $orgnr") }
 
-        val avtaleErSignert = digipostService.erSigneringsstatusCompleted(
-            statusQueryToken,
-            digipostJobbData.directJobReference,
-            digipostJobbData.statusUrl
-        )
+        val avtaleErSignert = digipostService.erSigneringsstatusCompleted(digipostJobbData)
 
         oppdaterStatusQueryToken(digipostJobbData)
 

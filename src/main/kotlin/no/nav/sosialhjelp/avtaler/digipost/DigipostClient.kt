@@ -7,6 +7,7 @@ import no.digipost.signature.client.Certificates
 import no.digipost.signature.client.ClientConfiguration
 import no.digipost.signature.client.ServiceUri
 import no.digipost.signature.client.core.DocumentType
+import no.digipost.signature.client.core.ResponseInputStream
 import no.digipost.signature.client.core.Sender
 import no.digipost.signature.client.direct.DirectClient
 import no.digipost.signature.client.direct.DirectDocument
@@ -113,10 +114,20 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         return DigipostResponse(directJobResponse.singleSigner.redirectUrl, directJobResponse.statusUrl, directJobResponse.reference)
     }
 
-    fun sjekkSigneringsstatus(statusQueryToken: String, jobReference: String, statusUrl: URI): DirectJobStatus {
+    fun sjekkSigneringsstatus(digipostJobbData: DigipostJobbData): DirectJobStatus {
+        val directJobResponse = DirectJobResponse(1, digipostJobbData.directJobReference, digipostJobbData.statusUrl, null)
+        val directJobStatusResponse = client.getStatus(
+            StatusReference.of(directJobResponse)
+                .withStatusQueryToken(digipostJobbData.statusQueryToken)
+        )
+        return directJobStatusResponse.status
+    }
+
+    fun hentSignertAvtale(statusQueryToken: String, jobReference: String, statusUrl: URI): ResponseInputStream? {
         val directJobResponse = DirectJobResponse(1, jobReference, statusUrl, null)
         val directJobStatusResponse = client.getStatus(StatusReference.of(directJobResponse).withStatusQueryToken(statusQueryToken))
-        return directJobStatusResponse.status
+
+        return if (directJobStatusResponse.isPAdESAvailable) client.getPAdES(directJobStatusResponse.getpAdESUrl()) else null
     }
 
     private fun getAvtalePdf(): ByteArray {

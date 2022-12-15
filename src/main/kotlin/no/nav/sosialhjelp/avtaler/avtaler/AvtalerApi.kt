@@ -36,10 +36,10 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
             call.respond(HttpStatusCode.OK, avtale)
         }
 
-        get("/signert-avtale") {
-            val signeringsstatusRequest = call.receive<SigneringsstatusRequest>()
+        get("/signert-avtale/{orgnr}") {
+            val orgnr = call.orgnr()
             val signertAvtale =
-                avtaleService.hentSignertAvtale(signeringsstatusRequest.orgnr, signeringsstatusRequest.token)
+                avtaleService.hentSignertAvtale(orgnr)
 
             if (signertAvtale == null) {
                 call.response.status(HttpStatusCode.NotFound)
@@ -91,4 +91,8 @@ private fun ApplicationCall.getAccessToken(): String? {
 
 private fun ApplicationCall.kommunenr(): String = requireNotNull(parameters["kommunenr"]) {
     "Mangler kommunenr i URL"
+}
+
+private fun ApplicationCall.orgnr(): String = requireNotNull(parameters["orgnr"]) {
+    "Mangler orgnr i URL"
 }

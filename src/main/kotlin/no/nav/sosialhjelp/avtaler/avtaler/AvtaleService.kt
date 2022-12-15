@@ -73,7 +73,8 @@ class AvtaleService(
         val digipostJobbData = DigipostJobbData(
             orgnr = orgnr,
             directJobReference = digipostResponse.reference,
-            statusUrl = digipostResponse.signerUrl
+            statusUrl = digipostResponse.signerUrl,
+            statusQueryToken = null
         )
         transaction(databaseContext) { ctx ->
             ctx.digipostJobbDataStore.lagreDigipostResponse(digipostJobbData)
@@ -96,18 +97,33 @@ class AvtaleService(
             digipostJobbData.statusUrl
         )
 
+        oppdaterStatusQueryToken(digipostJobbData)
+
         if (!avtaleErSignert) {
             return avtale.also { log.info("Avtale for orgnr $orgnr er ikke signert") }
         }
         return lagreAvtalestatus(avtale)
     }
 
-    suspend fun hentSignertAvtale(orgnr: String, statusQueryToken: String): InputStream? {
+    private suspend fun oppdaterStatusQueryToken(digipostJobbData: DigipostJobbData) {
+        transaction(databaseContext) { ctx ->
+            ctx.digipostJobbDataStore.oppdaterStatusQueryToken(digipostJobbData)
+        }
+    }
+
+    suspend fun hentSignertAvtale(orgnr: String): InputStream? {
         log.info("Henter signert avtale for orgnr $orgnr")
         val digipostJobbData = hentDigipostJobb(orgnr)
-            ?: return null.also { log.error("Kunne ikke hente signert avtale for orgnr $orgnr") }
 
-        return digipostService.hentSignertDokument(statusQueryToken, digipostJobbData.directJobReference, digipostJobbData.statusUrl)
+        if (digipostJobbData == null || digipostJobbData.statusQueryToken == null) {
+            return null.also { log.error("Kunne ikke hente signert avtale for orgnr $orgnr") }
+        }
+
+        return digipostService.hentSignertDokument(
+            digipostJobbData.statusQueryToken,
+            digipostJobbData.directJobReference,
+            digipostJobbData.statusUrl
+        )
     }
 
     private suspend fun hentDigipostJobb(orgnr: String): DigipostJobbData? =

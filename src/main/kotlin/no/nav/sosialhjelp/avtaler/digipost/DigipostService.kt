@@ -2,7 +2,6 @@ package no.nav.sosialhjelp.avtaler.digipost
 
 import no.digipost.signature.client.direct.DirectJobStatus
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
-import java.io.InputStream
 import java.net.URI
 
 class DigipostService(private val digipostClient: DigipostClient) {
@@ -14,7 +13,7 @@ class DigipostService(private val digipostClient: DigipostClient) {
         return digipostClient.sjekkSigneringsstatus(digipostJobbData) == DirectJobStatus.COMPLETED_SUCCESSFULLY
     }
 
-    fun hentSignertDokument(statusQueryToken: String, directJobReference: String, statusUrl: URI): InputStream? {
+    fun hentSignertDokument(statusQueryToken: String, directJobReference: String, statusUrl: URI): URI {
         return digipostClient.hentSignertAvtale(statusQueryToken, directJobReference, statusUrl)
     }
 }

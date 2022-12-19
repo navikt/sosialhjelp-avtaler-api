@@ -9,7 +9,6 @@ import no.nav.sosialhjelp.avtaler.digipost.DigipostJobbData
 import no.nav.sosialhjelp.avtaler.digipost.DigipostResponse
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
-import java.io.InputStream
 import java.net.URI
 
 private val log = KotlinLogging.logger { }
@@ -108,7 +107,7 @@ class AvtaleService(
         }
     }
 
-    suspend fun hentSignertAvtale(orgnr: String): InputStream? {
+    suspend fun hentSignertAvtale(orgnr: String): URI? {
         log.info("Henter signert avtale for orgnr $orgnr")
         val digipostJobbData = hentDigipostJobb(orgnr)
 

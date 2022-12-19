@@ -38,14 +38,14 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
 
         get("/signert-avtale/{orgnr}") {
             val orgnr = call.orgnr()
-            val signertAvtale =
+            val signertAvtaleURI =
                 avtaleService.hentSignertAvtale(orgnr)
 
-            if (signertAvtale == null) {
+            if (signertAvtaleURI == null) {
                 call.response.status(HttpStatusCode.NotFound)
                 return@get
             }
-            call.respond(HttpStatusCode.OK, signertAvtale)
+            call.respond(HttpStatusCode.OK, signertAvtaleURI)
         }
 
         post("/signer") {

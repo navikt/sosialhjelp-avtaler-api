@@ -7,7 +7,6 @@ import no.digipost.signature.client.Certificates
 import no.digipost.signature.client.ClientConfiguration
 import no.digipost.signature.client.ServiceUri
 import no.digipost.signature.client.core.DocumentType
-import no.digipost.signature.client.core.ResponseInputStream
 import no.digipost.signature.client.core.Sender
 import no.digipost.signature.client.direct.DirectClient
 import no.digipost.signature.client.direct.DirectDocument
@@ -123,11 +122,14 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         return directJobStatusResponse.status
     }
 
-    fun hentSignertAvtale(statusQueryToken: String, jobReference: String, statusUrl: URI): ResponseInputStream? {
+    fun hentSignertAvtale(statusQueryToken: String, jobReference: String, statusUrl: URI): URI {
         val directJobResponse = DirectJobResponse(1, jobReference, statusUrl, null)
         val directJobStatusResponse = client.getStatus(StatusReference.of(directJobResponse).withStatusQueryToken(statusQueryToken))
 
-        return if (directJobStatusResponse.isPAdESAvailable) client.getPAdES(directJobStatusResponse.getpAdESUrl()) else null
+        if (!directJobStatusResponse.isPAdESAvailable) {
+            throw DigipostException("Kunne ikke hente URI for signert dokument fra Digipost.")
+        }
+        return directJobStatusResponse.getpAdESUrl().getpAdESUrl()
     }
 
     private fun getAvtalePdf(): ByteArray {

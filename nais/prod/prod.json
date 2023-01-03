@@ -2,6 +2,7 @@
   "applicationName": "sosialhjelp-avtaler-api",
   "postgresUserName": "sosialhjelp-avtaler-api-db",
   "postgresDatabaseName": "avtalerapidb",
+  "postgresDatabaseTier": "db-custom-1-1024",
   "namespace": "teamdigisos",
   "outboundExternalHosts": [
     "data.brreg.no",

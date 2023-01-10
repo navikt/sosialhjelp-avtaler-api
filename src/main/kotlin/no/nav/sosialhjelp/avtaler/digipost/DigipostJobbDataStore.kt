@@ -13,7 +13,7 @@ interface DigipostJobbDataStore : Store {
     fun lagreDigipostResponse(digipostJobbData: DigipostJobbData): DigipostJobbData
 
     fun hentDigipostJobb(orgnr: String): DigipostJobbData?
-    fun oppdaterStatusQueryToken(digipostJobbData: DigipostJobbData): DigipostJobbData
+    fun oppdaterDigipostJobbData(digipostJobbData: DigipostJobbData): DigipostJobbData
 }
 
 class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) : DigipostJobbDataStore, TransactionalStore(sessionFactory) {
@@ -53,7 +53,7 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
         it.query(sql, mapOf("orgnr" to orgnr), ::mapper)
     }
 
-    override fun oppdaterStatusQueryToken(digipostJobbData: DigipostJobbData): DigipostJobbData = session {
+    override fun oppdaterDigipostJobbData(digipostJobbData: DigipostJobbData): DigipostJobbData = session {
         @Language("PostgreSQL")
         val sql = """
             UPDATE digipost_jobb_data 

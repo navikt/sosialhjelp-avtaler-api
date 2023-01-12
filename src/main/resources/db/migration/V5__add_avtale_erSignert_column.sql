@@ -1,0 +1,1 @@
+ALTER TABLE avtale_v1 ADD COLUMN er_signert BOOLEAN NOT NULL DEFAULT true

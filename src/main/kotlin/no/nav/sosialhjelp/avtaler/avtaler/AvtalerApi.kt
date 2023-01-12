@@ -38,14 +38,13 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
 
         get("/signert-avtale/{orgnr}") {
             val orgnr = call.orgnr()
-            val signertAvtale =
-                avtaleService.hentSignertAvtale(orgnr)
+            val signertAvtaleDokument = avtaleService.hentSignertAvtaleDokument(orgnr)
 
-            if (signertAvtale == null) {
+            if (signertAvtaleDokument == null) {
                 call.response.status(HttpStatusCode.NotFound)
                 return@get
             }
-            call.respond(HttpStatusCode.OK, signertAvtale)
+            call.respond(HttpStatusCode.OK, signertAvtaleDokument)
         }
 
         post("/signer") {
@@ -65,7 +64,7 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
             val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")
             val navnInnsender = personNavnService.getFulltNavn(fnr, token)
 
-            avtaleService.sjekkAvtaleStatus(navnInnsender, signeringsstatusRequest.orgnr, signeringsstatusRequest.token)
+            avtaleService.sjekkAvtaleStatusOgLagreSignertDokument(navnInnsender, signeringsstatusRequest.orgnr, signeringsstatusRequest.token)
             val avtaleResponse = avtaleService.hentAvtale(
                 fnr = call.extractFnr(),
                 orgnr = signeringsstatusRequest.orgnr,

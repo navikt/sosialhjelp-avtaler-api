@@ -84,30 +84,32 @@ class AvtaleService(
         log.info("Lagret DigipostJobbData for orgnr $orgnr")
     }
 
-    suspend fun sjekkAvtaleStatusOgLagreSignertDokument(navnInnsender: String, orgnr: String, statusQueryToken: String): Avtale {
+    suspend fun sjekkAvtaleStatusOgLagreSignertDokument(navnInnsender: String, orgnr: String, statusQueryToken: String) {
         val avtale = Avtale(
             orgnr = orgnr,
             avtaleversjon = "1.0",
             navn_innsender = navnInnsender,
             erSignert = false
         )
-        var digipostJobbData = hentDigipostJobb(orgnr) ?: return avtale.apply { log.error("Kunne ikke hente signeringsstatus for orgnr $orgnr") }
-        digipostJobbData.copy(statusQueryToken = statusQueryToken).apply { digipostJobbData = this }
-        val harSignertAvtale = sjekkAvtaleStatus(avtale, digipostJobbData)
-        if (harSignertAvtale) { // vi lagrer bare avtaler som er signert - hvordan skille mellom a
-            hentSignertAvtaleDokument(digipostJobbData)
+        var digipostJobbData = hentDigipostJobb(orgnr)
+        if (digipostJobbData == null) {
+            log.error("Kunne ikke hente signeringsstatus for orgnr $orgnr")
+            return
+        }
+        val harSignertAvtale = sjekkAvtaleStatus(avtale, digipostJobbData, statusQueryToken)
+        if (!harSignertAvtale) {
+            oppdaterDigipostJobbData(digipostJobbData, statusQueryToken = statusQueryToken)
+            return
         }
 
-        return avtale
+        oppdaterDigipostJobbData(digipostJobbData, statusQueryToken = statusQueryToken, signertDokument = hentSignertAvtaleDokument(digipostJobbData))
     }
-    suspend fun sjekkAvtaleStatus(avtale: Avtale, digipostJobbData: DigipostJobbData): Boolean {
+    suspend fun sjekkAvtaleStatus(avtale: Avtale, digipostJobbData: DigipostJobbData, statusQueryToken: String): Boolean {
         val avtaleErSignert = digipostService.erSigneringsstatusCompleted(
-            digipostJobbData.directJobReference, digipostJobbData.statusUrl,
-            digipostJobbData.statusQueryToken!!
+            digipostJobbData.directJobReference, digipostJobbData.statusUrl, statusQueryToken
         )
 
         if (!avtaleErSignert) {
-            oppdaterDigipostJobbData(digipostJobbData)
             return false.apply { log.info("Avtale for orgnr ${avtale.orgnr} er ikke signert") }
         }
         return true.also { lagreAvtalestatus(avtale.apply { erSignert = true }) }
@@ -143,9 +145,13 @@ class AvtaleService(
             )
     }
 
-    private suspend fun oppdaterDigipostJobbData(digipostJobbData: DigipostJobbData) {
+    private suspend fun oppdaterDigipostJobbData(
+        digipostJobbData: DigipostJobbData,
+        statusQueryToken: String,
+        signertDokument: InputStream? = null
+    ) {
         transaction(databaseContext) { ctx ->
-            ctx.digipostJobbDataStore.oppdaterDigipostJobbData(digipostJobbData)
+            ctx.digipostJobbDataStore.oppdaterDigipostJobbData(digipostJobbData.copy(statusQueryToken = statusQueryToken, signertDokument = signertDokument))
         }
     }
 

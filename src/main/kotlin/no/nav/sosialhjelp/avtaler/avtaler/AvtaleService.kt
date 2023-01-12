@@ -113,7 +113,8 @@ class AvtaleService(
         if (!avtaleErSignert) {
             return false
         }
-        return true.also { lagreAvtalestatus(avtale.apply { erSignert = true }) }
+        lagreAvtalestatus(avtale.apply { erSignert = true })
+        return true
     }
 
     fun hentSignertAvtaleDokumentFraDigipost(digipostJobbData: DigipostJobbData): InputStream? {

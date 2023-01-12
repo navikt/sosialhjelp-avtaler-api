@@ -38,7 +38,7 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
 
         get("/signert-avtale/{orgnr}") {
             val orgnr = call.orgnr()
-            val signertAvtaleDokument = avtaleService.hentSignertAvtaleDokument(orgnr)
+            val signertAvtaleDokument = avtaleService.hentSignertAvtaleDokumentFraDatabaseEllerDigipost(orgnr)
 
             if (signertAvtaleDokument == null) {
                 call.response.status(HttpStatusCode.NotFound)

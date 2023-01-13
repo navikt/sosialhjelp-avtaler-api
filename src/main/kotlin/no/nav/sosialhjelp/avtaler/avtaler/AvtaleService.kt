@@ -91,7 +91,7 @@ class AvtaleService(
             navn_innsender = navnInnsender,
             erSignert = false
         )
-        var digipostJobbData = hentDigipostJobb(orgnr)
+        val digipostJobbData = hentDigipostJobb(orgnr)
         if (digipostJobbData == null) {
             log.error("Kunne ikke hente signeringsstatus for orgnr $orgnr")
             return
@@ -103,7 +103,11 @@ class AvtaleService(
             return
         }
         log.info("Avtale for orgnr ${avtale.orgnr} er signert")
-        oppdaterDigipostJobbData(digipostJobbData, statusQueryToken = statusQueryToken, signertDokument = hentSignertAvtaleDokumentFraDigipost(digipostJobbData))
+        oppdaterDigipostJobbData(
+            digipostJobbData,
+            statusQueryToken = statusQueryToken,
+            signertDokument = hentSignertAvtaleDokumentFraDigipost(digipostJobbData)
+        )
     }
     suspend fun sjekkAvtaleStatus(avtale: Avtale, digipostJobbData: DigipostJobbData, statusQueryToken: String): Boolean {
         val avtaleErSignert = digipostService.erSigneringsstatusCompleted(
@@ -136,7 +140,7 @@ class AvtaleService(
         val digipostJobbData = hentDigipostJobb(orgnr)
             ?: return null.apply { log.error("Kunne ikke hente signert avtale for orgnr $orgnr") }
 
-        return digipostJobbData.signertDokument ?: hentSignertAvtaleDokumentFraDigipost(digipostJobbData)
+        return digipostJobbData.signertDokument.also { log.info { "Hentet signert avtale for orgnr $orgnr fra database" } } ?: hentSignertAvtaleDokumentFraDigipost(digipostJobbData)
     }
 
     private suspend fun oppdaterDigipostJobbData(

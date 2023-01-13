@@ -136,11 +136,14 @@ class AvtaleService(
     }
 
     suspend fun hentSignertAvtaleDokumentFraDatabaseEllerDigipost(orgnr: String): InputStream? {
-        log.info("Henter signert avtale for orgnr $orgnr")
         val digipostJobbData = hentDigipostJobb(orgnr)
             ?: return null.apply { log.error("Kunne ikke hente digipost jobb-info fra database for orgnr $orgnr") }
 
-        return digipostJobbData.signertDokument.also { log.info { "Hentet signert avtale for orgnr $orgnr fra database" } } ?: hentSignertAvtaleDokumentFraDigipost(
+        if (digipostJobbData.signertDokument != null) {
+            log.info { "Hentet signert avtale for orgnr $orgnr fra database" }
+            return digipostJobbData.signertDokument
+        }
+        return hentSignertAvtaleDokumentFraDigipost(
             digipostJobbData,
             digipostJobbData.statusQueryToken
         )

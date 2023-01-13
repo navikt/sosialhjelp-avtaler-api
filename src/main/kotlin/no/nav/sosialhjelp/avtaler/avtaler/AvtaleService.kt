@@ -117,7 +117,7 @@ class AvtaleService(
         if (!avtaleErSignert) {
             return false
         }
-        lagreAvtalestatus(avtale.apply { erSignert = true })
+        lagreAvtale(avtale.copy(erSignert = true))
         return true
     }
 
@@ -161,7 +161,7 @@ class AvtaleService(
             ctx.digipostJobbDataStore.hentDigipostJobb(orgnr)
         }
 
-    private suspend fun lagreAvtalestatus(avtale: Avtale): Avtale {
+    private suspend fun lagreAvtale(avtale: Avtale): Avtale {
         transaction(databaseContext) { ctx ->
             ctx.avtaleStore.lagreAvtale(avtale)
         }

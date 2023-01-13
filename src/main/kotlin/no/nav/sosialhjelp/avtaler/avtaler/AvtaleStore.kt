@@ -23,7 +23,7 @@ data class Avtale(
     val orgnr: String,
     val avtaleversjon: String? = null,
     val navn_innsender: String,
-    var erSignert: Boolean,
+    val erSignert: Boolean,
     val opprettet: LocalDateTime = LocalDateTime.now()
 )
 

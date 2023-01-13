@@ -106,7 +106,7 @@ class AvtaleService(
         oppdaterDigipostJobbData(
             digipostJobbData,
             statusQueryToken = statusQueryToken,
-            signertDokument = hentSignertAvtaleDokumentFraDigipost(digipostJobbData)
+            signertDokument = hentSignertAvtaleDokumentFraDigipost(digipostJobbData, statusQueryToken = statusQueryToken,)
         )
     }
     suspend fun sjekkAvtaleStatus(avtale: Avtale, digipostJobbData: DigipostJobbData, statusQueryToken: String): Boolean {
@@ -121,15 +121,15 @@ class AvtaleService(
         return true
     }
 
-    fun hentSignertAvtaleDokumentFraDigipost(digipostJobbData: DigipostJobbData): InputStream? {
+    fun hentSignertAvtaleDokumentFraDigipost(digipostJobbData: DigipostJobbData, statusQueryToken: String?): InputStream? {
         log.info("Henter signert avtale for orgnr ${digipostJobbData.orgnr} fra Digipost")
 
-        if (digipostJobbData.statusQueryToken == null) {
-            return null.apply { log.error("Kunne ikke hente signert avtale for orgnr ${digipostJobbData.orgnr}") }
+        if (statusQueryToken == null) {
+            return null.apply { log.error("StatusQueryToken er null. Kunne ikke hente signert avtale for orgnr ${digipostJobbData.orgnr}") }
         }
 
         return digipostService.hentSignertDokument(
-            digipostJobbData.statusQueryToken,
+            statusQueryToken,
             digipostJobbData.directJobReference,
             digipostJobbData.statusUrl
         )
@@ -138,9 +138,12 @@ class AvtaleService(
     suspend fun hentSignertAvtaleDokumentFraDatabaseEllerDigipost(orgnr: String): InputStream? {
         log.info("Henter signert avtale for orgnr $orgnr")
         val digipostJobbData = hentDigipostJobb(orgnr)
-            ?: return null.apply { log.error("Kunne ikke hente signert avtale for orgnr $orgnr") }
+            ?: return null.apply { log.error("Kunne ikke hente digipost jobb-info fra database for orgnr $orgnr") }
 
-        return digipostJobbData.signertDokument.also { log.info { "Hentet signert avtale for orgnr $orgnr fra database" } } ?: hentSignertAvtaleDokumentFraDigipost(digipostJobbData)
+        return digipostJobbData.signertDokument.also { log.info { "Hentet signert avtale for orgnr $orgnr fra database" } } ?: hentSignertAvtaleDokumentFraDigipost(
+            digipostJobbData,
+            digipostJobbData.statusQueryToken
+        )
     }
 
     private suspend fun oppdaterDigipostJobbData(

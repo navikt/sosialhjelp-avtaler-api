@@ -84,7 +84,7 @@ class AvtaleService(
         log.info("Lagret DigipostJobbData for orgnr $orgnr")
     }
 
-    suspend fun sjekkAvtaleStatusOgLagreSignertDokument(navnInnsender: String, orgnr: String, statusQueryToken: String): AvtaleResponse? {
+    suspend fun sjekkAvtaleStatusOgLagreSignertDokument(navnInnsender: String, orgnr: String, statusQueryToken: String) {
         val avtale = Avtale(
             orgnr = orgnr,
             avtaleversjon = "1.0",
@@ -94,25 +94,19 @@ class AvtaleService(
         val digipostJobbData = hentDigipostJobb(orgnr)
         if (digipostJobbData == null) {
             log.error("Kunne ikke hente signeringsstatus for orgnr $orgnr")
-            return null
+            return
         }
         val harSignertAvtale = sjekkAvtaleStatus(avtale, digipostJobbData, statusQueryToken)
         if (!harSignertAvtale) {
             oppdaterDigipostJobbData(digipostJobbData, statusQueryToken = statusQueryToken)
             log.info("Avtale for orgnr ${avtale.orgnr} er ikke signert")
-            return null
+            return
         }
         log.info("Avtale for orgnr ${avtale.orgnr} er signert")
         oppdaterDigipostJobbData(
             digipostJobbData,
             statusQueryToken = statusQueryToken,
             signertDokument = hentSignertAvtaleDokumentFraDigipost(digipostJobbData, statusQueryToken = statusQueryToken,)
-        )
-        return AvtaleResponse(
-            orgnr = avtale.orgnr,
-            navn = avtale.navn_innsender,
-            avtaleversjon = avtale.avtaleversjon,
-            opprettet = avtale.opprettet,
         )
     }
     suspend fun sjekkAvtaleStatus(avtale: Avtale, digipostJobbData: DigipostJobbData, statusQueryToken: String): Boolean {

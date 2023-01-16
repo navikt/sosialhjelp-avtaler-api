@@ -64,18 +64,23 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
             val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")
             val navnInnsender = personNavnService.getFulltNavn(fnr, token)
 
-            avtaleService.sjekkAvtaleStatusOgLagreSignertDokument(
-                navnInnsender,
-                signeringsstatusRequest.orgnr,
-                signeringsstatusRequest.token
-            )
-
-            val avtaleResponse = avtaleService.hentAvtale(
+            var avtaleResponse = avtaleService.hentAvtale(
                 fnr = call.extractFnr(),
                 orgnr = signeringsstatusRequest.orgnr,
                 tjeneste = Avgiver.Tjeneste.AVTALESIGNERING,
                 token = this.context.getAccessToken()
             )
+            // avtale er signert tidligere, vi trenger ikke lagre avtale og avtaledokument på nytt
+            if (avtaleResponse != null) {
+                call.respond(HttpStatusCode.OK, avtaleResponse)
+            }
+
+            avtaleResponse = avtaleService.sjekkAvtaleStatusOgLagreSignertDokument(
+                navnInnsender,
+                signeringsstatusRequest.orgnr,
+                signeringsstatusRequest.token
+            )
+
             if (avtaleResponse == null) {
                 call.response.status(HttpStatusCode.NotFound)
                 return@post

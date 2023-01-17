@@ -1,4 +1,4 @@
-name: job-sync-tss
+name: job-lagre-digipost-dokumenter
 on:
   workflow_dispatch:
     inputs:
@@ -22,7 +22,7 @@ jobs:
         run: |
           echo "DOCKER_TAG=${{ env.DOCKER_IMAGE }}:${{ steps.artifact-version.outputs.version }}" >> $GITHUB_ENV
       - uses: nais/deploy/actions/deploy@v1
-        name: run job sync-tss on ${{ inputs.cluster }}-gcp
+        name: run job lagre-digipost-dokumenter on ${{ inputs.cluster }}-gcp
         env:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           RESOURCE: nais/nais-job-lagre-digipost-dokumenter.yaml

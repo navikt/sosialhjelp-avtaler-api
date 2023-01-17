@@ -38,7 +38,7 @@ spec:
         databases:
           - name: {{postgresDatabaseName}}
             envVarPrefix: POSTGRES
-        cascadingDelete: true
+        cascadingDelete: false
   accessPolicy:
     inbound:
       rules:

@@ -5,6 +5,7 @@ import kotliquery.Session
 import no.nav.sosialhjelp.avtaler.store.Store
 import no.nav.sosialhjelp.avtaler.store.TransactionalStore
 import no.nav.sosialhjelp.avtaler.store.query
+import no.nav.sosialhjelp.avtaler.store.queryList
 import no.nav.sosialhjelp.avtaler.store.update
 import org.intellij.lang.annotations.Language
 import java.net.URI
@@ -14,6 +15,7 @@ interface DigipostJobbDataStore : Store {
 
     fun hentDigipostJobb(orgnr: String): DigipostJobbData?
     fun oppdaterDigipostJobbData(digipostJobbData: DigipostJobbData): DigipostJobbData
+    fun hentAlleUtenLagretDokument(): List<DigipostJobbData>
 }
 
 class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) : DigipostJobbDataStore, TransactionalStore(sessionFactory) {
@@ -68,6 +70,16 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
             )
         )
         digipostJobbData
+    }
+
+    override fun hentAlleUtenLagretDokument(): List<DigipostJobbData> = session {
+        @Language("PostgreSQL")
+        val sql = """
+            SELECT * 
+            FROM digipost_jobb_data 
+            WHERE signert_dokument IS NULL 
+        """.trimIndent()
+        it.queryList(sql, mapOf(), ::mapper)
     }
 
     private fun mapper(row: Row): DigipostJobbData = DigipostJobbData(

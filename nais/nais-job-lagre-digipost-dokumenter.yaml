@@ -1,0 +1,48 @@
+apiVersion: nais.io/v1
+kind: Naisjob
+metadata:
+  name: sosialhjelp-avtaler-api-job-lagre-digipost-dokumenter
+  namespace: teamdigisos
+  labels:
+    team: teamdigisos
+spec:
+  restartPolicy: Never
+  image: {{ image }}
+  port: {{ port }}
+  env:
+  {{#each env}}
+     - name: {{@key}}
+  value: "{{this}}"
+  {{/each}}
+  - name: CRONJOB_TYPE
+    value: LAGRE-DIGIPOST-DOKUMENTER
+  azure:
+    application:
+      enabled: true
+  accessPolicy:
+    inbound:
+      rules:
+      {{#each inbound-applications}}
+         - application: {{ this }}
+                          {{/each}}
+    outbound:
+      rules:
+      {{#each outbound-applications}}
+         - application: {{ this }}
+                          {{/each}}
+      external:
+      {{#each external-hosts}}
+         - host: {{ this }}
+                   {{/each}}
+  secureLogs:
+    enabled: true
+  gcp:
+    secretmanager.host: secretmanager.googleapis.com
+    sqlInstances:
+      - type: POSTGRES_14
+        name: {{postgresUserName}}
+        tier: {{postgresDatabaseTier}}
+        diskSize: 10
+        databases:
+          - name: {{postgresDatabaseName}}
+            envVarPrefix: POSTGRES

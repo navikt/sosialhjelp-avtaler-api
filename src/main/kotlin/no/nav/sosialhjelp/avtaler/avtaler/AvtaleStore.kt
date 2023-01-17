@@ -23,6 +23,7 @@ data class Avtale(
     val orgnr: String,
     val avtaleversjon: String? = null,
     val navn_innsender: String,
+    val erSignert: Boolean,
     val opprettet: LocalDateTime = LocalDateTime.now()
 )
 
@@ -32,7 +33,7 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
     override fun hentAvtaleForOrganisasjon(orgnr: String): Avtale? = session {
         @Language("PostgreSQL")
         val sql = """
-            SELECT orgnr, avtaleversjon, navn_innsender, opprettet
+            SELECT orgnr, avtaleversjon, navn_innsender, er_signert, opprettet
             FROM avtale_v1
             WHERE orgnr = :orgnr
         """.trimIndent()
@@ -45,7 +46,7 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
         } else {
             @Language("PostgreSQL")
             var sql = """
-            SELECT orgnr, avtaleversjon, navn_innsender, opprettet
+            SELECT orgnr, avtaleversjon, navn_innsender, er_signert, opprettet
             FROM avtale_v1
             WHERE orgnr in (?)
             """.trimIndent()
@@ -61,9 +62,10 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
             INSERT INTO avtale_v1 (orgnr,
                                    avtaleversjon,
                                    navn_innsender,
+                                   er_signert,
                                    opprettet
                                    )
-            VALUES (:orgnr, :avtaleversjon, :navn_innsender, :opprettet)
+            VALUES (:orgnr, :avtaleversjon, :navn_innsender, :er_signert, :opprettet)
             ON CONFLICT DO NOTHING
         """.trimIndent()
         it.update(
@@ -72,6 +74,7 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
                 "orgnr" to avtale.orgnr,
                 "avtaleversjon" to avtale.avtaleversjon,
                 "navn_innsender" to avtale.navn_innsender,
+                "er_signert" to avtale.erSignert,
                 "opprettet" to avtale.opprettet
             )
         ).validate()
@@ -82,6 +85,7 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
         orgnr = row.string("orgnr"),
         avtaleversjon = row.stringOrNull("avtaleversjon"),
         navn_innsender = row.string("navn_innsender"),
-        opprettet = row.localDateTime("opprettet"),
+        erSignert = row.boolean("er_signert"),
+        opprettet = row.localDateTime("opprettet")
     )
 }

@@ -172,7 +172,4 @@ class AvtaleService(
         log.info("Lagret signert avtale for ${avtale.orgnr}")
         return avtale
     }
-
-    suspend fun lagreAlleSignerteDokumenter() {
-    }
 }

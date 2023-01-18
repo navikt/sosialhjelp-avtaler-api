@@ -77,7 +77,7 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
         val sql = """
             SELECT * 
             FROM digipost_jobb_data 
-            WHERE signert_dokument IS NULL 
+            WHERE signert_dokument IS NULL AND status_query_token IS NOT NULL
         """.trimIndent()
         it.queryList(sql, mapOf(), ::mapper)
     }

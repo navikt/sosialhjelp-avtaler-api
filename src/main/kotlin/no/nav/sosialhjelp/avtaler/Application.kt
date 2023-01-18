@@ -36,7 +36,8 @@ private val log = KotlinLogging.logger {}
 fun main(args: Array<String>) {
     when (System.getenv("CRONJOB_TYPE")) {
         "LAGRE-DIGIPOST-DOKUMENTER" -> cronJobLagreDokumenter()
-        else -> io.ktor.server.cio.EngineMain.main(args)
+        null -> io.ktor.server.cio.EngineMain.main(args)
+        else -> throw error("Ingen cronjobb spesifisert for ${System.getenv("CRONJOB_TYPE")}")
     }
 }
 

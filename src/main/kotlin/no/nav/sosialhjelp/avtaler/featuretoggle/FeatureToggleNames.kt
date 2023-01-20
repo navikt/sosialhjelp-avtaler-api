@@ -1,0 +1,3 @@
+package no.nav.sosialhjelp.avtaler.featuretoggle
+
+const val ENABLE_ENDEPUNKT_LAST_NED_DOKUMENTER_FRA_DIGIPOST = "sosialhjelp.avtaler.enable_endepunkt_last_ned_dokumenter_fra_digipost"

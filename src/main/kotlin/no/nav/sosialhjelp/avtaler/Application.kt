@@ -10,8 +10,10 @@ import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.IgnoreTrailingSlash
+import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
 import no.nav.security.token.support.client.core.ClientAuthenticationProperties
 import no.nav.sosialhjelp.avtaler.HttpClientConfig.httpClient
@@ -21,6 +23,7 @@ import no.nav.sosialhjelp.avtaler.auth.Oauth2Client
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
 import no.nav.sosialhjelp.avtaler.db.DefaultDatabaseContext
+import no.nav.sosialhjelp.avtaler.db.transaction
 import no.nav.sosialhjelp.avtaler.digipost.DigipostClient
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.internal.internalRoutes
@@ -85,7 +88,42 @@ fun Application.setupRoutes() {
                     avtaleApi(avtaleService, personNavnService)
                     kommuneApi(avtaleService)
                 }
+                log.info("Feature toggled endepunkt for å laste ned dokumenter fra Digipost er enabled...")
+                post("/last-ned-dokumenter") {
+                    cronJobLagreDokumenter()
+                }
             }
         }
+    }
+}
+
+fun cronJobLagreDokumenter() {
+    log.info("jobb lagre-digipost-dokumenter: start")
+    val databaseContext = DefaultDatabaseContext(DatabaseConfiguration(Configuration.dbProperties, Configuration.profile).dataSource())
+    val digipostService = DigipostService(DigipostClient(Configuration.digipostProperties, Configuration.virksomhetssertifikatProperties, Configuration.profile))
+
+    runBlocking {
+        val kommunerUtenDokumentIDatabase = transaction(databaseContext) { ctx ->
+            ctx.digipostJobbDataStore.hentAlleUtenLagretDokument()
+        }
+        log.info("jobb lagre-digipost-dokumenter: Lagrer signert dokument for ${kommunerUtenDokumentIDatabase.size} kommuner")
+
+        kommunerUtenDokumentIDatabase.forEach {
+            log.info("jobb lagre-digipost-dokumenter: Lagrer signert dokument for kommune med orgnr ${it.orgnr}")
+            if (it.statusQueryToken != null && digipostService.erSigneringsstatusCompleted(
+                    it.directJobReference,
+                    it.statusUrl,
+                    it.statusQueryToken
+                )
+            ) {
+                val signertDokument =
+                    digipostService.hentSignertDokument(it.statusQueryToken, it.directJobReference, it.statusUrl)
+                transaction(databaseContext) { ctx ->
+                    ctx.digipostJobbDataStore.oppdaterDigipostJobbData(it.copy(signertDokument = signertDokument))
+                }
+            }
+        }
+
+        log.info("jobb lagre-digipost-dokumenter: ferdig")
     }
 }

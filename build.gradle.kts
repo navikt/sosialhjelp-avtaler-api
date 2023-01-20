@@ -18,6 +18,7 @@ object Versions {
     const val jaxb_runtime = "2.3.7"
     const val google_cloud_libraries = "26.1.4"
     const val google_cloud_secretmanager = "2.6.0"
+    const val unleash = "4.4.1"
 }
 
 plugins {
@@ -89,6 +90,9 @@ dependencies {
     // google cloud secret manager api
     implementation(platform("com.google.cloud:libraries-bom:${Versions.google_cloud_libraries}"))
     implementation("com.google.cloud:google-cloud-secretmanager:${Versions.google_cloud_secretmanager}")
+
+    // Unleash
+    implementation("no.finn.unleash:unleash-client-java:${Versions.unleash}")
 
     // test
     testImplementation("io.ktor:ktor-client-mock:${Versions.ktor_version}")

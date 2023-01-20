@@ -59,14 +59,15 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
         @Language("PostgreSQL")
         val sql = """
             UPDATE digipost_jobb_data 
-            SET status_query_token = :status_query_token
+            SET status_query_token = :status_query_token, signert_dokument = :signert_dokument
             WHERE orgnr = :orgnr
         """.trimIndent()
         it.update(
             sql,
             mapOf(
                 "orgnr" to digipostJobbData.orgnr,
-                "status_query_token" to digipostJobbData.statusQueryToken
+                "status_query_token" to digipostJobbData.statusQueryToken,
+                "signert_dokument" to digipostJobbData.signertDokument
             )
         )
         digipostJobbData

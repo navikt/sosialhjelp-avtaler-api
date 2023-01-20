@@ -8,9 +8,10 @@
     "data.brreg.no",
     "api.difitest.signering.posten.no",
     "pdl-api.dev-fss-pub.nais.io",
-    "secretmanager.googleapis.com"
+    "secretmanager.googleapis.com",
+    "unleash.nais.io"
   ],
-  "inboundRulesApplications": ["sosialhjelp-avtaler-dev"],
+  "inboundRulesApplications": ["sosialhjelp-avtaler-dev", "curl-digipost-app"],
   "outboundRulesApplications": ["sosialhjelp-mock-alt-api-mock"],
   "env": {
     "SPRING_PROFILES_ACTIVE": "log-kibana,log-audit",

@@ -118,8 +118,10 @@ fun cronJobLagreDokumenter() {
             ) {
                 val signertDokument =
                     digipostService.hentSignertDokument(it.statusQueryToken, it.directJobReference, it.statusUrl)
-                transaction(databaseContext) { ctx ->
-                    ctx.digipostJobbDataStore.oppdaterDigipostJobbData(it.copy(signertDokument = signertDokument))
+                if (signertDokument != null) {
+                    transaction(databaseContext) { ctx ->
+                        ctx.digipostJobbDataStore.oppdaterDigipostJobbData(it.copy(signertDokument = signertDokument))
+                    }
                 }
             }
         }

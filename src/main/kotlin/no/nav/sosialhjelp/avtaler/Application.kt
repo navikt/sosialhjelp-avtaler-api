@@ -10,6 +10,7 @@ import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.IgnoreTrailingSlash
+import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.runBlocking
@@ -34,11 +35,7 @@ import java.util.TimeZone
 private val log = KotlinLogging.logger {}
 
 fun main(args: Array<String>) {
-    when (System.getenv("CRONJOB_TYPE")) {
-        "LAGRE-DIGIPOST-DOKUMENTER" -> cronJobLagreDokumenter()
-        null -> io.ktor.server.cio.EngineMain.main(args)
-        else -> throw error("Ingen cronjobb spesifisert for ${System.getenv("CRONJOB_TYPE")}")
-    }
+    io.ktor.server.cio.EngineMain.main(args)
 }
 
 fun Application.module() {
@@ -91,13 +88,16 @@ fun Application.setupRoutes() {
                     avtaleApi(avtaleService, personNavnService)
                     kommuneApi(avtaleService)
                 }
+                post("/last-ned-dokumenter") {
+                    cronJobLagreDokumenter()
+                }
             }
         }
     }
 }
 
 fun cronJobLagreDokumenter() {
-    log.info("cronjob lagre-digipost-dokumenter: start")
+    log.info("jobb lagre-digipost-dokumenter: start")
     val databaseContext = DefaultDatabaseContext(DatabaseConfiguration(Configuration.dbProperties, Configuration.profile).dataSource())
     val digipostService = DigipostService(DigipostClient(Configuration.digipostProperties, Configuration.virksomhetssertifikatProperties, Configuration.profile))
 
@@ -105,10 +105,10 @@ fun cronJobLagreDokumenter() {
         val kommunerUtenDokumentIDatabase = transaction(databaseContext) { ctx ->
             ctx.digipostJobbDataStore.hentAlleUtenLagretDokument()
         }
-        log.info("cronjob lagre-digipost-dokumenter: Lagrer signert dokument for ${kommunerUtenDokumentIDatabase.size} kommuner")
+        log.info("jobb lagre-digipost-dokumenter: Lagrer signert dokument for ${kommunerUtenDokumentIDatabase.size} kommuner")
 
         kommunerUtenDokumentIDatabase.forEach {
-            log.info("cronjob lagre-digipost-dokumenter: Lagrer signert dokument for kommune med orgnr ${it.orgnr}")
+            log.info("jobb lagre-digipost-dokumenter: Lagrer signert dokument for kommune med orgnr ${it.orgnr}")
             if (it.statusQueryToken != null && digipostService.erSigneringsstatusCompleted(
                     it.directJobReference,
                     it.statusUrl,
@@ -123,6 +123,6 @@ fun cronJobLagreDokumenter() {
             }
         }
 
-        log.info("cronjob lagre-digipost-dokumenter: ferdig")
+        log.info("jobb lagre-digipost-dokumenter: ferdig")
     }
 }

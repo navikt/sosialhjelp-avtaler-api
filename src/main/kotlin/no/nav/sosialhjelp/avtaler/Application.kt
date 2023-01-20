@@ -125,6 +125,7 @@ fun cronJobLagreDokumenter() {
                             ctx.digipostJobbDataStore.oppdaterDigipostJobbData(it.copy(signertDokument = signertDokument))
                         }
                     }
+                    Thread.sleep(200) // for å unngå Too many requests exception hos Digipost
                 } catch (e: UnexpectedResponseException) {
                     log.error("Feil fra Digipost, kunne ikke laste ned dokument", e.errorMessage)
                 }

@@ -9,15 +9,15 @@ object UnleashKlient {
     private val unleash: Unleash
 
     init {
-        val miljø = Configuration.cluster
-        unleash = when (miljø) {
+        val miljo = Configuration.cluster
+        unleash = when (miljo) {
             Configuration.Cluster.`PROD-GCP`, Configuration.Cluster.`DEV-GCP`, Configuration.Cluster.LOCAL -> DefaultUnleash(
                 UnleashConfig.builder()
                     .appName("sosialhjelp-avtaler-api")
-                    .instanceId(miljø.name)
+                    .instanceId(miljo.name)
                     .unleashAPI("https://unleash.nais.io/api/")
                     .build(),
-                ClusterStrategy(miljø)
+                ClusterStrategy(miljo)
             )
         }
     }
@@ -27,12 +27,12 @@ object UnleashKlient {
 
 object UnleashToggleKeys
 
-class ClusterStrategy(val miljø: Configuration.Cluster) : Strategy {
+class ClusterStrategy(val miljo: Configuration.Cluster) : Strategy {
     override fun getName() = "byCluster"
 
     override fun isEnabled(parameters: MutableMap<String, String>): Boolean {
         val clustersParameter = parameters["cluster"] ?: return false
         val alleClustere = clustersParameter.split(",").map { it.trim() }.map { it.lowercase() }.toList()
-        return alleClustere.contains(miljø.name.lowercase())
+        return alleClustere.contains(miljo.name.lowercase())
     }
 }

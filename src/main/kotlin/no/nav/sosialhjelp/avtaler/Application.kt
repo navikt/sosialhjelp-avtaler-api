@@ -26,6 +26,7 @@ import no.nav.sosialhjelp.avtaler.db.DefaultDatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
 import no.nav.sosialhjelp.avtaler.digipost.DigipostClient
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
+import no.nav.sosialhjelp.avtaler.featuretoggle.ENABLE_ENDEPUNKT_LAST_NED_DOKUMENTER_FRA_DIGIPOST
 import no.nav.sosialhjelp.avtaler.internal.internalRoutes
 import no.nav.sosialhjelp.avtaler.kommune.kommuneApi
 import no.nav.sosialhjelp.avtaler.pdl.PdlClient
@@ -88,8 +89,11 @@ fun Application.setupRoutes() {
                     avtaleApi(avtaleService, personNavnService)
                     kommuneApi(avtaleService)
                 }
-                post("/last-ned-dokumenter") {
-                    cronJobLagreDokumenter()
+                if (UnleashKlient.isEnabled(ENABLE_ENDEPUNKT_LAST_NED_DOKUMENTER_FRA_DIGIPOST)) {
+                    log.info("Feature toggled endepunkt for å laste ned dokumenter fra Digipost er enabled...")
+                    post("/last-ned-dokumenter") {
+                        cronJobLagreDokumenter()
+                    }
                 }
             }
         }

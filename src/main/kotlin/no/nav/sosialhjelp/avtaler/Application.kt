@@ -15,6 +15,7 @@ import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.runBlocking
 import mu.KotlinLogging
+import no.digipost.signature.client.core.exceptions.UnexpectedResponseException
 import no.nav.security.token.support.client.core.ClientAuthenticationProperties
 import no.nav.sosialhjelp.avtaler.HttpClientConfig.httpClient
 import no.nav.sosialhjelp.avtaler.altinn.AltinnClient
@@ -116,12 +117,17 @@ fun cronJobLagreDokumenter() {
                     it.statusQueryToken
                 )
             ) {
-                val signertDokument =
-                    digipostService.hentSignertDokument(it.statusQueryToken, it.directJobReference, it.statusUrl)
-                if (signertDokument != null) {
-                    transaction(databaseContext) { ctx ->
-                        ctx.digipostJobbDataStore.oppdaterDigipostJobbData(it.copy(signertDokument = signertDokument))
+                try {
+                    val signertDokument =
+                        digipostService.hentSignertDokument(it.statusQueryToken, it.directJobReference, it.statusUrl)
+                    if (signertDokument != null) {
+                        transaction(databaseContext) { ctx ->
+                            ctx.digipostJobbDataStore.oppdaterDigipostJobbData(it.copy(signertDokument = signertDokument))
+                        }
                     }
+                    Thread.sleep(200) // for å unngå Too many requests exception hos Digipost
+                } catch (e: UnexpectedResponseException) {
+                    log.error("Feil fra Digipost, kunne ikke laste ned dokument", e.errorMessage)
                 }
             }
         }

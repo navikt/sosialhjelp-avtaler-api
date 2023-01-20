@@ -11,7 +11,7 @@
     "secretmanager.googleapis.com",
     "unleash.nais.io"
   ],
-  "inboundRulesApplications": ["sosialhjelp-avtaler"],
+  "inboundRulesApplications": ["sosialhjelp-avtaler", "curl-digipost-app"],
   "env": {
     "SPRING_PROFILES_ACTIVE": "log-kibana,log-audit",
     "UNLEASH_API_URL": "https://unleash.nais.io/api",

@@ -10,7 +10,6 @@ import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.IgnoreTrailingSlash
-import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.runBlocking
@@ -88,10 +87,6 @@ fun Application.setupRoutes() {
                 authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
                     avtaleApi(avtaleService, personNavnService)
                     kommuneApi(avtaleService)
-                }
-                log.info("Feature toggled endepunkt for å laste ned dokumenter fra Digipost er enabled...")
-                post("/last-ned-dokumenter") {
-                    cronJobLagreDokumenter()
                 }
             }
         }

@@ -1,8 +1,8 @@
 apiVersion: "nais.io/v1alpha1"
 kind: "Application"
 metadata:
-  name: {{applicationName}}
-  namespace: {{namespace}}
+  name: sosialhjelp-avtaler-api-dev
+  namespace: teamdigisos
   labels:
     team: teamdigisos
 spec:
@@ -19,55 +19,47 @@ spec:
     initialDelay: 45
     timeout: 1
   prometheus:
-    enabled: {{prometheusEnabled}}
+    enabled: true
     path: /sosialhjelp/avtaler-api/internal/prometheus
   replicas:
-    min: {{minReplicas}}
-    max: {{maxReplicas}}
-  envFrom:
-    - secret: sosialhjelp-xsrf-secret
+    min: 1
+    max: 1
   tokenx:
     enabled: true
   gcp:
     secretmanager.host: secretmanager.googleapis.com
     sqlInstances:
       - type: POSTGRES_14
-        name: {{postgresUserName}}
-        tier: {{postgresDatabaseTier}}
+        name: sosialhjelp-avtaler-api-db-dev
+        tier: db-f1-micro
         diskSize: 10
         databases:
-          - name: {{postgresDatabaseName}}
+          - name: avtalerapidb-dev
             envVarPrefix: POSTGRES
         cascadingDelete: false
   accessPolicy:
     inbound:
       rules:
-      {{#each inboundRulesApplications}}
-        - application: "{{this}}"
-     {{/each}}
+        - application: sosialhjelp-avtaler-dev
+        - application: curl-digipost-app
     outbound:
       external:
-      {{#each outboundExternalHosts}}
-        - host: "{{this}}"
-      {{/each}}
+        - host: data.brreg.no
+        - host: api.difitest.signering.posten.no
+        - host: pdl-api.dev-fss-pub.nais.io
+        - host: secretmanager.googleapis.com
+        - host: unleash.nais.io
       rules:
-      {{#each outboundRulesApplications}}
-        - application: "{{this}}"
-      {{/each}}
+        - application: sosialhjelp-mock-alt-api-mock
         - application: altinn-rettigheter-proxy
           namespace: arbeidsgiver
   resources:
     limits:
-      cpu: {{cpuLimit}}
-      memory: {{memoryLimit}}
+      cpu: 400m
+      memory: 1Gi
     requests:
-      cpu: {{cpuRequest}}
-      memory: {{memoryRequest}}
-  env:
-  {{#each env}}
-    - name: {{@key}}
-      value: "{{this}}"
-  {{/each}}
+      cpu: 15m
+      memory: 512Mi
   azure:
     application:
       enabled: true

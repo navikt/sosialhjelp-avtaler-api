@@ -1,0 +1,69 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: sosialhjelp-avtaler-api-dev
+  namespace: teamdigisos
+  labels:
+    team: teamdigisos
+spec:
+  image: {{image}}
+  port: 9090
+  liveness:
+    path: /sosialhjelp/avtaler-api/internal/isAlive
+    initialDelay: 50
+    timeout: 1
+    periodSeconds: 10
+    failureThreshold: 10
+  readiness:
+    path: /sosialhjelp/avtaler-api/internal/isReady
+    initialDelay: 45
+    timeout: 1
+  prometheus:
+    enabled: true
+    path: /sosialhjelp/avtaler-api/internal/prometheus
+  replicas:
+    min: 1
+    max: 1
+  envFrom:
+    - secret: sosialhjelp-xsrf-secret
+  tokenx:
+    enabled: true
+  gcp:
+    secretmanager.host: secretmanager.googleapis.com
+    sqlInstances:
+      - type: POSTGRES_14
+        name: sosialhjelp-avtaler-api-db-dev
+        tier: db-f1-micro
+        diskSize: 10
+        databases:
+          - name: avtalerapidb-dev
+            envVarPrefix: POSTGRES
+        cascadingDelete: false
+  accessPolicy:
+    inbound:
+      rules:
+        - application: sosialhjelp-avtaler-dev
+        - application: curl-digipost-app
+    outbound:
+      external:
+        - host: data.brreg.no
+        - host: api.difitest.signering.posten.no
+        - host: pdl-api.dev-fss-pub.nais.io
+        - host: secretmanager.googleapis.com
+        - host: unleash.nais.io
+      rules:
+        - application: sosialhjelp-mock-alt-api-mock
+        - application: altinn-rettigheter-proxy
+          namespace: arbeidsgiver
+  resources:
+    limits:
+      cpu: 400m
+      memory: 1Gi
+    requests:
+      cpu: 15m
+      memory: 512Mi
+  azure:
+    application:
+      enabled: true
+  secureLogs:
+    enabled: true

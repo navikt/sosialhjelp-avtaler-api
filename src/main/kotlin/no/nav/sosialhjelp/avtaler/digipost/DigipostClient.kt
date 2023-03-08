@@ -46,7 +46,6 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         .serviceEnvironment(if (profile == Configuration.Profile.PROD) ServiceEnvironment.PRODUCTION else ServiceEnvironment.DIFITEST)
         .defaultSender(Sender(props.navOrgnr))
         .build()
-
     private val client = DirectClient(clientConfiguration)
 
     private fun configure(accessSecretVersion: AccessSecretVersion): KeyStoreConfig {

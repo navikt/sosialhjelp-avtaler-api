@@ -14,7 +14,7 @@ object Versions {
     const val flywaydb_version = "9.7.0"
     const val hikari_version = "5.0.1"
     const val postgresql_version = "42.5.3"
-    const val digipost_signature_api_client = "7.0-RC4"
+    const val digipost_signature_api_client = "7.0-RC7"
     const val jaxb_runtime = "2.3.7"
     const val google_cloud_libraries = "26.7.0"
     const val google_cloud_secretmanager = "2.10.0"

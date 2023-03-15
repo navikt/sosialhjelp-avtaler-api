@@ -49,6 +49,7 @@ spec:
         - host: pdl-api.dev-fss-pub.nais.io
         - host: secretmanager.googleapis.com
         - host: unleash.nais.io
+        - host: hooks.slack.com
       rules:
         - application: sosialhjelp-mock-alt-api-mock
         - application: altinn-rettigheter-proxy
@@ -65,3 +66,5 @@ spec:
       enabled: true
   secureLogs:
     enabled: true
+  envFrom:
+    - secret: digisos-slack-hook

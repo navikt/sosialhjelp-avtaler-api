@@ -1,6 +1,7 @@
 package no.nav.sosialhjelp.avtaler.avtaler
 
 import mu.KotlinLogging
+import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
@@ -9,6 +10,7 @@ import no.nav.sosialhjelp.avtaler.digipost.DigipostJobbData
 import no.nav.sosialhjelp.avtaler.digipost.DigipostResponse
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
+import no.nav.sosialhjelp.avtaler.slack.Slack
 import java.io.InputStream
 import java.net.URI
 
@@ -168,6 +170,9 @@ class AvtaleService(
         transaction(databaseContext) { ctx ->
             ctx.avtaleStore.lagreAvtale(avtale)
         }
+
+        if (Configuration.dev || Configuration.prod)
+            Slack.post("Ny avtale opprettet for orgnr=${avtale.orgnr}")
 
         log.info("Lagret signert avtale for ${avtale.orgnr}")
         return avtale

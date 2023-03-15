@@ -3,9 +3,8 @@ package no.nav.sosialhjelp.avtaler.digipost
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import mu.KotlinLogging
-import no.digipost.signature.client.Certificates
 import no.digipost.signature.client.ClientConfiguration
-import no.digipost.signature.client.ServiceUri
+import no.digipost.signature.client.ServiceEnvironment
 import no.digipost.signature.client.core.DocumentType
 import no.digipost.signature.client.core.ResponseInputStream
 import no.digipost.signature.client.core.Sender
@@ -44,10 +43,8 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
     private val virksomhetVersionId = virksomhetProps.versionId
     private val keyStoreConfig: KeyStoreConfig = configure(accessSecretVersion)
     private val clientConfiguration = ClientConfiguration.builder(keyStoreConfig)
-        .trustStore(if (profile == Configuration.Profile.PROD) Certificates.PRODUCTION else Certificates.TEST)
-        .serviceUri(if (profile == Configuration.Profile.PROD) ServiceUri.PRODUCTION else ServiceUri.DIFI_TEST)
-        .globalSender(Sender(props.navOrgnr))
-        .enableRequestAndResponseLogging()
+        .serviceEnvironment(if (profile == Configuration.Profile.PROD) ServiceEnvironment.PRODUCTION else ServiceEnvironment.DIFITEST)
+        .defaultSender(Sender(props.navOrgnr))
         .build()
     private val client = DirectClient(clientConfiguration)
 

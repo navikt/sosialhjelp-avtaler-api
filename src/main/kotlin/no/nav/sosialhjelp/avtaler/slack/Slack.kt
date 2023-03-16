@@ -14,7 +14,7 @@ object Slack {
     private val username = "sosialhjelp-avtaler-api"
     private val environment = Configuration.slackProperties.environment
     private val hookUrl = Configuration.slackProperties.slackHook
-    private val channelProd = "#digisos-avtaler-alerts"
+    private val channelProd = "#digisos-avtaler-varsling"
     private val channelDev = "#digisos-alerts-dev"
 
     fun post(message: String) {

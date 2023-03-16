@@ -141,9 +141,6 @@ class AvtaleService(
         val digipostJobbData = hentDigipostJobb(orgnr)
             ?: return null.apply { log.error("Kunne ikke hente digipost jobb-info fra database for orgnr $orgnr") }
 
-        if (Configuration.dev)
-            Slack.post("Test Slack")
-
         if (digipostJobbData.signertDokument != null) {
             log.info { "Hentet signert avtale for orgnr $orgnr fra database" }
             return digipostJobbData.signertDokument

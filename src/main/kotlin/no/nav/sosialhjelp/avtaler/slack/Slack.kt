@@ -26,8 +26,6 @@ object Slack {
                 "username" to username,
             )
 
-            log.info("Debug slack channel: $channelDev, lengde url: ${hookUrl.length}, short url:${hookUrl.take(50)} ")
-
             val objectMapper = ObjectMapper()
             val requestBody: String = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(values)
 

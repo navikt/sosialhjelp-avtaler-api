@@ -145,6 +145,10 @@ class AvtaleService(
             log.info { "Hentet signert avtale for orgnr $orgnr fra database" }
             return digipostJobbData.signertDokument
         }
+
+        if (Configuration.dev)
+            Slack.post("Test Slack")
+
         return hentSignertAvtaleDokumentFraDigipost(
             digipostJobbData,
             digipostJobbData.statusQueryToken

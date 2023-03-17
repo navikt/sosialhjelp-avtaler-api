@@ -118,7 +118,7 @@ object Configuration {
     val digipostProperties = DigipostProperties()
     val virksomhetssertifikatProperties = VirksomhetssertifikatProperties()
     val enhetsregistertetProperties = EnhetsregistertetProperties()
-
+    val slackProperties = SlackProperties()
     operator fun get(key: String): String = config[Key(key, stringType)]
 
     data class TokenXProperties(
@@ -176,5 +176,11 @@ object Configuration {
 
     data class EnhetsregistertetProperties(
         val baseUrl: String = this["enhetsregisteret_base_url"]
+    )
+
+    data class SlackProperties(
+        // The Slack-webhook is extracted from the environment variable SLACK_HOOK (envFrom: digisos-slack-hook)
+        val slackHook: String = this["SLACK_HOOK"],
+        val environment: String = profile.toString(),
     )
 }

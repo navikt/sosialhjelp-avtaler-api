@@ -37,6 +37,8 @@ spec:
           - name: avtalerapidb-dev
             envVarPrefix: POSTGRES
         cascadingDelete: false
+    buckets:
+      - name: avtaler
   accessPolicy:
     inbound:
       rules:

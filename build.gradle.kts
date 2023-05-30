@@ -16,7 +16,7 @@ object Versions {
     const val postgresql_version = "42.5.3"
     const val digipost_signature_api_client = "7.0-RC7"
     const val jaxb_runtime = "2.3.7"
-    const val google_cloud_libraries = "26.7.0"
+    const val google_cloud_libraries = "26.14.0"
     const val google_cloud_secretmanager = "2.10.0"
     const val unleash = "4.4.1"
 }
@@ -91,6 +91,8 @@ dependencies {
     implementation(platform("com.google.cloud:libraries-bom:${Versions.google_cloud_libraries}"))
     implementation("com.google.cloud:google-cloud-secretmanager:${Versions.google_cloud_secretmanager}")
 
+    // google cloud storage
+    implementation("com.google.cloud:google-cloud-storage")
     // Unleash
     implementation("no.finn.unleash:unleash-client-java:${Versions.unleash}")
 

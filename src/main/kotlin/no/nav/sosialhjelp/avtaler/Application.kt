@@ -26,6 +26,7 @@ import no.nav.sosialhjelp.avtaler.db.DefaultDatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
 import no.nav.sosialhjelp.avtaler.digipost.DigipostClient
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
+import no.nav.sosialhjelp.avtaler.gcpbucket.GcpBucket
 import no.nav.sosialhjelp.avtaler.internal.internalRoutes
 import no.nav.sosialhjelp.avtaler.kommune.kommuneApi
 import no.nav.sosialhjelp.avtaler.pdl.PdlClient
@@ -76,7 +77,8 @@ fun Application.setupRoutes() {
     val tokenExchangeClient = Oauth2Client(defaultHttpClient, authProperties, Configuration.tokenXProperties)
     val altinnService = AltinnService(AltinnClient(Configuration.altinnProperties, tokenExchangeClient))
     val digipostService = DigipostService(DigipostClient(Configuration.digipostProperties, Configuration.virksomhetssertifikatProperties, Configuration.profile))
-    val avtaleService = AvtaleService(altinnService, digipostService, databaseContext)
+    val gcpBucket = GcpBucket(Configuration.gcpProperties.bucketName)
+    val avtaleService = AvtaleService(altinnService, digipostService, gcpBucket, databaseContext)
     val personNavnService = PersonNavnService(PdlClient(Configuration.pdlProperties, tokenExchangeClient))
 
     routing {

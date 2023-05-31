@@ -53,7 +53,7 @@ object Configuration {
             "POSTGRES_PASSWORD" to "",
             "POSTGRES_HOST" to "",
             "POSTGRES_PORT" to "",
-            "gcp.bucketName" to "avtaler"
+            "gcp.bucketName" to "digisos-avtaler"
         )
     )
 
@@ -75,7 +75,7 @@ object Configuration {
             "virksomhetssertifikat.passwordSecretVersion" to "2",
             "pdl.url" to "https://pdl-api.dev-fss-pub.nais.io/graphql",
             "pdl.audience" to "dev-fss:pdl:pdl-api",
-            "gcp.bucketName" to "avtaler"
+            "gcp.bucketName" to "digisos-avtaler"
         )
     )
 
@@ -95,7 +95,7 @@ object Configuration {
             "virksomhetssertifikat.passwordSecretVersion" to "2",
             "pdl.url" to "https://pdl-api.prod-fss-pub.nais.io/graphql",
             "pdl.audience" to "prod-fss:pdl:pdl-api",
-            "gcp.bucketName" to "avtaler"
+            "gcp.bucketName" to "digisos-avtaler"
         )
     )
 

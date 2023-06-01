@@ -53,7 +53,7 @@ spec:
         - host: secretmanager.googleapis.com
         - host: unleash.nais.io
         - host: hooks.slack.com
-        - host: digisos.dev.nav.no
+        - host: digisos.intern.dev.nav.no
       rules:
         - application: sosialhjelp-mock-alt-api-mock
         - application: altinn-rettigheter-proxy

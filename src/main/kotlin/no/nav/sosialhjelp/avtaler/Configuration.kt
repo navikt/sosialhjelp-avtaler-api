@@ -59,10 +59,10 @@ object Configuration {
     private val devProperties = ConfigurationMap(
         mapOf(
 
-            "application.baseUrl" to "https://digisos.dev.nav.no/sosialhjelp/avtaler",
+            "application.baseUrl" to "https://digisos.intern.dev.nav.no/sosialhjelp/avtaler",
             "application.profile" to "DEV",
             "application.cluster" to "DEV-GCP",
-            "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.dev.nav.no/altinn-rettigheter-proxy",
+            "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.intern.dev.nav.no/altinn-rettigheter-proxy",
             "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api-dev",
             "enhetsregisteret_base_url" to "http://sosialhjelp-mock-alt-api-mock/sosialhjelp/mock-alt-api/enhetsregisteret/api",
             "altinn.altinnRettigheterAudience" to "dev-gcp:arbeidsgiver:altinn-rettigheter-proxy",

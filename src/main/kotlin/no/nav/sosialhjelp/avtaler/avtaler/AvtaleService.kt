@@ -120,17 +120,17 @@ class AvtaleService(
             log.error("Kunne ikke hente avtale fra database for orgnr $orgnr")
             return
         }
-        lagreSignertDokuentIBucket(dbAvtale, digipostJobbData)
+        lagreSignertDokuentIBucket(dbAvtale, signertDokument)
     }
 
-    private fun lagreSignertDokuentIBucket(avtale: Avtale, digipostJobbData: DigipostJobbData) {
-        if (digipostJobbData.signertDokument == null) {
+    private fun lagreSignertDokuentIBucket(avtale: Avtale, signertDokument: InputStream?) {
+        if (signertDokument == null) {
             log.error("Signert avtale er null, kan ikke lagre i bucket")
             return
         }
         val blobNavn = avtale.orgnr + "-" + avtale.avtaleversjon
         val metadata = mapOf("navnInnsender" to avtale.navn_innsender, "signertTidspunkt" to avtale.opprettet.toString())
-        gcpBucket.lagreBlob(blobNavn, MediaType.PDF, metadata, digipostJobbData.signertDokument.readAllBytes())
+        gcpBucket.lagreBlob(blobNavn, MediaType.PDF, metadata, signertDokument.readAllBytes())
         log.info("Lagret signert avtale i bucket for orgnr ${avtale.orgnr}")
     }
 

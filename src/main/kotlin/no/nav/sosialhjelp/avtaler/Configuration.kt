@@ -59,7 +59,7 @@ object Configuration {
     private val devProperties = ConfigurationMap(
         mapOf(
 
-            "application.baseUrl" to "https://digisos.dev.nav.no/sosialhjelp/avtaler",
+            "application.baseUrl" to "https://digisos.intern.dev.nav.no/sosialhjelp/avtaler",
             "application.profile" to "DEV",
             "application.cluster" to "DEV-GCP",
             "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.intern.dev.nav.no/altinn-rettigheter-proxy",

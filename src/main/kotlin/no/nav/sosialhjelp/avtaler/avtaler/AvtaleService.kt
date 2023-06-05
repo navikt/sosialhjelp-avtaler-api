@@ -131,7 +131,7 @@ class AvtaleService(
             return
         }
 
-        val kommunenavn = hentAvgivere(fnr, Avgiver.Tjeneste.AVTALESIGNERING, token).filter { it.orgnr == orgnr }.first().navn
+        val kommunenavn = hentAvgivere(fnr, Avgiver.Tjeneste.AVTALESIGNERING, token).first { it.orgnr == orgnr }.navn
         lagreSignertDokumentIBucket(dbAvtale, kommunenavn)
     }
 

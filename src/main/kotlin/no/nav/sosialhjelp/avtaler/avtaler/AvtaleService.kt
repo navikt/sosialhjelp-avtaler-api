@@ -123,12 +123,19 @@ class AvtaleService(
         lagreSignertDokuentIBucket(dbAvtale, signertDokument)
     }
 
-    private fun lagreSignertDokuentIBucket(avtale: Avtale, signertDokument: InputStream?) {
+    private suspend fun lagreSignertDokuentIBucket(avtale: Avtale, signertDokument: InputStream?) {
         if (signertDokument == null) {
             log.error("Signert avtale er null, kan ikke lagre i bucket")
             return
         }
-        val blobNavn = avtale.orgnr + "-" + avtale.avtaleversjon
+        log.info("Signert avtale inputstream size, ${signertDokument.available()}")
+
+        val digipostJobbData = hentDigipostJobb(avtale.orgnr)
+        if (digipostJobbData?.signertDokument != null) {
+            log.info("digipostjobbdata.inputstream avtale inputstream size, ${digipostJobbData.signertDokument.available()}")
+        }
+
+        val blobNavn = avtale.orgnr + "-avtaleversjon" + avtale.avtaleversjon
         val metadata = mapOf("navnInnsender" to avtale.navn_innsender, "signertTidspunkt" to avtale.opprettet.toString())
         gcpBucket.lagreBlob(blobNavn, MediaType.PDF, metadata, signertDokument.readAllBytes())
         log.info("Lagret signert avtale i bucket for orgnr ${avtale.orgnr}")

@@ -108,36 +108,30 @@ class AvtaleService(
             return
         }
         log.info("Avtale for orgnr ${avtale.orgnr} er signert")
-        val signertDokument =
-            hentSignertAvtaleDokumentFraDigipost(digipostJobbData, statusQueryToken = statusQueryToken)
+
         oppdaterDigipostJobbData(
             digipostJobbData,
             statusQueryToken = statusQueryToken,
-            signertDokument = signertDokument
+            signertDokument = hentSignertAvtaleDokumentFraDigipost(digipostJobbData, statusQueryToken = statusQueryToken)
         )
         val dbAvtale = hentAvtale(orgnr)
         if (dbAvtale == null) {
             log.error("Kunne ikke hente avtale fra database for orgnr $orgnr")
             return
         }
-        lagreSignertDokuentIBucket(dbAvtale, signertDokument)
+        lagreSignertDokuentIBucket(dbAvtale)
     }
 
-    private suspend fun lagreSignertDokuentIBucket(avtale: Avtale, signertDokument: InputStream?) {
-        if (signertDokument == null) {
-            log.error("Signert avtale er null, kan ikke lagre i bucket")
-            return
-        }
-        log.info("Signert avtale inputstream size, ${signertDokument.available()}")
-
+    private suspend fun lagreSignertDokuentIBucket(avtale: Avtale) {
         val digipostJobbData = hentDigipostJobb(avtale.orgnr)
-        if (digipostJobbData?.signertDokument != null) {
-            log.info("digipostjobbdata.inputstream avtale inputstream size, ${digipostJobbData.signertDokument.available()}")
+        if (digipostJobbData?.signertDokument == null) {
+            log.error("Signert avtale for orgnr ${avtale.orgnr} fra database er tom. Kan ikke lagre i bucket.")
+            return
         }
 
         val blobNavn = avtale.orgnr + "-avtaleversjon" + avtale.avtaleversjon
         val metadata = mapOf("navnInnsender" to avtale.navn_innsender, "signertTidspunkt" to avtale.opprettet.toString())
-        gcpBucket.lagreBlob(blobNavn, MediaType.PDF, metadata, signertDokument.readAllBytes())
+        gcpBucket.lagreBlob(blobNavn, MediaType.PDF, metadata, digipostJobbData.signertDokument.readAllBytes())
         log.info("Lagret signert avtale i bucket for orgnr ${avtale.orgnr}")
     }
 

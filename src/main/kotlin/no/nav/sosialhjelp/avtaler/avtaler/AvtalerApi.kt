@@ -67,6 +67,8 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
             avtaleService.sjekkAvtaleStatusOgLagreSignertDokument(
                 navnInnsender,
                 signeringsstatusRequest.orgnr,
+                fnr,
+                token,
                 signeringsstatusRequest.token
             )
 

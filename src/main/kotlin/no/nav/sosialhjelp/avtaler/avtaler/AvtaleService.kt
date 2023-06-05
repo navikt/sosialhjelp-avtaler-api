@@ -1,6 +1,8 @@
 package no.nav.sosialhjelp.avtaler.avtaler
 
 import com.google.common.net.MediaType
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService
@@ -27,11 +29,7 @@ class AvtaleService(
 ) {
 
     suspend fun hentAvtaler(fnr: String, tjeneste: Avgiver.Tjeneste, token: String?): List<AvtaleResponse> {
-        val avgivereFiltrert = altinnService.hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
-            .filter { avgiver ->
-                avgiver.erKommune().also { log.info("Hentet enhet med orgnr: ${avgiver.orgnr}") }
-            }
-        sikkerLog.info("Filtrert avgivere for fnr: $fnr, tjeneste: $tjeneste, avgivere: $avgivereFiltrert")
+        val avgivereFiltrert = hentAvgivere(fnr, tjeneste, token)
 
         val avtaler = transaction(databaseContext) { ctx ->
             ctx.avtaleStore.hentAvtalerForOrganisasjoner(avgivereFiltrert.map { it.orgnr }).associateBy {
@@ -48,6 +46,19 @@ class AvtaleService(
                     opprettet = avtaler[it.orgnr]?.opprettet,
                 )
             }
+    }
+
+    private suspend fun hentAvgivere(
+        fnr: String,
+        tjeneste: Avgiver.Tjeneste,
+        token: String?
+    ): List<Avgiver> {
+        val avgivereFiltrert = altinnService.hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
+            .filter { avgiver ->
+                avgiver.erKommune().also { log.info("Hentet enhet med orgnr: ${avgiver.orgnr}") }
+            }
+        sikkerLog.info("Filtrert avgivere for fnr: $fnr, tjeneste: $tjeneste, avgivere: $avgivereFiltrert")
+        return avgivereFiltrert
     }
 
     suspend fun hentAvtale(
@@ -89,7 +100,7 @@ class AvtaleService(
         log.info("Lagret DigipostJobbData for orgnr $orgnr")
     }
 
-    suspend fun sjekkAvtaleStatusOgLagreSignertDokument(navnInnsender: String, orgnr: String, statusQueryToken: String) {
+    suspend fun sjekkAvtaleStatusOgLagreSignertDokument(navnInnsender: String, orgnr: String, fnr: String, statusQueryToken: String, token: String) {
         val avtale = Avtale(
             orgnr = orgnr,
             avtaleversjon = "1.0",
@@ -119,19 +130,25 @@ class AvtaleService(
             log.error("Kunne ikke hente avtale fra database for orgnr $orgnr")
             return
         }
-        lagreSignertDokuentIBucket(dbAvtale)
+
+        val kommunenavn = hentAvgivere(fnr, Avgiver.Tjeneste.AVTALESIGNERING, token).filter { it.orgnr == orgnr }.first().navn
+        lagreSignertDokumentIBucket(dbAvtale, kommunenavn)
     }
 
-    private suspend fun lagreSignertDokuentIBucket(avtale: Avtale) {
+    private suspend fun lagreSignertDokumentIBucket(avtale: Avtale, kommunenavn: String) {
         val digipostJobbData = hentDigipostJobb(avtale.orgnr)
         if (digipostJobbData?.signertDokument == null) {
             log.error("Signert avtale for orgnr ${avtale.orgnr} fra database er tom. Kan ikke lagre i bucket.")
             return
         }
-
-        val blobNavn = avtale.orgnr + "-avtaleversjon" + avtale.avtaleversjon
+        val blobNavn = "$kommunenavn-${avtale.orgnr}-avtaleversjon-${avtale.avtaleversjon}"
         val metadata = mapOf("navnInnsender" to avtale.navn_innsender, "signertTidspunkt" to avtale.opprettet.toString())
-        gcpBucket.lagreBlob(blobNavn, MediaType.PDF, metadata, digipostJobbData.signertDokument.readAllBytes())
+        gcpBucket.lagreBlob(
+            blobNavn, MediaType.PDF, metadata,
+            withContext(Dispatchers.IO) {
+                digipostJobbData.signertDokument.readAllBytes()
+            }
+        )
         log.info("Lagret signert avtale i bucket for orgnr ${avtale.orgnr}")
     }
 

@@ -68,8 +68,8 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
                 navnInnsender,
                 signeringsstatusRequest.orgnr,
                 fnr,
-                token,
-                signeringsstatusRequest.token
+                signeringsstatusRequest.token,
+                token
             )
 
             val avtaleResponse = avtaleService.hentAvtale(

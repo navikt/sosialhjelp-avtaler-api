@@ -95,7 +95,7 @@ class AvtaleService(
         orgnr: String,
         statusQueryToken: String,
         token: String
-    ) {
+    ): AvtaleResponse? {
         val avtale = Avtale(
             orgnr = orgnr,
             avtaleversjon = "1.0",
@@ -105,12 +105,12 @@ class AvtaleService(
         val digipostJobbData = hentDigipostJobb(orgnr)
         if (digipostJobbData == null) {
             log.error("Kunne ikke hente signeringsstatus for orgnr $orgnr")
-            return
+            return null
         }
         if (!erAvtaleSignert(avtale, digipostJobbData, statusQueryToken)) {
             oppdaterDigipostJobbData(digipostJobbData, statusQueryToken = statusQueryToken)
             log.info("Avtale for orgnr ${avtale.orgnr} er ikke signert")
-            return
+            return null
         }
         log.info("Avtale for orgnr ${avtale.orgnr} er signert")
 
@@ -122,11 +122,17 @@ class AvtaleService(
         val dbAvtale = hentAvtale(orgnr)
         if (dbAvtale == null) {
             log.error("Kunne ikke hente avtale fra database for orgnr $orgnr")
-            return
+            return null
         }
         val kommunenavn =
             altinnService.hentAvgivere(fnr, Avgiver.Tjeneste.AVTALESIGNERING, token).first { it.orgnr == orgnr }.navn
         lagreSignertDokuentIBucket(dbAvtale, kommunenavn)
+        return AvtaleResponse(
+            orgnr = dbAvtale.orgnr,
+            navn = dbAvtale.navn_innsender,
+            avtaleversjon = dbAvtale.avtaleversjon,
+            opprettet = dbAvtale.opprettet
+        )
     }
 
     private suspend fun lagreSignertDokuentIBucket(avtale: Avtale, kommunenavn: String) {

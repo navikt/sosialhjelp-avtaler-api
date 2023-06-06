@@ -75,7 +75,7 @@ object Configuration {
             "virksomhetssertifikat.passwordSecretVersion" to "2",
             "pdl.url" to "https://pdl-api.dev-fss-pub.nais.io/graphql",
             "pdl.audience" to "dev-fss:pdl:pdl-api",
-            "gcp.bucketName" to "digisos-avtaler"
+            "gcp.bucketName" to "digisos-nks-avtaler-dev"
         )
     )
 
@@ -95,7 +95,7 @@ object Configuration {
             "virksomhetssertifikat.passwordSecretVersion" to "2",
             "pdl.url" to "https://pdl-api.prod-fss-pub.nais.io/graphql",
             "pdl.audience" to "prod-fss:pdl:pdl-api",
-            "gcp.bucketName" to "digisos-avtaler"
+            "gcp.bucketName" to "digisos-nks-avtaler"
         )
     )
 

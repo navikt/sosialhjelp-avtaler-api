@@ -65,9 +65,11 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
             val navnInnsender = personNavnService.getFulltNavn(fnr, token)
 
             avtaleService.sjekkAvtaleStatusOgLagreSignertDokument(
-                navnInnsender,
-                signeringsstatusRequest.orgnr,
-                signeringsstatusRequest.token
+                fnr = fnr,
+                navnInnsender = navnInnsender,
+                orgnr = signeringsstatusRequest.orgnr,
+                statusQueryToken = signeringsstatusRequest.token,
+                token = token
             )
 
             val avtaleResponse = avtaleService.hentAvtale(

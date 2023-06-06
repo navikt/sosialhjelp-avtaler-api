@@ -89,7 +89,13 @@ class AvtaleService(
         log.info("Lagret DigipostJobbData for orgnr $orgnr")
     }
 
-    suspend fun sjekkAvtaleStatusOgLagreSignertDokument(navnInnsender: String, orgnr: String, statusQueryToken: String) {
+    suspend fun sjekkAvtaleStatusOgLagreSignertDokument(
+        fnr: String,
+        navnInnsender: String,
+        orgnr: String,
+        statusQueryToken: String,
+        token: String
+    ) {
         val avtale = Avtale(
             orgnr = orgnr,
             avtaleversjon = "1.0",
@@ -118,6 +124,7 @@ class AvtaleService(
             log.error("Kunne ikke hente avtale fra database for orgnr $orgnr")
             return
         }
+        altinnService.hentAvgivere(fnr, Avgiver.Tjeneste.AVTALESIGNERING, token)
         lagreSignertDokuentIBucket(dbAvtale)
     }
 

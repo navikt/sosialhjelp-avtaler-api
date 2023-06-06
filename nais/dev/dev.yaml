@@ -38,7 +38,7 @@ spec:
             envVarPrefix: POSTGRES
         cascadingDelete: false
     buckets:
-      - name: digisos-avtaler
+      - name: digisos-nks-avtaler-dev
         cascadingDelete: true
   accessPolicy:
     inbound:

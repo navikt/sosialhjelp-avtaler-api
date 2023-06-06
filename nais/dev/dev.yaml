@@ -37,6 +37,9 @@ spec:
           - name: avtalerapidb-dev
             envVarPrefix: POSTGRES
         cascadingDelete: false
+    buckets:
+      - name: digisos-avtaler
+        cascadingDelete: true
   accessPolicy:
     inbound:
       rules:

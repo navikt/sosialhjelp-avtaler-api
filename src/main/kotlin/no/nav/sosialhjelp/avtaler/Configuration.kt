@@ -52,7 +52,8 @@ object Configuration {
             "POSTGRES_USERNAME" to "",
             "POSTGRES_PASSWORD" to "",
             "POSTGRES_HOST" to "",
-            "POSTGRES_PORT" to ""
+            "POSTGRES_PORT" to "",
+            "gcp.bucketName" to "digisos-avtaler"
         )
     )
 
@@ -73,7 +74,8 @@ object Configuration {
             "virksomhetssertifikat.passwordSecretId" to "test-keystore-credentials-json",
             "virksomhetssertifikat.passwordSecretVersion" to "2",
             "pdl.url" to "https://pdl-api.dev-fss-pub.nais.io/graphql",
-            "pdl.audience" to "dev-fss:pdl:pdl-api"
+            "pdl.audience" to "dev-fss:pdl:pdl-api",
+            "gcp.bucketName" to "digisos-avtaler"
         )
     )
 
@@ -92,7 +94,8 @@ object Configuration {
             "virksomhetssertifikat.passwordSecretId" to "digisos-keystore-credentials-json",
             "virksomhetssertifikat.passwordSecretVersion" to "2",
             "pdl.url" to "https://pdl-api.prod-fss-pub.nais.io/graphql",
-            "pdl.audience" to "prod-fss:pdl:pdl-api"
+            "pdl.audience" to "prod-fss:pdl:pdl-api",
+            "gcp.bucketName" to "digisos-avtaler"
         )
     )
 
@@ -119,6 +122,8 @@ object Configuration {
     val virksomhetssertifikatProperties = VirksomhetssertifikatProperties()
     val enhetsregistertetProperties = EnhetsregistertetProperties()
     val slackProperties = SlackProperties()
+    val gcpProperties = GcpProperties()
+
     operator fun get(key: String): String = config[Key(key, stringType)]
 
     data class TokenXProperties(
@@ -182,5 +187,9 @@ object Configuration {
         // The Slack-webhook is extracted from the environment variable SLACK_HOOK (envFrom: digisos-slack-hook)
         val slackHook: String = this["SLACK_HOOK"],
         val environment: String = profile.toString(),
+    )
+
+    data class GcpProperties(
+        val bucketName: String = this["gcp.bucketName"]
     )
 }

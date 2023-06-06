@@ -124,18 +124,19 @@ class AvtaleService(
             log.error("Kunne ikke hente avtale fra database for orgnr $orgnr")
             return
         }
-        altinnService.hentAvgivere(fnr, Avgiver.Tjeneste.AVTALESIGNERING, token)
-        lagreSignertDokuentIBucket(dbAvtale)
+        val kommunenavn =
+            altinnService.hentAvgivere(fnr, Avgiver.Tjeneste.AVTALESIGNERING, token).first { it.orgnr == orgnr }.navn
+        lagreSignertDokuentIBucket(dbAvtale, kommunenavn)
     }
 
-    private suspend fun lagreSignertDokuentIBucket(avtale: Avtale) {
+    private suspend fun lagreSignertDokuentIBucket(avtale: Avtale, kommunenavn: String) {
         val digipostJobbData = hentDigipostJobb(avtale.orgnr)
         if (digipostJobbData?.signertDokument == null) {
             log.error("Signert avtale for orgnr ${avtale.orgnr} fra database er tom. Kan ikke lagre i bucket.")
             return
         }
 
-        val blobNavn = avtale.orgnr + "-avtaleversjon" + avtale.avtaleversjon
+        val blobNavn = "$kommunenavn-${avtale.orgnr}-avtaleversjon${avtale.avtaleversjon}"
         val metadata = mapOf("navnInnsender" to avtale.navn_innsender, "signertTidspunkt" to avtale.opprettet.toString())
         gcpBucket.lagreBlob(blobNavn, MediaType.PDF, metadata, digipostJobbData.signertDokument.readAllBytes())
         log.info("Lagret signert avtale i bucket for orgnr ${avtale.orgnr}")

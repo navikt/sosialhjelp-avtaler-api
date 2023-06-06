@@ -129,7 +129,7 @@ class AvtaleService(
         lagreSignertDokuentIBucket(dbAvtale, kommunenavn)
         return AvtaleResponse(
             orgnr = dbAvtale.orgnr,
-            navn = dbAvtale.navn_innsender,
+            navn = kommunenavn,
             avtaleversjon = dbAvtale.avtaleversjon,
             opprettet = dbAvtale.opprettet
         )

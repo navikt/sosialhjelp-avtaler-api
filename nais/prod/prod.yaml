@@ -56,6 +56,7 @@ spec:
       rules:
         - application: altinn-rettigheter-proxy
           namespace: arbeidsgiver
+        - application: curl-digipost-app
   resources:
     limits:
       cpu: 400m

@@ -3,6 +3,8 @@ package no.nav.sosialhjelp.avtaler
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.google.cloud.storage.StorageException
+import com.google.common.net.MediaType
 import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
@@ -10,11 +12,16 @@ import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.routing.IgnoreTrailingSlash
+import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import mu.KotlinLogging
-import no.digipost.signature.client.core.exceptions.UnexpectedResponseException
 import no.nav.security.token.support.client.core.ClientAuthenticationProperties
 import no.nav.sosialhjelp.avtaler.HttpClientConfig.httpClient
 import no.nav.sosialhjelp.avtaler.altinn.AltinnClient
@@ -90,45 +97,58 @@ fun Application.setupRoutes() {
                     avtaleApi(avtaleService, personNavnService)
                     kommuneApi(avtaleService)
                 }
+                post("/avtaler-til-bucket") {
+                    lagreDokumenterIBucket()
+                }
             }
         }
     }
 }
 
-fun cronJobLagreDokumenter() {
-    log.info("jobb lagre-digipost-dokumenter: start")
+fun lagreDokumenterIBucket() {
+    @Serializable
+    data class Kommune(val orgnr: String, val navn: String)
+
+    log.info("jobb lagre-digipost-dokumenter-i-bucket: start")
     val databaseContext = DefaultDatabaseContext(DatabaseConfiguration(Configuration.dbProperties, Configuration.profile).dataSource())
-    val digipostService = DigipostService(DigipostClient(Configuration.digipostProperties, Configuration.virksomhetssertifikatProperties, Configuration.profile))
+    val gcpBucket = GcpBucket(Configuration.gcpProperties.bucketName)
 
     runBlocking {
-        val kommunerUtenDokumentIDatabase = transaction(databaseContext) { ctx ->
-            ctx.digipostJobbDataStore.hentAlleUtenLagretDokument()
+        val digipostJobbData = transaction(databaseContext) { ctx ->
+            ctx.digipostJobbDataStore.hentAlle()
         }
-        log.info("jobb lagre-digipost-dokumenter: Lagrer signert dokument for ${kommunerUtenDokumentIDatabase.size} kommuner")
 
-        kommunerUtenDokumentIDatabase.forEach {
+        log.info("jobb lagre-digipost-dokumenter: Lagrer signert dokument for ${digipostJobbData.size} kommuner")
+
+        val kommuneJson = withContext(Dispatchers.IO) {
+            this::class.java.getResource("/enhetsregisteret/kommuner.json")!!.openStream().readAllBytes().toString()
+        }
+        val kommuner = Json.decodeFromString<List<Kommune>>(kommuneJson)
+
+        digipostJobbData.forEach {
             log.info("jobb lagre-digipost-dokumenter: Lagrer signert dokument for kommune med orgnr ${it.orgnr}")
-            if (it.statusQueryToken != null && digipostService.erSigneringsstatusCompleted(
-                    it.directJobReference,
-                    it.statusUrl,
-                    it.statusQueryToken
-                )
-            ) {
+            val avtale = transaction(databaseContext) { ctx ->
+                ctx.avtaleStore.hentAvtaleForOrganisasjon(it.orgnr)
+            }
+            if (avtale != null) {
                 try {
-                    val signertDokument =
-                        digipostService.hentSignertDokument(it.statusQueryToken, it.directJobReference, it.statusUrl)
-                    if (signertDokument != null) {
-                        transaction(databaseContext) { ctx ->
-                            ctx.digipostJobbDataStore.oppdaterDigipostJobbData(it.copy(signertDokument = signertDokument))
-                        }
+                    val kommunenavn = kommuner.first { kommune -> kommune.orgnr == avtale.orgnr }
+                    val blobNavn = "$kommunenavn-${avtale.orgnr}-avtaleversjon${avtale.avtaleversjon}"
+                    val metadata = mapOf("navnInnsender" to avtale.navn_innsender, "signertTidspunkt" to avtale.opprettet.toString())
+                    if (gcpBucket.finnesFil(blobNavn)) {
+                        log.info("Blob for signert avtale finnes allerede i bucket for orgnr ${avtale.orgnr}. Hopper over...")
+                    } else if (it.signertDokument == null) {
+                        log.warn("Signert dokument for kommune $kommunenavn orgnr ${it.orgnr} finnes ikke i database")
+                    } else {
+                        gcpBucket.lagreBlob(blobNavn, MediaType.PDF, metadata, it.signertDokument!!.readAllBytes())
+                        log.info("Lagret signert avtale i bucket for orgnr ${avtale.orgnr}")
                     }
-                    Thread.sleep(200) // for å unngå Too many requests exception hos Digipost
-                } catch (e: UnexpectedResponseException) {
-                    log.error("Feil fra Digipost, kunne ikke laste ned dokument", e.errorMessage)
+                } catch (e: StorageException) {
+                    log.error("Feil fra Google Cloud Storage, kunne ikke laste opp dokument $e")
                 }
             }
         }
 
-        log.info("jobb lagre-digipost-dokumenter: ferdig")
+        log.info("jobb lagre-digipost-dokumenter-i-bucket: ferdig")
     }
 }

@@ -56,6 +56,7 @@ spec:
         - host: digisos.intern.dev.nav.no
       rules:
         - application: sosialhjelp-mock-alt-api-mock
+        - application: curl-digipost-app
         - application: altinn-rettigheter-proxy
           namespace: arbeidsgiver
   resources:

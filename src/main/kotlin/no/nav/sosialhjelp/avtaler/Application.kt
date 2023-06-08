@@ -123,7 +123,7 @@ fun lagreDokumenterIBucket() {
         val kommuneJson = withContext(Dispatchers.IO) {
             this::class.java.getResource("/enhetsregisteret/kommuner.json")!!.openStream().readAllBytes().toString()
         }
-        val kommuner = Json.decodeFromString<List<Kommune>>(kommuneJson)
+        val kommuner = Json.decodeFromString<Array<Kommune>>(kommuneJson)
 
         digipostJobbData.forEach {
             log.info("jobb lagre-digipost-dokumenter: Lagrer signert dokument for kommune med orgnr ${it.orgnr}")

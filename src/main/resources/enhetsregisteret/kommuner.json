@@ -1,6 +1,4 @@
-{
-  "_embedded": {
-    "enheter": [
+[
       {
         "organisasjonsnummer": "938712441",
         "navn": "ALSTAHAUG KOMMUNE",
@@ -1102,25 +1100,3 @@
         }
       }
     ]
-  },
-  "_links": {
-    "first": {
-      "href": "https://data.brreg.no/enhetsregisteret/api/enheter?organisasjonsform=KOMM&page=0&size=20"
-    },
-    "self": {
-      "href": "https://data.brreg.no/enhetsregisteret/api/enheter?organisasjonsform=KOMM"
-    },
-    "next": {
-      "href": "https://data.brreg.no/enhetsregisteret/api/enheter?organisasjonsform=KOMM&page=1&size=20"
-    },
-    "last": {
-      "href": "https://data.brreg.no/enhetsregisteret/api/enheter?organisasjonsform=KOMM&page=17&size=20"
-    }
-  },
-  "page": {
-    "size": 20,
-    "totalElements": 358,
-    "totalPages": 18,
-    "number": 0
-  }
-}

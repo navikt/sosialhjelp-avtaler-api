@@ -134,8 +134,8 @@ fun lagreDokumenterIBucket() {
             }
             if (avtale != null) {
                 try {
-                    val kommunenavn = kommuner.first { kommune -> kommune.organisasjonsnummer == avtale.orgnr }.navn
-                    val blobNavn = AvtaleService.lagFilnavn(kommunenavn, avtale.orgnr, avtale.avtaleversjon)
+                    val kommunenavn = if (Configuration.prod) kommuner.first { kommune -> kommune.organisasjonsnummer == avtale.orgnr }.navn else avtale.navn_innsender
+                    val blobNavn = AvtaleService.lagFilnavn(kommunenavn)
                     val metadata = mapOf("navnInnsender" to avtale.navn_innsender, "signertTidspunkt" to avtale.opprettet.toString())
                     if (gcpBucket.finnesFil(blobNavn)) {
                         log.info("Blob for signert avtale finnes allerede i bucket for orgnr ${avtale.orgnr}. Hopper over...")

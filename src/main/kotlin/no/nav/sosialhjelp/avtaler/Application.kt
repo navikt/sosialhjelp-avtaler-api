@@ -107,7 +107,7 @@ fun Application.setupRoutes() {
 
 fun lagreDokumenterIBucket() {
     @Serializable
-    data class Kommune(val orgnr: String, val navn: String)
+    data class Kommune(val organisasjonsnummer: String, val navn: String)
 
     log.info("jobb lagre-digipost-dokumenter-i-bucket: start")
     val databaseContext = DefaultDatabaseContext(DatabaseConfiguration(Configuration.dbProperties, Configuration.profile).dataSource())
@@ -121,9 +121,11 @@ fun lagreDokumenterIBucket() {
         log.info("jobb lagre-digipost-dokumenter: Lagrer signert dokument for ${digipostJobbData.size} kommuner")
 
         val kommuneJson = withContext(Dispatchers.IO) {
-            this::class.java.getResource("/enhetsregisteret/kommuner.json")!!.openStream().readAllBytes().toString()
+            this::class.java.getResource("/enhetsregisteret/kommuner.json")!!.readText()
         }
-        val kommuner = Json.decodeFromString<Array<Kommune>>(kommuneJson)
+        val json = Json { ignoreUnknownKeys = true }
+
+        val kommuner = json.decodeFromString<Array<Kommune>>(kommuneJson)
 
         digipostJobbData.forEach {
             log.info("jobb lagre-digipost-dokumenter: Lagrer signert dokument for kommune med orgnr ${it.orgnr}")
@@ -132,7 +134,7 @@ fun lagreDokumenterIBucket() {
             }
             if (avtale != null) {
                 try {
-                    val kommunenavn = kommuner.first { kommune -> kommune.orgnr == avtale.orgnr }.navn
+                    val kommunenavn = kommuner.first { kommune -> kommune.organisasjonsnummer == avtale.orgnr }.navn
                     val blobNavn = AvtaleService.lagFilnavn(kommunenavn, avtale.orgnr, avtale.avtaleversjon)
                     val metadata = mapOf("navnInnsender" to avtale.navn_innsender, "signertTidspunkt" to avtale.opprettet.toString())
                     if (gcpBucket.finnesFil(blobNavn)) {

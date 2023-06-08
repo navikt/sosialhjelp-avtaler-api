@@ -1,6 +1,7 @@
 package no.nav.sosialhjelp.avtaler
 
 import io.kotest.matchers.ints.shouldBeGreaterThan
+import io.kotest.matchers.string.shouldBeEqualIgnoringCase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -22,5 +23,6 @@ internal class ApplicationTest {
 
         val kommuner = json.decodeFromString<Array<Kommune>>(kommuneJson)
         kommuner.size shouldBeGreaterThan 1
+        kommuner.first { it.organisasjonsnummer == "210522352" }.navn shouldBeEqualIgnoringCase "ALSTAHAUG KOMMUNE"
     }
 }

@@ -142,7 +142,7 @@ class AvtaleService(
             return
         }
 
-        val blobNavn = "$kommunenavn-${avtale.orgnr}-avtaleversjon${avtale.avtaleversjon}"
+        val blobNavn = lagFilnavn(kommunenavn, avtale.orgnr, avtale.avtaleversjon)
         val metadata = mapOf("navnInnsender" to avtale.navn_innsender, "signertTidspunkt" to avtale.opprettet.toString())
         gcpBucket.lagreBlob(blobNavn, MediaType.PDF, metadata, digipostJobbData.signertDokument.readAllBytes())
         log.info("Lagret signert avtale i bucket for orgnr ${avtale.orgnr}")
@@ -219,5 +219,10 @@ class AvtaleService(
 
         log.info("Lagret signert avtale for ${avtale.orgnr}")
         return avtale
+    }
+    companion object {
+        fun lagFilnavn(kommunenavn: String, orgnr: String, avtaleversjon: String?): String {
+            return "DIGISOS - Avtale om påkobling til innsynsflate NKS - $kommunenavn-$orgnr-avtaleversjon-${avtaleversjon.orEmpty()}"
+        }
     }
 }

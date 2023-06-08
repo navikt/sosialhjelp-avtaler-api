@@ -6,11 +6,14 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.google.cloud.storage.StorageException
 import com.google.common.net.MediaType
 import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
+import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.response.respond
 import io.ktor.server.routing.IgnoreTrailingSlash
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
@@ -99,6 +102,7 @@ fun Application.setupRoutes() {
                 }
                 post("/avtaler-til-bucket") {
                     lagreDokumenterIBucket()
+                    call.respond(HttpStatusCode.OK)
                 }
             }
         }

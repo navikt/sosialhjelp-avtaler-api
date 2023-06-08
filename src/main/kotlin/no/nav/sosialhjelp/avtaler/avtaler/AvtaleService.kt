@@ -222,7 +222,7 @@ class AvtaleService(
     }
     companion object {
         fun lagFilnavn(kommunenavn: String): String {
-            return "Digisos - Avtale om innsynsflate for NAV Kontaktsenter -$kommunenavn"
+            return "Avtale om innsynsflate for NAV Kontaktsenter - Digisos - $kommunenavn"
         }
     }
 }

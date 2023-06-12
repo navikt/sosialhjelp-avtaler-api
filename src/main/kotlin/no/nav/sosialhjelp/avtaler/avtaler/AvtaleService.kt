@@ -15,6 +15,7 @@ import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
 import no.nav.sosialhjelp.avtaler.slack.Slack
 import java.io.InputStream
 import java.net.URI
+import java.time.LocalDateTime
 
 private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
@@ -142,7 +143,7 @@ class AvtaleService(
             return
         }
 
-        val blobNavn = lagFilnavn(kommunenavn)
+        val blobNavn = lagFilnavn(kommunenavn, avtale.opprettet)
         val metadata = mapOf("navnInnsender" to avtale.navn_innsender, "signertTidspunkt" to avtale.opprettet.toString())
         gcpBucket.lagreBlob(blobNavn, MediaType.PDF, metadata, digipostJobbData.signertDokument.readAllBytes())
         log.info("Lagret signert avtale i bucket for orgnr ${avtale.orgnr}")
@@ -221,8 +222,8 @@ class AvtaleService(
         return avtale
     }
     companion object {
-        fun lagFilnavn(kommunenavn: String): String {
-            return "Avtale om innsynsflate for NAV Kontaktsenter - Digisos - $kommunenavn"
+        fun lagFilnavn(kommunenavn: String, opprettet: LocalDateTime): String {
+            return "Avtale om innsynsflate for NAV Kontaktsenter - Digisos - $kommunenavn - $opprettet"
         }
     }
 }

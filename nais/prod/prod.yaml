@@ -58,6 +58,8 @@ spec:
           namespace: arbeidsgiver
         - application: curl-digipost-app
   resources:
+    limits:
+      memory: 2Gi
     requests:
       cpu: 200m
       memory: 1Gi

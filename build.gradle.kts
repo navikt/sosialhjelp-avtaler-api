@@ -7,7 +7,7 @@ object Versions {
     const val kotestVersion = "5.5.5"
     const val ktlint = "0.45.2"
     const val logback_version = "1.4.5"
-    const val logback_encoder_version = "7.2"
+    const val logback_encoder_version = "7.3"
     const val jackson_version = "2.14.2"
     const val microutils_version = "3.0.5"
     const val token_support_version = "3.0.3"

@@ -66,9 +66,6 @@ spec:
     requests:
       cpu: 15m
       memory: 512Mi
-  azure:
-    application:
-      enabled: true
   secureLogs:
     enabled: true
   envFrom:

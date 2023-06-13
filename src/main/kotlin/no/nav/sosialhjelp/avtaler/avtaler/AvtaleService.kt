@@ -16,6 +16,7 @@ import no.nav.sosialhjelp.avtaler.slack.Slack
 import java.io.InputStream
 import java.net.URI
 import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 
 private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
@@ -223,7 +224,9 @@ class AvtaleService(
     }
     companion object {
         fun lagFilnavn(kommunenavn: String, opprettet: LocalDateTime): String {
-            return "Avtale om innsynsflate for NAV Kontaktsenter - Digisos - $kommunenavn - $opprettet"
+            return "Avtale om innsynsflate for NAV Kontaktsenter - Digisos - $kommunenavn - ${opprettet.format(
+                DateTimeFormatter.ofPattern("dd.MM.yyyy")
+            )}"
         }
     }
 }

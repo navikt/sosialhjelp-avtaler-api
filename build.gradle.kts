@@ -3,6 +3,7 @@ object Versions {
     const val konfig_version = "1.6.10.0"
     const val ktor_version = "2.2.3"
     const val kotlin_version = "1.8.10"
+    const val kotlin_serialization_plugin_version = "1.5.0"
     const val kotestVersion = "5.5.5"
     const val ktlint = "0.45.2"
     const val logback_version = "1.4.5"
@@ -24,6 +25,7 @@ object Versions {
 plugins {
     application
     kotlin("jvm") version "1.7.10"
+    kotlin("plugin.serialization") version "1.8.21"
     id("io.ktor.plugin") version "2.1.1"
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
@@ -64,6 +66,7 @@ dependencies {
     implementation("io.ktor:ktor-client-jackson:${Versions.ktor_version}")
     implementation("io.ktor:ktor-client-mock:${Versions.ktor_version}")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.kotlin_serialization_plugin_version}")
     implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor_version}")
     implementation("io.ktor:ktor-serialization-jackson-jvm:${Versions.ktor_version}")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${Versions.jackson_version}")

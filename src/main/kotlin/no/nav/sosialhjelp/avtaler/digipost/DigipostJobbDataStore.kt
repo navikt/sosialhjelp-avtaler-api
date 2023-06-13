@@ -16,6 +16,8 @@ interface DigipostJobbDataStore : Store {
     fun hentDigipostJobb(orgnr: String): DigipostJobbData?
     fun oppdaterDigipostJobbData(digipostJobbData: DigipostJobbData): DigipostJobbData
     fun hentAlleUtenLagretDokument(): List<DigipostJobbData>
+
+    fun hentAlle(): List<DigipostJobbData>
 }
 
 class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) : DigipostJobbDataStore, TransactionalStore(sessionFactory) {
@@ -79,6 +81,16 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
             SELECT * 
             FROM digipost_jobb_data 
             WHERE signert_dokument IS NULL AND status_query_token IS NOT NULL
+        """.trimIndent()
+        it.queryList(sql, mapOf(), ::mapper)
+    }
+
+    override fun hentAlle(): List<DigipostJobbData> = session {
+        @Language("PostgreSQL")
+        val sql = """
+            SELECT * 
+            FROM digipost_jobb_data 
+            WHERE signert_dokument IS NOT NULL
         """.trimIndent()
         it.queryList(sql, mapOf(), ::mapper)
     }

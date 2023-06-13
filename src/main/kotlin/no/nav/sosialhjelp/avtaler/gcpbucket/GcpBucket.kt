@@ -19,4 +19,9 @@ class GcpBucket(private val bucketName: String) {
 
         storage.create(blobInfo, bytes)
     }
+
+    fun finnesFil(blobNavn: String): Boolean {
+        val blob = storage.get(bucketName, blobNavn)
+        return blob != null && blob.size > 0
+    }
 }

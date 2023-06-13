@@ -1,0 +1,1102 @@
+[
+      {
+        "organisasjonsnummer": "938712441",
+        "navn": "ALSTAHAUG KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.alstahaug.kommune.no",
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 1157,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "8800",
+          "poststed": "SANDNESSJØEN",
+          "adresse": [
+            "Strandgata 52"
+          ],
+          "kommune": "ALSTAHAUG",
+          "kommunenummer": "1820"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Bokmål",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/938712441"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "944588132",
+        "navn": "ALTA KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.alta.kommune.no",
+        "postadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "9506",
+          "poststed": "ALTA",
+          "adresse": [
+            "Postboks 1403"
+          ],
+          "kommune": "ALTA",
+          "kommunenummer": "5403"
+        },
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "frivilligMvaRegistrertBeskrivelser": [
+          "Utleier av bygg eller anlegg"
+        ],
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 3052,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "9510",
+          "poststed": "ALTA",
+          "adresse": [
+            "Sandfallveien 1"
+          ],
+          "kommune": "ALTA",
+          "kommunenummer": "5403"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Bokmål",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/944588132"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "939984194",
+        "navn": "ALVDAL KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.alvdal.kommune.no",
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 435,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "2560",
+          "poststed": "ALVDAL",
+          "adresse": [
+            "Gjelen 3"
+          ],
+          "kommune": "ALVDAL",
+          "kommunenummer": "3428"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Bokmål",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/939984194"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "920290922",
+        "navn": "ALVER KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "postadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "5906",
+          "poststed": "FREKHAUG",
+          "adresse": [
+            "Postboks 4"
+          ],
+          "kommune": "ALVER",
+          "kommunenummer": "4631"
+        },
+        "registreringsdatoEnhetsregisteret": "2018-01-23",
+        "registrertIMvaregisteret": true,
+        "frivilligMvaRegistrertBeskrivelser": [
+          "Utleier av bygg eller anlegg"
+        ],
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 4448,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "5914",
+          "poststed": "ISDALSTØ",
+          "adresse": [
+            "Kvernhusmyrane 41"
+          ],
+          "kommune": "ALVER",
+          "kommunenummer": "4631"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Nynorsk",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/920290922"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "945624809",
+        "navn": "ANDØY KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.andoy.kommune.no",
+        "postadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "8483",
+          "poststed": "ANDENES",
+          "adresse": [
+            "Postboks 187"
+          ],
+          "kommune": "ANDØY",
+          "kommunenummer": "1871"
+        },
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 1098,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "8480",
+          "poststed": "ANDENES",
+          "adresse": [
+            "Storgata 68"
+          ],
+          "kommune": "ANDØY",
+          "kommunenummer": "1871"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Bokmål",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/945624809"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "940875560",
+        "navn": "AREMARK KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.aremark.kommune.no",
+        "postadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "1798",
+          "poststed": "AREMARK",
+          "adresse": [
+            "Rådhuset",
+            "Aremarkveien 2276"
+          ],
+          "kommune": "AREMARK",
+          "kommunenummer": "3012"
+        },
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 255,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "1798",
+          "poststed": "AREMARK",
+          "adresse": [
+            "Aremarkveien 2276"
+          ],
+          "kommune": "AREMARK",
+          "kommunenummer": "3012"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Bokmål",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/940875560"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "940493021",
+        "navn": "ARENDAL KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.arendal.kommune.no",
+        "postadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "4891",
+          "poststed": "GRIMSTAD",
+          "adresse": [
+            "Postboks 123"
+          ],
+          "kommune": "GRIMSTAD",
+          "kommunenummer": "4202"
+        },
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "frivilligMvaRegistrertBeskrivelser": [
+          "Utleier av bygg eller anlegg"
+        ],
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 5664,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "4836",
+          "poststed": "ARENDAL",
+          "adresse": [
+            "Sam Eydes plass 4"
+          ],
+          "kommune": "ARENDAL",
+          "kommunenummer": "4203"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Bokmål",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/940493021"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "920125298",
+        "navn": "ASKER KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.asker.kommune.no",
+        "postadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "3440",
+          "poststed": "RØYKEN",
+          "adresse": [
+            "Katrineåsveien 20"
+          ],
+          "kommune": "ASKER",
+          "kommunenummer": "3025"
+        },
+        "registreringsdatoEnhetsregisteret": "2017-12-14",
+        "registrertIMvaregisteret": true,
+        "frivilligMvaRegistrertBeskrivelser": [
+          "Utleier av bygg eller anlegg"
+        ],
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 10264,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "1383",
+          "poststed": "ASKER",
+          "adresse": [
+            "Knud Askers vei 25"
+          ],
+          "kommune": "ASKER",
+          "kommunenummer": "3025"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Bokmål",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/920125298"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "964968330",
+        "navn": "ASKVOLL KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.askvoll.kommune.no",
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "frivilligMvaRegistrertBeskrivelser": [
+          "Utleier av bygg eller anlegg"
+        ],
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 605,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "6980",
+          "poststed": "ASKVOLL",
+          "adresse": [
+            "Askvollvegen 426A"
+          ],
+          "kommune": "ASKVOLL",
+          "kommunenummer": "4645"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Nynorsk",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/964968330"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "964338442",
+        "navn": "ASKØY KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.askoy.kommune.no",
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "frivilligMvaRegistrertBeskrivelser": [
+          "Utleier av bygg eller anlegg"
+        ],
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 3619,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "5300",
+          "poststed": "KLEPPESTØ",
+          "adresse": [
+            "Klampavikvegen 1"
+          ],
+          "kommune": "ASKØY",
+          "kommunenummer": "4627"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Bokmål",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/964338442"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "964981337",
+        "navn": "AUKRA KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.aukra.kommune.no",
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "frivilligMvaRegistrertBeskrivelser": [
+          "Utleier av bygg eller anlegg"
+        ],
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 721,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "6480",
+          "poststed": "AUKRA",
+          "adresse": [
+            "Kommunehuset",
+            "Nyjordvegen 12"
+          ],
+          "kommune": "AUKRA",
+          "kommunenummer": "1547"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Nynorsk",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/964981337"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "988913898",
+        "navn": "AURE KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "postadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "6689",
+          "poststed": "AURE",
+          "adresse": [
+            "Postboks 33"
+          ],
+          "kommune": "AURE",
+          "kommunenummer": "1576"
+        },
+        "registreringsdatoEnhetsregisteret": "2005-11-14",
+        "registrertIMvaregisteret": true,
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 718,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "6690",
+          "poststed": "AURE",
+          "adresse": [
+            "Aurdalsvegen 9"
+          ],
+          "kommune": "AURE",
+          "kommunenummer": "1576"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Bokmål",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/988913898"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "964968063",
+        "navn": "AURLAND KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.aurland.kommune.no",
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 424,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "5745",
+          "poststed": "AURLAND",
+          "adresse": [
+            "Vangen 1"
+          ],
+          "kommune": "AURLAND",
+          "kommunenummer": "4641"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Nynorsk",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/964968063"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "948164256",
+        "navn": "AURSKOG-HØLAND KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.ahk.no",
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "frivilligMvaRegistrertBeskrivelser": [
+          "Utleier av bygg eller anlegg"
+        ],
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 2155,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "1940",
+          "poststed": "BJØRKELANGEN",
+          "adresse": [
+            "Rådhusveien 3"
+          ],
+          "kommune": "AURSKOG-HØLAND",
+          "kommunenummer": "3026"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Bokmål",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/948164256"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "941139787",
+        "navn": "AUSTEVOLL KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.austevoll.kommune.no/",
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "frivilligMvaRegistrertBeskrivelser": [
+          "Utleier av bygg eller anlegg"
+        ],
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 694,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "5392",
+          "poststed": "STOREBØ",
+          "adresse": [
+            "Birkelandsvegen 2"
+          ],
+          "kommune": "AUSTEVOLL",
+          "kommunenummer": "4625"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Nynorsk",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/941139787"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "948350823",
+        "navn": "AUSTRHEIM KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.austrheim.kommune.no/",
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 485,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "5943",
+          "poststed": "AUSTRHEIM",
+          "adresse": [
+            "Sætremarka 2"
+          ],
+          "kommune": "AUSTRHEIM",
+          "kommunenummer": "4632"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Nynorsk",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/948350823"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "962378064",
+        "navn": "AVERØY KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.averoy.kommune.no",
+        "postadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "6538",
+          "poststed": "AVERØY",
+          "adresse": [
+            "Postboks 152 Bruhagen"
+          ],
+          "kommune": "AVERØY",
+          "kommunenummer": "1554"
+        },
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 765,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "6530",
+          "poststed": "AVERØY",
+          "adresse": [
+            "Bruvollveien 4"
+          ],
+          "kommune": "AVERØY",
+          "kommunenummer": "1554"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Bokmål",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/962378064"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "940208580",
+        "navn": "BALSFJORD KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.balsfjord.kommune.no",
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "frivilligMvaRegistrertBeskrivelser": [
+          "Utleier av bygg eller anlegg"
+        ],
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 1018,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "9050",
+          "poststed": "STORSTEINNES",
+          "adresse": [
+            "Rådhusgata 11"
+          ],
+          "kommune": "BALSFJORD",
+          "kommunenummer": "5422"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Bokmål",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/940208580"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "940244145",
+        "navn": "BAMBLE KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.bamble.kommune.no/",
+        "postadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "3993",
+          "poststed": "LANGESUND",
+          "adresse": [
+            "Postboks 80"
+          ],
+          "kommune": "BAMBLE",
+          "kommunenummer": "3813"
+        },
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 1982,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "3970",
+          "poststed": "LANGESUND",
+          "adresse": [
+            "Kirkeveien 12"
+          ],
+          "kommune": "BAMBLE",
+          "kommunenummer": "3813"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Bokmål",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/940244145"
+          }
+        }
+      },
+      {
+        "organisasjonsnummer": "864993982",
+        "navn": "BARDU KOMMUNE",
+        "organisasjonsform": {
+          "kode": "KOMM",
+          "beskrivelse": "Kommune",
+          "_links": {
+            "self": {
+              "href": "https://data.brreg.no/enhetsregisteret/api/organisasjonsformer/KOMM"
+            }
+          }
+        },
+        "hjemmeside": "www.bardu.kommune.no/",
+        "postadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "9365",
+          "poststed": "BARDU",
+          "adresse": [
+            "Postboks 401"
+          ],
+          "kommune": "BARDU",
+          "kommunenummer": "5416"
+        },
+        "registreringsdatoEnhetsregisteret": "1995-06-07",
+        "registrertIMvaregisteret": true,
+        "naeringskode1": {
+          "beskrivelse": "Generell offentlig administrasjon",
+          "kode": "84.110"
+        },
+        "antallAnsatte": 796,
+        "forretningsadresse": {
+          "land": "Norge",
+          "landkode": "NO",
+          "postnummer": "9360",
+          "poststed": "BARDU",
+          "adresse": [
+            "Altevannsveien 16"
+          ],
+          "kommune": "BARDU",
+          "kommunenummer": "5416"
+        },
+        "institusjonellSektorkode": {
+          "kode": "6500",
+          "beskrivelse": "Kommuneforvaltningen"
+        },
+        "registrertIForetaksregisteret": false,
+        "registrertIStiftelsesregisteret": false,
+        "registrertIFrivillighetsregisteret": false,
+        "konkurs": false,
+        "underAvvikling": false,
+        "underTvangsavviklingEllerTvangsopplosning": false,
+        "maalform": "Bokmål",
+        "_links": {
+          "self": {
+            "href": "https://data.brreg.no/enhetsregisteret/api/enheter/864993982"
+          }
+        }
+      }
+    ]

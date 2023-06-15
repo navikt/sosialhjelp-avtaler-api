@@ -224,7 +224,7 @@ class AvtaleService(
     }
     companion object {
         fun lagFilnavn(kommunenavn: String, opprettet: LocalDateTime): String {
-            return "Avtale om innsynsflate for NAV Kontaktsenter - Digisos - $kommunenavn - ${opprettet.format(
+            return "Avtale om innsynsflate for NAV Kontaktsenter - Digisos - ${kommunenavn.replace("/", "-")} - ${opprettet.format(
                 DateTimeFormatter.ofPattern("dd.MM.yyyy")
             )}"
         }

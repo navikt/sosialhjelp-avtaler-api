@@ -26,7 +26,7 @@ plugins {
     application
     kotlin("jvm") version "1.7.10"
     kotlin("plugin.serialization") version "1.8.21"
-    id("io.ktor.plugin") version "2.1.1"
+    id("io.ktor.plugin") version "2.3.1"
     id("org.jlleitschuh.gradle.ktlint") version "10.3.0"
 }
 

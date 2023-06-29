@@ -22,7 +22,7 @@ jobs:
         id: artifact-version
         uses: navikt/sosialhjelp-ci/actions/create-and-release-tag@master
 
-      - name: Create tag and release
+      - name: Build and push Docker Image
         uses: navikt/sosialhjelp-ci/actions/build-and-push-docker-image@master
         with:
           image-name: ghcr.io/${{ github.repository }}/${{ github.event.repository.name }}

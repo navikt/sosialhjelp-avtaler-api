@@ -18,6 +18,9 @@ jobs:
       - name: Build kotlin, and run tests/lint
         uses: navikt/sosialhjelp-ci/actions/build-kotlin@master
 
+      - name: Show git log
+        run: echo "Git Log $(git log)"
+
       - name: Create and release tag
         id: artifact-version
         uses: navikt/sosialhjelp-ci/actions/create-and-release-tag@master

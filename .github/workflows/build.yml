@@ -13,11 +13,11 @@ jobs:
     env:
       DOCKER_IMAGE: ghcr.io/${{ github.repository }}/${{ github.event.repository.name }}
       ORG_GRADLE_PROJECT_githubUser: x-access-token
-      ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}      
+      ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
     steps:
       - name: Build kotlin, and run tests/lint
         uses: navikt/sosialhjelp-ci/actions/build-kotlin@master
-        
+
       - name: Create and release tag
         id: artifact-version
         uses: navikt/sosialhjelp-ci/actions/create-and-release-tag@master

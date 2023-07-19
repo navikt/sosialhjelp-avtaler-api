@@ -20,6 +20,11 @@ object Versions {
     const val google_cloud_libraries = "26.14.0"
     const val google_cloud_secretmanager = "2.10.0"
     const val unleash = "4.4.1"
+
+    // constraints
+    const val json_smart = "2.4.9"
+    const val netty = "4.1.94.Final"
+    const val guava = "32.0.1-jre"
 }
 
 plugins {
@@ -104,4 +109,16 @@ dependencies {
     testImplementation("io.ktor:ktor-server-tests-jvm:${Versions.ktor_version}")
     testImplementation("io.kotest:kotest-assertions-core-jvm:${Versions.kotestVersion}")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:${Versions.kotlin_version}")
+
+    constraints {
+        implementation("net.minidev:json-smart:${Versions.json_smart}") {
+            because("https://github.com/advisories/GHSA-493p-pfq6-5258")
+        }
+        implementation("io.netty:netty-handler:${Versions.netty}") {
+            because("https://github.com/advisories/GHSA-6mjq-h674-j845")
+        }
+        implementation("com.google.guava:guava:${Versions.guava}") {
+            because("https://github.com/advisories/GHSA-7g45-4rm6-3mm3")
+        }
+    }
 }

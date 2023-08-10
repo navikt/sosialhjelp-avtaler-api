@@ -1,2 +1,2 @@
 # sosialhjelp-avtaler-api
-Backend for selvbetjening av avtaler
+Backend for selvbetjening av avtaler.

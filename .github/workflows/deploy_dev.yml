@@ -1,27 +1,16 @@
-name: Deploy til dev
+name: 'Deploy to Development'
+run-name: Deploy '${{ github.ref_name }}' to 'dev-gcp'
 on:
   workflow_dispatch:
 
 jobs:
-  deploy:
-    name: Deploy to dev - ${{ github.event.inputs.config-file-name }}
-    runs-on: ubuntu-latest
-    env:
-      DOCKER_IMAGE: ghcr.io/${{ github.repository }}/${{ github.event.repository.name }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Create artifact version
-        id: artifact-version
-        uses: navikt/sosialhjelp-ci/actions/create-artifact-version@v2
-      - name: Sett env variabler
-        run: |
-          echo "DOCKER_TAG=${{ env.DOCKER_IMAGE }}:${{ steps.artifact-version.outputs.version }}" >> $GITHUB_ENV
-      - name: Deploy til dev
-        uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          RESOURCE: nais/dev/dev.yaml
-          CLUSTER: dev-gcp
-          REF: ${{ github.sha }}
-          PRINT_PAYLOAD: true
-          IMAGE: ${{ env.DOCKER_TAG }}
+  deploy-to-dev:
+    name: 'Deploy to dev'
+    permissions:
+      packages: write
+      contents: write
+    uses: navikt/sosialhjelp-ci/.github/workflows/deploy_app.yml@v2
+    with:
+      cluster-name: 'dev-gcp'
+      resource-name: 'dev'
+    secrets: inherit

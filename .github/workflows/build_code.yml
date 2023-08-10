@@ -1,0 +1,23 @@
+name: 'Build Kotlin, Run Lint and Test'
+on:
+  push:
+    branches:
+      - '**' # Build all branches
+    tags-ignore:
+      - '**' # Don't build any tags
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: 'Build with Gradle'
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+      contents: write
+    env:
+      ORG_GRADLE_PROJECT_githubUser: x-access-token
+      ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build kotlin, and run tests/lint
+        uses: navikt/sosialhjelp-ci/actions/build-kotlin@v2

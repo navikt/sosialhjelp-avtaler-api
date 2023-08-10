@@ -1,31 +1,22 @@
-name: Deploy til prod
+name: 'Deploy to Production'
 on:
   workflow_run:
-    workflows: [ "Build image" ]    # Venter på at bygget for prod er ferdig
+    workflows: [ 'Build Kotlin, Run Lint and Test' ]    # Venter på at bygg på master har kjørt uten feil
     branches: [ main ]
     types:
       - completed
 
 jobs:
-  deploy:
-    name: Deploy to prod
-    runs-on: ubuntu-latest
-    env:
-      DOCKER_IMAGE: ghcr.io/${{ github.repository }}/${{ github.event.repository.name }}
-    steps:
-      - uses: actions/checkout@v3
-      - name: Create artifact version
-        id: artifact-version
-        uses: navikt/sosialhjelp-ci/actions/create-artifact-version@v2
-      - name: Sett env variabler
-        run: |
-          echo "DOCKER_TAG=${{ env.DOCKER_IMAGE }}:${{ steps.artifact-version.outputs.version }}" >> $GITHUB_ENV
-      - name: Deploy til prod
-        uses: nais/deploy/actions/deploy@v1
-        env:
-          APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
-          RESOURCE: nais/prod/prod.yaml
-          CLUSTER: prod-gcp
-          REF: ${{ github.sha }}
-          PRINT_PAYLOAD: true
-          IMAGE: ${{ env.DOCKER_TAG }}
+  deploy-to-prod:
+    name: 'Deploy to prod-gcp'
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      packages: write
+      contents: write
+    uses: navikt/sosialhjelp-ci/.github/workflows/deploy_app.yml@v2
+    with:
+      cluster-name: 'prod-gcp'
+      resource-folder: 'prod'
+      resource-name: 'prod'
+      build-always: true
+    secrets: inherit

@@ -29,7 +29,7 @@ object Versions {
 
 plugins {
     application
-    kotlin("jvm") version "1.9.0"
+    kotlin("jvm") version "1.9.10"
     kotlin("plugin.serialization") version "1.9.0"
     id("io.ktor.plugin") version "2.3.2"
     id("org.jlleitschuh.gradle.ktlint") version "11.5.0"

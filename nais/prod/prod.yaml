@@ -51,7 +51,6 @@ spec:
         - host: api.signering.posten.no
         - host: pdl-api.prod-fss-pub.nais.io
         - host: secretmanager.googleapis.com
-        - host: unleash.nais.io
         - host: hooks.slack.com
       rules:
         - application: altinn-rettigheter-proxy

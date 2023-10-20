@@ -19,7 +19,6 @@ object Versions {
     const val jaxb_runtime = "2.3.7"
     const val google_cloud_libraries = "26.14.0"
     const val google_cloud_secretmanager = "2.10.0"
-    const val unleash = "4.4.1"
 
     // constraints
     const val json_smart = "2.4.9"
@@ -101,8 +100,6 @@ dependencies {
 
     // google cloud storage
     implementation("com.google.cloud:google-cloud-storage")
-    // Unleash
-    implementation("no.finn.unleash:unleash-client-java:${Versions.unleash}")
 
     // test
     testImplementation("io.ktor:ktor-client-mock:${Versions.ktor_version}")

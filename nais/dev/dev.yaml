@@ -51,7 +51,6 @@ spec:
         - host: api.difitest.signering.posten.no
         - host: pdl-api.dev-fss-pub.nais.io
         - host: secretmanager.googleapis.com
-        - host: unleash.nais.io
         - host: hooks.slack.com
         - host: digisos.intern.dev.nav.no
       rules:

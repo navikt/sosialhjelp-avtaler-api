@@ -88,10 +88,10 @@ object Configuration {
             "altinn.altinnRettigheterAudience" to "prod-gcp:arbeidsgiver:altinn-rettigheter-proxy",
             "virksomhetssertifikat.projectId" to "virksomhetssertifikat-prod",
             "virksomhetssertifikat.secretId" to "virksomhetssertifikat-digisos-keystore-jceks_2021-2024",
-            "virksomhetssertifikat.versionId" to "3",
+            "virksomhetssertifikat.versionId" to "2",
             "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-prod",
             "virksomhetssertifikat.passwordSecretId" to "digisos-keystore-credentials-json",
-            "virksomhetssertifikat.passwordSecretVersion" to "3",
+            "virksomhetssertifikat.passwordSecretVersion" to "2",
             "pdl.url" to "https://pdl-api.prod-fss-pub.nais.io/graphql",
             "pdl.audience" to "prod-fss:pdl:pdl-api",
             "gcp.bucketName" to "digisos-nks-avtaler"

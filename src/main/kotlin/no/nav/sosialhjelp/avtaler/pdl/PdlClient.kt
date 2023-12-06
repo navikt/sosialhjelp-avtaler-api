@@ -19,6 +19,9 @@ import no.nav.sosialhjelp.avtaler.pdl.api.Variables
 private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
+private const val HEADER_BEHANDLINGSNUMMER = "behandlingsnummer"
+private const val BEHANDLINGSNUMMER_AVTALER = "B563"
+
 class PdlClient(
     props: Configuration.PdlProperties,
     private val tokenClient: Oauth2Client
@@ -42,8 +45,7 @@ class PdlClient(
         val response = client.post(pdlUrl) {
             setBody(request)
             header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
-            header(HEADER_TEMA, TEMA_KOM)
-            // call-id?
+            header(HEADER_BEHANDLINGSNUMMER, BEHANDLINGSNUMMER_AVTALER)
         }
 
         when (response.status) {
@@ -69,10 +71,5 @@ class PdlClient(
         return this::class.java.getResource("/pdl/hentPerson.graphql")!!
             .readText()
             .replace("[\n\r]", "")
-    }
-
-    companion object {
-        private const val HEADER_TEMA = "Tema"
-        private const val TEMA_KOM = "KOM"
     }
 }

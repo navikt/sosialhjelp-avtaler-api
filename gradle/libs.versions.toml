@@ -1,0 +1,109 @@
+[versions]
+konfig = "1.6.10.0"
+ktor = "2.2.3"
+kotlin = "1.8.10"
+kotlinSerializationPlugin = "1.5.0"
+kotest = "5.5.5"
+ktlint = "0.45.2"
+logback = "1.4.5"
+logbackEncoder = "7.2"
+jackson = "2.14.2"
+microutils = "3.0.5"
+tokenSupport = "3.0.3"
+kotliquery = "1.9.0"
+flywaydb = "9.7.0"
+hikari = "5.0.1"
+postgresql = "42.5.3"
+digipostSignatureApiClient = "7.0-RC7"
+jaxbRuntime = "2.3.7"
+googleCloudLibraries = "26.14.0"
+googleCloudSecretManager = "2.10.0"
+
+[libraries]
+konfig = { module = "com.natpryce:konfig", version.ref = "konfig" }
+ktor-server-core-jvm = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
+ktor-server-netty-jvm = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
+ktor-server-content-negotiation-jvm = { module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor" }
+ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
+ktor-client-jackson = { module = "io.ktor:ktor-client-jackson", version.ref = "ktor" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinSerializationPlugin" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-serialization-jackson-jvm = { module = "io.ktor:ktor-serialization-jackson-jvm", version.ref = "ktor" }
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
+kotlin-logging = { module = "io.github.microutils:kotlin-logging", version.ref = "microutils" }
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flywaydb" }
+hikariCP = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+kotliquery = { module = "com.github.seratch:kotliquery", version.ref = "kotliquery" }
+token-validation-ktor = { module = "no.nav.security:token-validation-ktor", version.ref = "tokenSupport" }
+token-client-core = { module = "no.nav.security:token-client-core", version.ref = "tokenSupport" }
+signature-api-client-java = { module = "no.digipost.signature:signature-api-client-java", version.ref = "digipostSignatureApiClient" }
+jaxb-impl = { module = "com.sun.xml.bind:jaxb-impl", version.ref = "jaxbRuntime" }
+libraries-bom = { module = "com.google.cloud:libraries-bom", version.ref = "googleCloudLibraries" }
+google-cloud-secretmanager = { module = "com.google.cloud:google-cloud-secretmanager", version.ref = "googleCloudSecretManager" }
+google-cloud-storage = { module = "com.google.cloud:google-cloud-storage" }
+logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logbackEncoder" }
+
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+ktor-server-tests-jvm = { module = "io.ktor:ktor-server-tests-jvm", version.ref = "ktor" }
+kotest-assertions-core-jvm = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }
+kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+
+[bundles]
+ktor-server = [
+    "ktor-server-core-jvm",
+    "ktor-server-cio",
+    "ktor-server-netty-jvm",
+    "ktor-server-content-negotiation-jvm",
+    "ktor-server-auth-jwt",
+]
+ktor-client = [
+    "ktor-client-core",
+    "ktor-client-cio",
+    "ktor-client-content-negotiation",
+    "ktor-client-auth",
+    "ktor-client-jackson",
+]
+
+serialization = [
+    "kotlinx-serialization-json",
+    "ktor-serialization-jackson-jvm",
+    "ktor-serialization-kotlinx-json",
+    "jackson-module-kotlin",
+    "jackson-datatype-jsr310",
+]
+
+logging = [
+    "kotlin-logging",
+    "logback-classic",
+    "logstash-logback-encoder",
+]
+
+database = [
+    "postgresql",
+    "flyway-core",
+    "hikariCP",
+    "kotliquery",
+]
+
+test = [
+    "ktor-client-mock",
+    "ktor-server-tests-jvm",
+    "kotest-assertions-core-jvm",
+    "kotlin-test-junit",
+]
+
+
+
+[plugins]
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "11.6.1" }

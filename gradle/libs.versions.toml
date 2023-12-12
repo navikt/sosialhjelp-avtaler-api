@@ -40,6 +40,7 @@ kotlin-logging = { module = "io.github.microutils:kotlin-logging", version.ref =
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flywaydb" }
+flyway-postgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flywaydb" }
 hikariCP = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
 kotliquery = { module = "com.github.seratch:kotliquery", version.ref = "kotliquery" }
 token-validation-ktor = { module = "no.nav.security:token-validation-ktor", version.ref = "tokenSupport" }
@@ -89,6 +90,7 @@ logging = [
 database = [
     "postgresql",
     "flyway-core",
+    "flyway-postgresql",
     "hikariCP",
     "kotliquery",
 ]

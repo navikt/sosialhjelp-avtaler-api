@@ -7,8 +7,11 @@ import mu.KotlinLogging
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
 class AltinnService(private val altinnClient: AltinnClient) {
-
-    suspend fun hentAvgivere(fnr: String, tjeneste: Avgiver.Tjeneste, token: String?): List<Avgiver> =
+    suspend fun hentAvgivere(
+        fnr: String,
+        tjeneste: Avgiver.Tjeneste,
+        token: String?,
+    ): List<Avgiver> =
         withContext(Dispatchers.IO) {
             val avgivere = altinnClient.hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
             sikkerLog.info {
@@ -17,9 +20,13 @@ class AltinnService(private val altinnClient: AltinnClient) {
             avgivere
         }
 
-    suspend fun harTilgangTilSignering(fnr: String, orgnr: String): Boolean = withContext(Dispatchers.IO) {
-        altinnClient
-            .hentRettigheter(fnr = fnr, orgnr = orgnr)
-            .contains(Avgiver.Tjeneste.AVTALESIGNERING)
-    }
+    suspend fun harTilgangTilSignering(
+        fnr: String,
+        orgnr: String,
+    ): Boolean =
+        withContext(Dispatchers.IO) {
+            altinnClient
+                .hentRettigheter(fnr = fnr, orgnr = orgnr)
+                .contains(Avgiver.Tjeneste.AVTALESIGNERING)
+        }
 }

@@ -4,7 +4,7 @@ ktor = "2.3.7"
 kotlin = "1.9.21"
 kotlinSerializationPlugin = "1.6.2"
 kotest = "5.8.0"
-ktlint = "0.45.2"
+ktlint = "1.0.1"
 logback = "1.4.14"
 logbackEncoder = "7.4"
 jackson = "2.16.0"
@@ -108,4 +108,4 @@ test = [
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "11.6.1" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "12.0.3" }

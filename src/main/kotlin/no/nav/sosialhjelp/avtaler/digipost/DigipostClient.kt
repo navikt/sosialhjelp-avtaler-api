@@ -20,8 +20,8 @@ import no.digipost.signature.client.security.KeyStoreConfig
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
 import no.nav.sosialhjelp.avtaler.exceptions.VirsomhetsertifikatException
-import no.nav.sosialhjelp.avtaler.secretmanager.AccessSecretVersion
 import no.nav.sosialhjelp.avtaler.secretmanager.DigisosKeyStoreCredentials
+import no.nav.sosialhjelp.avtaler.secretmanager.SecretManager
 import java.io.ByteArrayInputStream
 import java.net.URI
 import java.util.Collections
@@ -30,8 +30,13 @@ import java.util.UUID
 private val log = KotlinLogging.logger {}
 
 data class DigipostResponse(val redirectUrl: URI, val signerUrl: URI, val reference: String)
-class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: Configuration.VirksomhetssertifikatProperties, profile: Configuration.Profile) {
-    private val accessSecretVersion: AccessSecretVersion = AccessSecretVersion
+
+class DigipostClient(
+    props: Configuration.DigipostProperties,
+    virksomhetProps: Configuration.VirksomhetssertifikatProperties,
+    profile: Configuration.Profile,
+) {
+    private val accessSecretVersion: SecretManager = SecretManager
     private val onCompletionUrl = props.onCompletionUrl
     private val onErrorUrl = props.onErrorUrl
     private val onRejectionUrl = props.onRejectionUrl
@@ -42,25 +47,36 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
     private val virksomhetSecretId = virksomhetProps.secretId
     private val virksomhetVersionId = virksomhetProps.versionId
     private val keyStoreConfig: KeyStoreConfig = configure(accessSecretVersion)
-    private val clientConfiguration = ClientConfiguration.builder(keyStoreConfig)
-        .serviceEnvironment(if (profile == Configuration.Profile.PROD) ServiceEnvironment.PRODUCTION else ServiceEnvironment.DIFITEST)
-        .defaultSender(Sender(props.navOrgnr))
-        .build()
+    private val clientConfiguration =
+        ClientConfiguration.builder(keyStoreConfig)
+            .serviceEnvironment(if (profile == Configuration.Profile.PROD) ServiceEnvironment.PRODUCTION else ServiceEnvironment.DIFITEST)
+            .defaultSender(Sender(props.navOrgnr))
+            .build()
     private val client = DirectClient(clientConfiguration)
 
-    private fun configure(accessSecretVersion: AccessSecretVersion): KeyStoreConfig {
-        val certificatePassword = accessSecretVersion.accessSecretVersion(virksomhetPasswordProjectId, virksomhetPasswordSecretId, virksomhetPasswordVersionId)?.data?.toStringUtf8()
+    private fun configure(accessSecretVersion: SecretManager): KeyStoreConfig {
+        val certificatePassword =
+            accessSecretVersion.accessSecretVersion(
+                virksomhetPasswordProjectId,
+                virksomhetPasswordSecretId,
+                virksomhetPasswordVersionId,
+            )?.data?.toStringUtf8()
         val objectMapper = ObjectMapper().registerKotlinModule()
-        val keystoreCredentials: DigisosKeyStoreCredentials = objectMapper.readValue(certificatePassword, DigisosKeyStoreCredentials::class.java)
+        val keystoreCredentials: DigisosKeyStoreCredentials =
+            objectMapper.readValue(
+                certificatePassword,
+                DigisosKeyStoreCredentials::class.java,
+            )
 
         val secretPayload = accessSecretVersion.accessSecretVersion(virksomhetProjectId, virksomhetSecretId, virksomhetVersionId)
 
-        val inputStream = try {
-            ByteArrayInputStream(secretPayload!!.data.toByteArray())
-        } catch (e: Exception) {
-            log.error("Kunne ikke hente virksomhetssertifikat. SecretPayload er null.")
-            throw VirsomhetsertifikatException("Kunne ikke hente virksomhetssertifikat. SecretPayload er null.", e)
-        }
+        val inputStream =
+            try {
+                ByteArrayInputStream(secretPayload!!.data.toByteArray())
+            } catch (e: Exception) {
+                log.error("Kunne ikke hente virksomhetssertifikat. SecretPayload er null.")
+                throw VirsomhetsertifikatException("Kunne ikke hente virksomhetssertifikat. SecretPayload er null.", e)
+            }
 
         log.info("Hentet sertifikat med lengde: ${secretPayload.data.size()}")
 
@@ -68,16 +84,20 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
             inputStream,
             keystoreCredentials.alias,
             keystoreCredentials.password,
-            keystoreCredentials.password
+            keystoreCredentials.password,
         )
     }
 
-    fun sendTilSignering(fnr: String, avtale: Avtale): DigipostResponse {
-        val exitUrls = ExitUrls.of(
-            URI.create(onCompletionUrl + avtale.orgnr),
-            URI.create(onRejectionUrl + avtale.orgnr),
-            URI.create(onErrorUrl + avtale.orgnr)
-        )
+    fun sendTilSignering(
+        fnr: String,
+        avtale: Avtale,
+    ): DigipostResponse {
+        val exitUrls =
+            ExitUrls.of(
+                URI.create(onCompletionUrl + avtale.orgnr),
+                URI.create(onRejectionUrl + avtale.orgnr),
+                URI.create(onErrorUrl + avtale.orgnr),
+            )
 
         val avtalePdf: ByteArray
         try {
@@ -88,20 +108,23 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         }
 
         val avtaleTittel = "Avtale om påkobling til innsynsflate NKS"
-        val documents: List<DirectDocument> = listOf(
-            DirectDocument.builder(avtaleTittel, avtalePdf).type(DocumentType.PDF).build()
-        )
+        val documents: List<DirectDocument> =
+            listOf(
+                DirectDocument.builder(avtaleTittel, avtalePdf).type(DocumentType.PDF).build(),
+            )
 
-        val signers: List<DirectSigner> = Collections.singletonList(
-            DirectSigner
-                .withPersonalIdentificationNumber(fnr)
+        val signers: List<DirectSigner> =
+            Collections.singletonList(
+                DirectSigner
+                    .withPersonalIdentificationNumber(fnr)
+                    .build(),
+            )
+
+        val job =
+            DirectJob
+                .builder(avtaleTittel, documents, signers, exitUrls)
+                .withReference(UUID.randomUUID().toString())
                 .build()
-        )
-
-        val job = DirectJob
-            .builder(avtaleTittel, documents, signers, exitUrls)
-            .withReference(UUID.randomUUID().toString())
-            .build()
 
         val directJobResponse = client.create(job)
         if (directJobResponse.singleSigner.redirectUrl == null) {
@@ -111,16 +134,25 @@ class DigipostClient(props: Configuration.DigipostProperties, virksomhetProps: C
         return DigipostResponse(directJobResponse.singleSigner.redirectUrl, directJobResponse.statusUrl, directJobResponse.reference)
     }
 
-    fun sjekkSigneringsstatus(directJobReference: String, statusUrl: URI, statusQueryToken: String): DirectJobStatus {
+    fun sjekkSigneringsstatus(
+        directJobReference: String,
+        statusUrl: URI,
+        statusQueryToken: String,
+    ): DirectJobStatus {
         val directJobResponse = DirectJobResponse(1, directJobReference, statusUrl, null)
-        val directJobStatusResponse = client.getStatus(
-            StatusReference.of(directJobResponse)
-                .withStatusQueryToken(statusQueryToken)
-        )
+        val directJobStatusResponse =
+            client.getStatus(
+                StatusReference.of(directJobResponse)
+                    .withStatusQueryToken(statusQueryToken),
+            )
         return directJobStatusResponse.status
     }
 
-    fun hentSignertAvtale(statusQueryToken: String, jobReference: String, statusUrl: URI): ResponseInputStream? {
+    fun hentSignertAvtale(
+        statusQueryToken: String,
+        jobReference: String,
+        statusUrl: URI,
+    ): ResponseInputStream? {
         val directJobResponse = DirectJobResponse(1, jobReference, statusUrl, null)
         val directJobStatusResponse = client.getStatus(StatusReference.of(directJobResponse).withStatusQueryToken(statusQueryToken))
 

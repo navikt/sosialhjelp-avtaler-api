@@ -17,26 +17,30 @@ private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
 class AltinnClient(props: Configuration.AltinnProperties, private val tokenClient: Oauth2Client) {
-
     private val client: HttpClient = defaultHttpClientWithJsonHeaders()
     private val baseUrl = props.baseUrl
     private val altinnRettigheterAudience = props.altinnRettigheterAudience
 
-    suspend fun hentAvgivere(fnr: String, tjeneste: Avgiver.Tjeneste, token: String?): List<Avgiver> {
+    suspend fun hentAvgivere(
+        fnr: String,
+        tjeneste: Avgiver.Tjeneste,
+        token: String?,
+    ): List<Avgiver> {
         token?.let {
             val scopedAccessToken = tokenClient.exchangeToken(token, altinnRettigheterAudience).accessToken
 
-            val response = client.get("$baseUrl/ekstern/altinn/api/serviceowner/reportees") {
-                url {
-                    parameters.append("ForceEIAuthentication", "")
-                    parameters.append("subject", fnr)
-                    parameters.append("serviceCode", tjeneste.kode)
-                    parameters.append("serviceEdition", tjeneste.versjon.toString())
-                    parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active' and OrganizationForm eq 'KOMM'")
-                    parameters.append("\$top", "200")
-                    header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
+            val response =
+                client.get("$baseUrl/ekstern/altinn/api/serviceowner/reportees") {
+                    url {
+                        parameters.append("ForceEIAuthentication", "")
+                        parameters.append("subject", fnr)
+                        parameters.append("serviceCode", tjeneste.kode)
+                        parameters.append("serviceEdition", tjeneste.versjon.toString())
+                        parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active' and OrganizationForm eq 'KOMM'")
+                        parameters.append("\$top", "200")
+                        header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
+                    }
                 }
-            }
             sikkerLog.info { "Hentet avgivere med url: ${response.request.url}" }
             if (response.status == HttpStatusCode.OK) {
                 return response.body() ?: emptyList()
@@ -48,16 +52,19 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
         return emptyList()
     }
 
-    suspend fun hentRettigheter(fnr: String, orgnr: String): Set<Avgiver.Tjeneste> {
-
-        val response = client.get("$baseUrl/ekstern/altinn/api/serviceowner/authorization/rights") {
-            url {
-                parameters.append("ForceEIAuthentication", "true")
-                parameters.append("subject", fnr)
-                parameters.append("reportee", orgnr)
-                parameters.append("\$filter", Avgiver.Tjeneste.FILTER)
+    suspend fun hentRettigheter(
+        fnr: String,
+        orgnr: String,
+    ): Set<Avgiver.Tjeneste> {
+        val response =
+            client.get("$baseUrl/ekstern/altinn/api/serviceowner/authorization/rights") {
+                url {
+                    parameters.append("ForceEIAuthentication", "true")
+                    parameters.append("subject", fnr)
+                    parameters.append("reportee", orgnr)
+                    parameters.append("\$filter", Avgiver.Tjeneste.FILTER)
+                }
             }
-        }
 
         sikkerLog.info { "Hentet rettigheter med url: ${response.request.url}" }
         if (response.status == HttpStatusCode.OK) {
@@ -72,9 +79,12 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
         @JsonProperty("ServiceEditionCode") val versjon: Int,
     )
 
-    private data class HentRettigheterResponse(@JsonProperty("Rights") val rettigheter: List<Rettighet>) {
-        fun tilSet(): Set<Avgiver.Tjeneste> = rettigheter.mapNotNull {
-            Avgiver.Tjeneste.fra(it.kode, it.versjon)
-        }.toSet()
+    private data class HentRettigheterResponse(
+        @JsonProperty("Rights") val rettigheter: List<Rettighet>,
+    ) {
+        fun tilSet(): Set<Avgiver.Tjeneste> =
+            rettigheter.mapNotNull {
+                Avgiver.Tjeneste.fra(it.kode, it.versjon)
+            }.toSet()
     }
 }

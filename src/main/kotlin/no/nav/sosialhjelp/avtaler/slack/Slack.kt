@@ -20,21 +20,23 @@ object Slack {
     fun post(message: String) {
         try {
             val slackMessage = "${environment.uppercase()} - $message"
-            val values = mapOf(
-                "text" to slackMessage,
-                "channel" to if (Configuration.prod) channelProd else channelDev,
-                "username" to username,
-            )
+            val values =
+                mapOf(
+                    "text" to slackMessage,
+                    "channel" to if (Configuration.prod) channelProd else channelDev,
+                    "username" to username,
+                )
 
             val objectMapper = ObjectMapper()
             val requestBody: String = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(values)
 
             val client = HttpClient.newBuilder().build()
-            val request = HttpRequest.newBuilder()
-                .uri(URI.create(hookUrl))
-                .header("Content-Type", "application/json")
-                .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-                .build()
+            val request =
+                HttpRequest.newBuilder()
+                    .uri(URI.create(hookUrl))
+                    .header("Content-Type", "application/json")
+                    .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+                    .build()
             client.send(request, HttpResponse.BodyHandlers.ofString())
         } catch (e: Exception) {
             log.warn("Posting av varsel til slack feilet.", e)

@@ -8,5 +8,5 @@ data class DigipostJobbData(
     val directJobReference: String,
     val statusUrl: URI,
     val statusQueryToken: String?,
-    val signertDokument: InputStream?
+    val signertDokument: InputStream?,
 )

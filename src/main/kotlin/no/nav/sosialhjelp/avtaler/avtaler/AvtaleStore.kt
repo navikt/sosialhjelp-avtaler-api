@@ -15,7 +15,9 @@ private val log = KotlinLogging.logger {}
 
 interface AvtaleStore : Store {
     fun hentAvtaleForOrganisasjon(orgnr: String): Avtale?
+
     fun hentAvtalerForOrganisasjoner(orgnr: List<String>): List<Avtale>
+
     fun lagreAvtale(avtale: Avtale): Avtale
 }
 
@@ -24,68 +26,73 @@ data class Avtale(
     val avtaleversjon: String? = null,
     val navn_innsender: String,
     val erSignert: Boolean,
-    val opprettet: LocalDateTime = LocalDateTime.now()
+    val opprettet: LocalDateTime = LocalDateTime.now(),
 )
 
 class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleStore,
     TransactionalStore(sessionFactory) {
-
-    override fun hentAvtaleForOrganisasjon(orgnr: String): Avtale? = session {
-        @Language("PostgreSQL")
-        val sql = """
-            SELECT orgnr, avtaleversjon, navn_innsender, er_signert, opprettet
-            FROM avtale_v1
-            WHERE orgnr = :orgnr
-        """.trimIndent()
-        it.query(sql, mapOf("orgnr" to orgnr), ::mapper)
-    }
-
-    override fun hentAvtalerForOrganisasjoner(orgnr: List<String>): List<Avtale> = session {
-        if (orgnr.isEmpty()) {
-            emptyList()
-        } else {
+    override fun hentAvtaleForOrganisasjon(orgnr: String): Avtale? =
+        session {
             @Language("PostgreSQL")
-            var sql = """
-            SELECT orgnr, avtaleversjon, navn_innsender, er_signert, opprettet
-            FROM avtale_v1
-            WHERE orgnr in (?)
-            """.trimIndent()
-            sql = sql.replace("(?)", "(" + (0 until orgnr.count()).joinToString { "?" } + ")")
-            it.queryList(sql, orgnr, ::mapper)
+            val sql =
+                """
+                SELECT orgnr, avtaleversjon, navn_innsender, er_signert, opprettet
+                FROM avtale_v1
+                WHERE orgnr = :orgnr
+                """.trimIndent()
+            it.query(sql, mapOf("orgnr" to orgnr), ::mapper)
         }
-    }
 
-    override fun lagreAvtale(avtale: Avtale): Avtale = session {
+    override fun hentAvtalerForOrganisasjoner(orgnr: List<String>): List<Avtale> =
+        session {
+            if (orgnr.isEmpty()) {
+                emptyList()
+            } else {
+                @Language("PostgreSQL")
+                var sql =
+                    """
+                    SELECT orgnr, avtaleversjon, navn_innsender, er_signert, opprettet
+                    FROM avtale_v1
+                    WHERE orgnr in (?)
+                    """.trimIndent()
+                sql = sql.replace("(?)", "(" + (0 until orgnr.count()).joinToString { "?" } + ")")
+                it.queryList(sql, orgnr, ::mapper)
+            }
+        }
 
-        @Language("PostgreSQL")
-        val sql = """
-            INSERT INTO avtale_v1 (orgnr,
-                                   avtaleversjon,
-                                   navn_innsender,
-                                   er_signert,
-                                   opprettet
-                                   )
-            VALUES (:orgnr, :avtaleversjon, :navn_innsender, :er_signert, :opprettet)
-            ON CONFLICT DO NOTHING
-        """.trimIndent()
-        it.update(
-            sql,
-            mapOf(
-                "orgnr" to avtale.orgnr,
-                "avtaleversjon" to avtale.avtaleversjon,
-                "navn_innsender" to avtale.navn_innsender,
-                "er_signert" to avtale.erSignert,
-                "opprettet" to avtale.opprettet
-            )
-        ).validate()
-        avtale
-    }
+    override fun lagreAvtale(avtale: Avtale): Avtale =
+        session {
+            @Language("PostgreSQL")
+            val sql =
+                """
+                INSERT INTO avtale_v1 (orgnr,
+                                       avtaleversjon,
+                                       navn_innsender,
+                                       er_signert,
+                                       opprettet
+                                       )
+                VALUES (:orgnr, :avtaleversjon, :navn_innsender, :er_signert, :opprettet)
+                ON CONFLICT DO NOTHING
+                """.trimIndent()
+            it.update(
+                sql,
+                mapOf(
+                    "orgnr" to avtale.orgnr,
+                    "avtaleversjon" to avtale.avtaleversjon,
+                    "navn_innsender" to avtale.navn_innsender,
+                    "er_signert" to avtale.erSignert,
+                    "opprettet" to avtale.opprettet,
+                ),
+            ).validate()
+            avtale
+        }
 
-    private fun mapper(row: Row): Avtale = Avtale(
-        orgnr = row.string("orgnr"),
-        avtaleversjon = row.stringOrNull("avtaleversjon"),
-        navn_innsender = row.string("navn_innsender"),
-        erSignert = row.boolean("er_signert"),
-        opprettet = row.localDateTime("opprettet")
-    )
+    private fun mapper(row: Row): Avtale =
+        Avtale(
+            orgnr = row.string("orgnr"),
+            avtaleversjon = row.stringOrNull("avtaleversjon"),
+            navn_innsender = row.string("navn_innsender"),
+            erSignert = row.boolean("er_signert"),
+            opprettet = row.localDateTime("opprettet"),
+        )
 }

@@ -29,11 +29,15 @@ class MockEngineBuilder(private val routes: MutableList<MockRoute> = mutableList
         configure: MockRequestHandler,
     ) = routes.add(MockRoute(url = url, method = method, handler = configure))
 
-    fun get(url: String, configure: MockRequestHandler) =
-        add(url = url, method = HttpMethod.Get, configure = configure)
+    fun get(
+        url: String,
+        configure: MockRequestHandler,
+    ) = add(url = url, method = HttpMethod.Get, configure = configure)
 
-    fun post(url: String, configure: MockRequestHandler) =
-        add(url = url, method = HttpMethod.Post, configure = configure)
+    fun post(
+        url: String,
+        configure: MockRequestHandler,
+    ) = add(url = url, method = HttpMethod.Post, configure = configure)
 
     fun findOrElse(
         request: HttpRequestData,
@@ -49,27 +53,28 @@ object StubEngine {
         respond(
             jsonMapper.writeValueAsString(body),
             HttpStatusCode.OK,
-            headersOf(HttpHeaders.ContentType, "application/json")
+            headersOf(HttpHeaders.ContentType, "application/json"),
         )
 
-    private fun mockEngineBuilder(block: MockEngineBuilder.() -> Unit): MockEngineBuilder =
-        MockEngineBuilder().apply(block)
+    private fun mockEngineBuilder(block: MockEngineBuilder.() -> Unit): MockEngineBuilder = MockEngineBuilder().apply(block)
 
-    private fun mockEngine(block: MockEngineBuilder.() -> Unit): HttpClientEngine = MockEngine { request ->
-        log.info { "Svarer på ${request.method.value} ${request.url}:${request.url.port}" }
-        mockEngineBuilder(block)
-            .findOrElse(request) { respondError(HttpStatusCode.NotFound) }
-            .handler(this, request)
-    }
-
-    fun tokenX(): HttpClientEngine = mockEngine {
-        get("/default/.well-known/openid-configuration") {
-            respond(
-                mapOf(
-                    "issuer" to "http://localhost:8080/default",
-                    "jwks_uri" to "http://localhost:8080/default/jwks"
-                )
-            )
+    private fun mockEngine(block: MockEngineBuilder.() -> Unit): HttpClientEngine =
+        MockEngine { request ->
+            log.info { "Svarer på ${request.method.value} ${request.url}:${request.url.port}" }
+            mockEngineBuilder(block)
+                .findOrElse(request) { respondError(HttpStatusCode.NotFound) }
+                .handler(this, request)
         }
-    }
+
+    fun tokenX(): HttpClientEngine =
+        mockEngine {
+            get("/default/.well-known/openid-configuration") {
+                respond(
+                    mapOf(
+                        "issuer" to "http://localhost:8080/default",
+                        "jwks_uri" to "http://localhost:8080/default/jwks",
+                    ),
+                )
+            }
+        }
 }

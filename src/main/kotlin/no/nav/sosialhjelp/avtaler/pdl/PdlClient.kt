@@ -24,29 +24,34 @@ private const val BEHANDLINGSNUMMER_AVTALER = "B563"
 
 class PdlClient(
     props: Configuration.PdlProperties,
-    private val tokenClient: Oauth2Client
+    private val tokenClient: Oauth2Client,
 ) {
-
     private val client: HttpClient = defaultHttpClientWithJsonHeaders()
     private val pdlUrl = props.pdlUrl
     private val pdlAudience = props.pdlAudience
 
-    suspend fun hentPerson(ident: String, token: String): PdlHentPerson? {
+    suspend fun hentPerson(
+        ident: String,
+        token: String,
+    ): PdlHentPerson? {
         val query = getHentPersonQuery()
-        val request = HentPersonRequest(
-            query = query,
-            variables = Variables(
-                ident = ident
+        val request =
+            HentPersonRequest(
+                query = query,
+                variables =
+                    Variables(
+                        ident = ident,
+                    ),
             )
-        )
 
         val scopedAccessToken = tokenClient.exchangeToken(token, pdlAudience).accessToken
 
-        val response = client.post(pdlUrl) {
-            setBody(request)
-            header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
-            header(HEADER_BEHANDLINGSNUMMER, BEHANDLINGSNUMMER_AVTALER)
-        }
+        val response =
+            client.post(pdlUrl) {
+                setBody(request)
+                header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
+                header(HEADER_BEHANDLINGSNUMMER, BEHANDLINGSNUMMER_AVTALER)
+            }
 
         when (response.status) {
             HttpStatusCode.OK -> {

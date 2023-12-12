@@ -19,35 +19,41 @@ private val log = KotlinLogging.logger { }
 class Oauth2Client(
     private val httpClient: HttpClient,
     private val clientAuthProperties: ClientAuthenticationProperties,
-    tokenXProperties: Configuration.TokenXProperties
+    tokenXProperties: Configuration.TokenXProperties,
 ) {
-
     private val tokenXTokenEndpointUrl = tokenXProperties.tokenXTokenEndpoint
 
-    suspend fun exchangeToken(token: String, audience: String): OAuth2AccessTokenResponse {
+    suspend fun exchangeToken(
+        token: String,
+        audience: String,
+    ): OAuth2AccessTokenResponse {
         log.info { "exhangeToken tokenendpointurl:$tokenXTokenEndpointUrl,  audience:$audience " }
         val grant = GrantRequest.tokenExchange(token, audience)
         return httpClient.tokenRequest(
             tokenXTokenEndpointUrl,
             clientAuthProperties = clientAuthProperties,
-            grantRequest = grant
+            grantRequest = grant,
         )
     }
 }
 
 data class GrantRequest(
     val grantType: OAuth2GrantType,
-    val params: Map<String, String> = emptyMap()
+    val params: Map<String, String> = emptyMap(),
 ) {
     companion object {
-        fun tokenExchange(token: String, audience: String): GrantRequest =
+        fun tokenExchange(
+            token: String,
+            audience: String,
+        ): GrantRequest =
             GrantRequest(
                 grantType = OAuth2GrantType.TOKEN_EXCHANGE,
-                params = mapOf(
-                    OAuth2ParameterNames.SUBJECT_TOKEN_TYPE to "urn:ietf:params:oauth:token-type:jwt",
-                    OAuth2ParameterNames.SUBJECT_TOKEN to token,
-                    OAuth2ParameterNames.AUDIENCE to audience
-                )
+                params =
+                    mapOf(
+                        OAuth2ParameterNames.SUBJECT_TOKEN_TYPE to "urn:ietf:params:oauth:token-type:jwt",
+                        OAuth2ParameterNames.SUBJECT_TOKEN to token,
+                        OAuth2ParameterNames.AUDIENCE to audience,
+                    ),
             )
     }
 }
@@ -55,25 +61,26 @@ data class GrantRequest(
 internal suspend fun HttpClient.tokenRequest(
     tokenEndpointUrl: String,
     clientAuthProperties: ClientAuthenticationProperties,
-    grantRequest: GrantRequest
+    grantRequest: GrantRequest,
 ): OAuth2AccessTokenResponse =
     submitForm(
         url = tokenEndpointUrl,
-        formParameters = Parameters.build {
-            appendClientAuthParams(
-                tokenEndpointUrl = tokenEndpointUrl,
-                clientAuthProperties = clientAuthProperties
-            )
-            append(OAuth2ParameterNames.GRANT_TYPE, grantRequest.grantType.value)
-            grantRequest.params.forEach {
-                append(it.key, it.value)
-            }
-        }
+        formParameters =
+            Parameters.build {
+                appendClientAuthParams(
+                    tokenEndpointUrl = tokenEndpointUrl,
+                    clientAuthProperties = clientAuthProperties,
+                )
+                append(OAuth2ParameterNames.GRANT_TYPE, grantRequest.grantType.value)
+                grantRequest.params.forEach {
+                    append(it.key, it.value)
+                }
+            },
     ).body()
 
 private fun ParametersBuilder.appendClientAuthParams(
     tokenEndpointUrl: String,
-    clientAuthProperties: ClientAuthenticationProperties
+    clientAuthProperties: ClientAuthenticationProperties,
 ) = apply {
     val clientAssertion = ClientAssertion(URI.create(tokenEndpointUrl), clientAuthProperties)
     append(OAuth2ParameterNames.CLIENT_ID, clientAuthProperties.clientId)

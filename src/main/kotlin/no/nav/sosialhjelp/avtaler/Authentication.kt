@@ -24,18 +24,20 @@ private val log = KotlinLogging.logger {}
 fun Application.installAuthentication(httpClient: HttpClient) {
     var tokenXConfig: AuthenticationConfiguration
     runBlocking(Dispatchers.IO) {
-        tokenXConfig = AuthenticationConfiguration(
-            metadata = httpClient.get(Configuration.tokenXProperties.wellKnownUrl).body(),
-            clientId = Configuration.tokenXProperties.clientId,
-        )
+        tokenXConfig =
+            AuthenticationConfiguration(
+                metadata = httpClient.get(Configuration.tokenXProperties.wellKnownUrl).body(),
+                clientId = Configuration.tokenXProperties.clientId,
+            )
     }
 
-    val jwkProviderTokenx = JwkProviderBuilder(URL(tokenXConfig.metadata.jwksUri))
-        // cache up to 1000 JWKs for 24 hours
-        .cached(1000, 24, TimeUnit.HOURS)
-        // if not cached, only allow max 100 different keys per minute to be fetched from external provider
-        .rateLimited(100, 1, TimeUnit.MINUTES)
-        .build()
+    val jwkProviderTokenx =
+        JwkProviderBuilder(URL(tokenXConfig.metadata.jwksUri))
+            // cache up to 1000 JWKs for 24 hours
+            .cached(1000, 24, TimeUnit.HOURS)
+            // if not cached, only allow max 100 different keys per minute to be fetched from external provider
+            .rateLimited(100, 1, TimeUnit.MINUTES)
+            .build()
 
     authentication {
         jwt(TOKEN_X_AUTH) {

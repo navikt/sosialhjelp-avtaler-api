@@ -14,92 +14,105 @@ interface DigipostJobbDataStore : Store {
     fun lagreDigipostResponse(digipostJobbData: DigipostJobbData): DigipostJobbData
 
     fun hentDigipostJobb(orgnr: String): DigipostJobbData?
+
     fun oppdaterDigipostJobbData(digipostJobbData: DigipostJobbData): DigipostJobbData
+
     fun hentAlleUtenLagretDokument(): List<DigipostJobbData>
 
     fun hentAlle(): List<DigipostJobbData>
 }
 
 class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) : DigipostJobbDataStore, TransactionalStore(sessionFactory) {
-    override fun lagreDigipostResponse(digipostJobbData: DigipostJobbData): DigipostJobbData = session {
-        @Language("PostgreSQL")
-        val sql = """
-            INSERT INTO digipost_jobb_data (orgnr,
-                                            direct_job_reference,
-                                            status_url,
-                                            status_query_token,
-                                            signert_dokument)
-            VALUES (:orgnr, :direct_job_reference, :status_url, :status_query_token, :signert_dokument)
-            ON CONFLICT (orgnr) 
-            DO UPDATE SET direct_job_reference = :direct_job_reference, status_url = :status_url, status_query_token = :status_query_token, signert_dokument = :signert_dokument
-        """.trimIndent()
+    override fun lagreDigipostResponse(digipostJobbData: DigipostJobbData): DigipostJobbData =
+        session {
+            @Language("PostgreSQL")
+            val sql =
+                """
+                INSERT INTO digipost_jobb_data (orgnr,
+                                                direct_job_reference,
+                                                status_url,
+                                                status_query_token,
+                                                signert_dokument)
+                VALUES (:orgnr, :direct_job_reference, :status_url, :status_query_token, :signert_dokument)
+                ON CONFLICT (orgnr) 
+                DO UPDATE SET direct_job_reference = :direct_job_reference, status_url = :status_url, status_query_token = :status_query_token, signert_dokument = :signert_dokument
+                """.trimIndent()
 
-        it.update(
-            sql,
-            mapOf(
-                "orgnr" to digipostJobbData.orgnr,
-                "direct_job_reference" to digipostJobbData.directJobReference,
-                "status_url" to digipostJobbData.statusUrl.toString(),
-                "status_query_token" to digipostJobbData.statusQueryToken,
-                "signert_dokument" to digipostJobbData.signertDokument
+            it.update(
+                sql,
+                mapOf(
+                    "orgnr" to digipostJobbData.orgnr,
+                    "direct_job_reference" to digipostJobbData.directJobReference,
+                    "status_url" to digipostJobbData.statusUrl.toString(),
+                    "status_query_token" to digipostJobbData.statusQueryToken,
+                    "signert_dokument" to digipostJobbData.signertDokument,
+                ),
             )
-        )
-        digipostJobbData
-    }
+            digipostJobbData
+        }
 
-    override fun hentDigipostJobb(orgnr: String): DigipostJobbData? = session {
-        @Language("PostgreSQL")
-        val sql = """
-            SELECT * 
-            FROM digipost_jobb_data 
-            WHERE orgnr = :orgnr
-        """.trimIndent()
-        it.query(sql, mapOf("orgnr" to orgnr), ::mapper)
-    }
+    override fun hentDigipostJobb(orgnr: String): DigipostJobbData? =
+        session {
+            @Language("PostgreSQL")
+            val sql =
+                """
+                SELECT * 
+                FROM digipost_jobb_data 
+                WHERE orgnr = :orgnr
+                """.trimIndent()
+            it.query(sql, mapOf("orgnr" to orgnr), ::mapper)
+        }
 
-    override fun oppdaterDigipostJobbData(digipostJobbData: DigipostJobbData): DigipostJobbData = session {
-        @Language("PostgreSQL")
-        val sql = """
-            UPDATE digipost_jobb_data 
-            SET status_query_token = :status_query_token, signert_dokument = :signert_dokument
-            WHERE orgnr = :orgnr
-        """.trimIndent()
-        it.update(
-            sql,
-            mapOf(
-                "orgnr" to digipostJobbData.orgnr,
-                "status_query_token" to digipostJobbData.statusQueryToken,
-                "signert_dokument" to digipostJobbData.signertDokument
+    override fun oppdaterDigipostJobbData(digipostJobbData: DigipostJobbData): DigipostJobbData =
+        session {
+            @Language("PostgreSQL")
+            val sql =
+                """
+                UPDATE digipost_jobb_data 
+                SET status_query_token = :status_query_token, signert_dokument = :signert_dokument
+                WHERE orgnr = :orgnr
+                """.trimIndent()
+            it.update(
+                sql,
+                mapOf(
+                    "orgnr" to digipostJobbData.orgnr,
+                    "status_query_token" to digipostJobbData.statusQueryToken,
+                    "signert_dokument" to digipostJobbData.signertDokument,
+                ),
             )
+            digipostJobbData
+        }
+
+    override fun hentAlleUtenLagretDokument(): List<DigipostJobbData> =
+        session {
+            @Language("PostgreSQL")
+            val sql =
+                """
+                SELECT * 
+                FROM digipost_jobb_data 
+                WHERE signert_dokument IS NULL AND status_query_token IS NOT NULL
+                """.trimIndent()
+            it.queryList(sql, mapOf(), ::mapper)
+        }
+
+    override fun hentAlle(): List<DigipostJobbData> =
+        session {
+            @Language("PostgreSQL")
+            val sql =
+                """
+                SELECT * 
+                FROM digipost_jobb_data 
+                WHERE signert_dokument IS NOT NULL
+                """.trimIndent()
+            it.queryList(sql, mapOf(), ::mapper)
+        }
+
+    private fun mapper(row: Row): DigipostJobbData =
+        DigipostJobbData(
+            orgnr = row.string("orgnr"),
+            directJobReference = row.string("direct_job_reference"),
+            statusUrl = URI(row.string("status_url")),
+            statusQueryToken = row.stringOrNull("status_query_token"),
+            signertDokument = row.binaryStreamOrNull("signert_dokument"),
         )
-        digipostJobbData
-    }
-
-    override fun hentAlleUtenLagretDokument(): List<DigipostJobbData> = session {
-        @Language("PostgreSQL")
-        val sql = """
-            SELECT * 
-            FROM digipost_jobb_data 
-            WHERE signert_dokument IS NULL AND status_query_token IS NOT NULL
-        """.trimIndent()
-        it.queryList(sql, mapOf(), ::mapper)
-    }
-
-    override fun hentAlle(): List<DigipostJobbData> = session {
-        @Language("PostgreSQL")
-        val sql = """
-            SELECT * 
-            FROM digipost_jobb_data 
-            WHERE signert_dokument IS NOT NULL
-        """.trimIndent()
-        it.queryList(sql, mapOf(), ::mapper)
-    }
-
-    private fun mapper(row: Row): DigipostJobbData = DigipostJobbData(
-        orgnr = row.string("orgnr"),
-        directJobReference = row.string("direct_job_reference"),
-        statusUrl = URI(row.string("status_url")),
-        statusQueryToken = row.stringOrNull("status_query_token"),
-        signertDokument = row.binaryStreamOrNull("signert_dokument")
-    )
 }

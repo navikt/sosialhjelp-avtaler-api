@@ -10,12 +10,18 @@ class GcpBucket(private val bucketName: String) {
     private val retrySetting = RetrySettings.newBuilder().setTotalTimeout(Duration.ofMillis(3000)).build()
     private val storage = StorageOptions.newBuilder().setRetrySettings(retrySetting).build().service
 
-    fun lagreBlob(blobName: String, contentType: MediaType, metadata: Map<String, String>, bytes: ByteArray) {
+    fun lagreBlob(
+        blobName: String,
+        contentType: MediaType,
+        metadata: Map<String, String>,
+        bytes: ByteArray,
+    ) {
         val contentTypeVerdi = contentType.toString()
-        val blobInfo = BlobInfo.newBuilder(bucketName, blobName)
-            .setContentType(contentTypeVerdi)
-            .setMetadata(metadata + mapOf("content-type" to contentTypeVerdi))
-            .build()
+        val blobInfo =
+            BlobInfo.newBuilder(bucketName, blobName)
+                .setContentType(contentTypeVerdi)
+                .setMetadata(metadata + mapOf("content-type" to contentTypeVerdi))
+                .build()
 
         storage.create(blobInfo, bytes)
     }

@@ -19,16 +19,20 @@ data class AvtaleRequest(val orgnr: String)
 
 data class SigneringsstatusRequest(val orgnr: String, val status: String, val token: String)
 
-fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnService) {
+fun Route.avtaleApi(
+    avtaleService: AvtaleService,
+    personNavnService: PersonNavnService,
+) {
     route("/avtale") {
         get("/{kommunenr}") {
             val kommunenummer = call.kommunenr()
-            val avtale = avtaleService.hentAvtale(
-                fnr = call.extractFnr(),
-                orgnr = kommunenummer,
-                tjeneste = Avgiver.Tjeneste.AVTALESIGNERING,
-                token = this.context.getAccessToken()
-            )
+            val avtale =
+                avtaleService.hentAvtale(
+                    fnr = call.extractFnr(),
+                    orgnr = kommunenummer,
+                    tjeneste = Avgiver.Tjeneste.AVTALESIGNERING,
+                    token = this.context.getAccessToken(),
+                )
             if (avtale == null) {
                 call.response.status(HttpStatusCode.NotFound)
                 return@get
@@ -64,13 +68,14 @@ fun Route.avtaleApi(avtaleService: AvtaleService, personNavnService: PersonNavnS
             val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")
             val navnInnsender = personNavnService.getFulltNavn(fnr, token)
 
-            val avtaleResponse = avtaleService.sjekkAvtaleStatusOgLagreSignertDokument(
-                fnr = fnr,
-                navnInnsender = navnInnsender,
-                orgnr = signeringsstatusRequest.orgnr,
-                statusQueryToken = signeringsstatusRequest.token,
-                token = token
-            )
+            val avtaleResponse =
+                avtaleService.sjekkAvtaleStatusOgLagreSignertDokument(
+                    fnr = fnr,
+                    navnInnsender = navnInnsender,
+                    orgnr = signeringsstatusRequest.orgnr,
+                    statusQueryToken = signeringsstatusRequest.token,
+                    token = token,
+                )
 
             if (avtaleResponse == null) {
                 call.response.status(HttpStatusCode.NotFound)
@@ -89,10 +94,12 @@ private fun ApplicationCall.getAccessToken(): String? {
     return null
 }
 
-private fun ApplicationCall.kommunenr(): String = requireNotNull(parameters["kommunenr"]) {
-    "Mangler kommunenr i URL"
-}
+private fun ApplicationCall.kommunenr(): String =
+    requireNotNull(parameters["kommunenr"]) {
+        "Mangler kommunenr i URL"
+    }
 
-private fun ApplicationCall.orgnr(): String = requireNotNull(parameters["orgnr"]) {
-    "Mangler orgnr i URL"
-}
+private fun ApplicationCall.orgnr(): String =
+    requireNotNull(parameters["orgnr"]) {
+        "Mangler orgnr i URL"
+    }

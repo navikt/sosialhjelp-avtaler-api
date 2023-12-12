@@ -63,23 +63,26 @@ fun Application.setupRoutes() {
     installAuthentication(httpClient(engineFactory { StubEngine.tokenX() }))
 
     // Token X
-    val authProperties = ClientAuthenticationProperties.builder()
-        .clientId(Configuration.tokenXProperties.clientId)
-        .clientJwk(Configuration.tokenXProperties.privateJwk)
-        .clientAuthMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
-        .build()
+    val authProperties =
+        ClientAuthenticationProperties.builder()
+            .clientId(Configuration.tokenXProperties.clientId)
+            .clientJwk(Configuration.tokenXProperties.privateJwk)
+            .clientAuthMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
+            .build()
 
     val defaultHttpClient = defaultHttpClient()
 
     val tokenExchangeClient = Oauth2Client(defaultHttpClient, authProperties, Configuration.tokenXProperties)
     val altinnService = AltinnService(AltinnClient(Configuration.altinnProperties, tokenExchangeClient))
-    val digipostService = DigipostService(DigipostClient(Configuration.digipostProperties, Configuration.virksomhetssertifikatProperties, Configuration.profile))
+    val digipostService =
+        DigipostService(
+            DigipostClient(Configuration.digipostProperties, Configuration.virksomhetssertifikatProperties, Configuration.profile),
+        )
     val gcpBucket = GcpBucket(Configuration.gcpProperties.bucketName)
     val avtaleService = AvtaleService(altinnService, digipostService, gcpBucket, databaseContext)
     val personNavnService = PersonNavnService(PdlClient(Configuration.pdlProperties, tokenExchangeClient))
 
     routing {
-
         route("/sosialhjelp/avtaler-api") {
             internalRoutes()
             route("/api") {

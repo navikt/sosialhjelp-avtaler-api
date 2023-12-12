@@ -8,95 +8,98 @@ import com.natpryce.konfig.overriding
 import com.natpryce.konfig.stringType
 
 object Configuration {
-
-    private val defaultProperties = ConfigurationMap(
-        mapOf(
-            "application.baseUrl" to "http://localhost:5000/sosialhjelp/avtaler",
-            "userclaim" to "pid",
-            "TOKEN_X_CLIENT_ID" to "abc",
-            "TOKEN_X_WELL_KNOWN_URL" to "abc",
-            "TOKEN_X_TOKEN_ENDPOINT" to "",
-            "TOKEN_X_PRIVATE_JWK" to "",
-            "altinn.altinnUrl" to "",
-            "altinn.proxyConsumerId" to "",
-            "altinn.altinnRettigheterAudience" to "",
-            "ALTINN_APIKEY" to "dummyverdi",
-            "ALTINN_APIGW_APIKEY" to "dummyverdi",
-            "digipost.keyStorePassword" to "KeyStorePassword",
-            "digipost.certificatePassword" to "CertificatePassword",
-            "digipost.onCompletionUrl" to "/opprett-avtale/suksess/",
-            "digipost.onErrorUrl" to "/opprett-avtale/feil/",
-            "digipost.onRejectionUrl" to "/opprett-avtale/feil/",
-            "digipost.navOrgnr" to "889640782",
-            "enhetsregisteret_base_url" to "https://data.brreg.no/enhetsregisteret/api",
-            "virksomhetssertifikat.projectId" to "virksomhetssertifikat-dev",
-            "virksomhetssertifikat.secretId" to "test-virksomhetssertifikat-felles-keystore-jceks_2018-2021",
-            "virksomhetssertifikat.versionId" to "3",
-            "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-dev",
-            "virksomhetssertifikat.passwordSecretId" to "test-keystore-credentials-json",
-            "virksomhetssertifikat.passwordSecretVersion" to "2",
-            "pdl.url" to "",
-            "pdl.audience" to ""
+    private val defaultProperties =
+        ConfigurationMap(
+            mapOf(
+                "application.baseUrl" to "http://localhost:5000/sosialhjelp/avtaler",
+                "userclaim" to "pid",
+                "TOKEN_X_CLIENT_ID" to "abc",
+                "TOKEN_X_WELL_KNOWN_URL" to "abc",
+                "TOKEN_X_TOKEN_ENDPOINT" to "",
+                "TOKEN_X_PRIVATE_JWK" to "",
+                "altinn.altinnUrl" to "",
+                "altinn.proxyConsumerId" to "",
+                "altinn.altinnRettigheterAudience" to "",
+                "ALTINN_APIKEY" to "dummyverdi",
+                "ALTINN_APIGW_APIKEY" to "dummyverdi",
+                "digipost.keyStorePassword" to "KeyStorePassword",
+                "digipost.certificatePassword" to "CertificatePassword",
+                "digipost.onCompletionUrl" to "/opprett-avtale/suksess/",
+                "digipost.onErrorUrl" to "/opprett-avtale/feil/",
+                "digipost.onRejectionUrl" to "/opprett-avtale/feil/",
+                "digipost.navOrgnr" to "889640782",
+                "enhetsregisteret_base_url" to "https://data.brreg.no/enhetsregisteret/api",
+                "virksomhetssertifikat.projectId" to "virksomhetssertifikat-dev",
+                "virksomhetssertifikat.secretId" to "test-virksomhetssertifikat-felles-keystore-jceks_2018-2021",
+                "virksomhetssertifikat.versionId" to "3",
+                "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-dev",
+                "virksomhetssertifikat.passwordSecretId" to "test-keystore-credentials-json",
+                "virksomhetssertifikat.passwordSecretVersion" to "2",
+                "pdl.url" to "",
+                "pdl.audience" to "",
+            ),
         )
-    )
 
-    private val localProperties = ConfigurationMap(
-        mapOf(
-            "application.profile" to "LOCAL",
-            "application.cluster" to "LOCAL",
-            "TOKEN_X_WELL_KNOWN_URL" to "http://host.docker.internal:8080/default/.well-known/openid-configuration",
-            "TOKEN_X_CLIENT_ID" to "local",
-            "userclaim" to "sub",
-            "POSTGRES_DATABASE" to "",
-            "POSTGRES_USERNAME" to "",
-            "POSTGRES_PASSWORD" to "",
-            "POSTGRES_HOST" to "",
-            "POSTGRES_PORT" to "",
-            "gcp.bucketName" to "digisos-avtaler"
+    private val localProperties =
+        ConfigurationMap(
+            mapOf(
+                "application.profile" to "LOCAL",
+                "application.cluster" to "LOCAL",
+                "TOKEN_X_WELL_KNOWN_URL" to "http://host.docker.internal:8080/default/.well-known/openid-configuration",
+                "TOKEN_X_CLIENT_ID" to "local",
+                "userclaim" to "sub",
+                "POSTGRES_DATABASE" to "",
+                "POSTGRES_USERNAME" to "",
+                "POSTGRES_PASSWORD" to "",
+                "POSTGRES_HOST" to "",
+                "POSTGRES_PORT" to "",
+                "gcp.bucketName" to "digisos-avtaler",
+            ),
         )
-    )
 
-    private val devProperties = ConfigurationMap(
-        mapOf(
-
-            "application.baseUrl" to "https://digisos.intern.dev.nav.no/sosialhjelp/avtaler",
-            "application.profile" to "DEV",
-            "application.cluster" to "DEV-GCP",
-            "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.intern.dev.nav.no/altinn-rettigheter-proxy",
-            "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api-dev",
-            "enhetsregisteret_base_url" to "http://sosialhjelp-mock-alt-api-mock/sosialhjelp/mock-alt-api/enhetsregisteret/api",
-            "altinn.altinnRettigheterAudience" to "dev-gcp:arbeidsgiver:altinn-rettigheter-proxy",
-            "virksomhetssertifikat.projectId" to "virksomhetssertifikat-dev",
-            "virksomhetssertifikat.secretId" to "test-virksomhetssertifikat-felles-keystore-jceks_2018-2021",
-            "virksomhetssertifikat.versionId" to "3",
-            "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-dev",
-            "virksomhetssertifikat.passwordSecretId" to "test-keystore-credentials-json",
-            "virksomhetssertifikat.passwordSecretVersion" to "2",
-            "pdl.url" to "https://pdl-api.dev-fss-pub.nais.io/graphql",
-            "pdl.audience" to "dev-fss:pdl:pdl-api",
-            "gcp.bucketName" to "digisos-nks-avtaler-dev"
+    private val devProperties =
+        ConfigurationMap(
+            mapOf(
+                "application.baseUrl" to "https://digisos.intern.dev.nav.no/sosialhjelp/avtaler",
+                "application.profile" to "DEV",
+                "application.cluster" to "DEV-GCP",
+                "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.intern.dev.nav.no/altinn-rettigheter-proxy",
+                "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api-dev",
+                "enhetsregisteret_base_url" to "http://sosialhjelp-mock-alt-api-mock/sosialhjelp/mock-alt-api/enhetsregisteret/api",
+                "altinn.altinnRettigheterAudience" to "dev-gcp:arbeidsgiver:altinn-rettigheter-proxy",
+                "virksomhetssertifikat.projectId" to "virksomhetssertifikat-dev",
+                "virksomhetssertifikat.secretId" to "test-virksomhetssertifikat-felles-keystore-jceks_2018-2021",
+                "virksomhetssertifikat.versionId" to "3",
+                "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-dev",
+                "virksomhetssertifikat.passwordSecretId" to "test-keystore-credentials-json",
+                "virksomhetssertifikat.passwordSecretVersion" to "2",
+                "pdl.url" to "https://pdl-api.dev-fss-pub.nais.io/graphql",
+                "pdl.audience" to "dev-fss:pdl:pdl-api",
+                "gcp.bucketName" to "digisos-nks-avtaler-dev",
+            ),
         )
-    )
 
-    private val prodProperties = ConfigurationMap(
-        mapOf(
-            "application.baseUrl" to "https://nav.no/sosialhjelp/avtaler",
-            "application.profile" to "PROD",
-            "application.cluster" to "PROD-GCP",
-            "altinn.altinnUrl" to "http://altinn-rettigheter-proxy.arbeidsgiver.svc.cluster.local/altinn-rettigheter-proxy", // dobbeltsjekk denne
-            "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api",
-            "altinn.altinnRettigheterAudience" to "prod-gcp:arbeidsgiver:altinn-rettigheter-proxy",
-            "virksomhetssertifikat.projectId" to "virksomhetssertifikat-prod",
-            "virksomhetssertifikat.secretId" to "virksomhetssertifikat-digisos-keystore-jceks_2021-2024",
-            "virksomhetssertifikat.versionId" to "4",
-            "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-prod",
-            "virksomhetssertifikat.passwordSecretId" to "digisos-keystore-credentials-json",
-            "virksomhetssertifikat.passwordSecretVersion" to "3",
-            "pdl.url" to "https://pdl-api.prod-fss-pub.nais.io/graphql",
-            "pdl.audience" to "prod-fss:pdl:pdl-api",
-            "gcp.bucketName" to "digisos-nks-avtaler"
+    private val prodProperties =
+        ConfigurationMap(
+            mapOf(
+                "application.baseUrl" to "https://nav.no/sosialhjelp/avtaler",
+                "application.profile" to "PROD",
+                "application.cluster" to "PROD-GCP",
+                "altinn.altinnUrl" to
+                    "http://altinn-rettigheter-proxy.arbeidsgiver.svc.cluster.local/altinn-rettigheter-proxy",
+                "altinn.proxyConsumerId" to "sosialhjelp-avtaler-api",
+                "altinn.altinnRettigheterAudience" to "prod-gcp:arbeidsgiver:altinn-rettigheter-proxy",
+                "virksomhetssertifikat.projectId" to "virksomhetssertifikat-prod",
+                "virksomhetssertifikat.secretId" to "virksomhetssertifikat-digisos-keystore-jceks_2021-2024",
+                "virksomhetssertifikat.versionId" to "4",
+                "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-prod",
+                "virksomhetssertifikat.passwordSecretId" to "digisos-keystore-credentials-json",
+                "virksomhetssertifikat.passwordSecretVersion" to "3",
+                "pdl.url" to "https://pdl-api.prod-fss-pub.nais.io/graphql",
+                "pdl.audience" to "prod-fss:pdl:pdl-api",
+                "gcp.bucketName" to "digisos-nks-avtaler",
+            ),
         )
-    )
 
     private val resourceProperties =
         when (System.getenv("NAIS_CLUSTER_NAME") ?: System.getProperty("NAIS_CLUSTER_NAME")) {
@@ -108,7 +111,7 @@ object Configuration {
     private val config = systemProperties() overriding EnvironmentVariables() overriding resourceProperties overriding defaultProperties
 
     val profile: Profile = this["application.profile"].let { Profile.valueOf(it) }
-    val cluster: Cluster = this["application.cluster"].let { Cluster.valueOf(it) }
+    val cluster: Cluster = this["application.cluster"].let { Cluster.fromNaisString(it) }
     val local: Boolean = profile == Profile.LOCAL
     val dev: Boolean = profile == Profile.DEV
     val prod: Boolean = profile == Profile.PROD
@@ -134,11 +137,27 @@ object Configuration {
     )
 
     enum class Profile {
-        LOCAL, DEV, PROD
+        LOCAL,
+        DEV,
+        PROD,
     }
 
     enum class Cluster {
-        `PROD-GCP`, `DEV-GCP`, `LOCAL`
+        PROD_GCP,
+        DEV_GCP,
+        LOCAL,
+        ;
+
+        companion object {
+            fun fromNaisString(cluster: String): Cluster {
+                return when (cluster) {
+                    "PROD-GCP" -> PROD_GCP
+                    "DEV-GCP" -> PROD_GCP
+                    "LOCAL" -> PROD_GCP
+                    else -> error("Ukjent cluster-navn")
+                }
+            }
+        }
     }
 
     data class AltinnProperties(
@@ -151,7 +170,7 @@ object Configuration {
 
     data class PdlProperties(
         val pdlUrl: String = this["pdl.url"],
-        val pdlAudience: String = this["pdl.audience"]
+        val pdlAudience: String = this["pdl.audience"],
     )
 
     data class DatabaseProperties(
@@ -166,7 +185,7 @@ object Configuration {
         val onCompletionUrl: String = this["application.baseUrl"] + this["digipost.onCompletionUrl"],
         val onRejectionUrl: String = this["application.baseUrl"] + this["digipost.onRejectionUrl"],
         val onErrorUrl: String = this["application.baseUrl"] + this["digipost.onErrorUrl"],
-        val navOrgnr: String = this["digipost.navOrgnr"]
+        val navOrgnr: String = this["digipost.navOrgnr"],
     )
 
     data class VirksomhetssertifikatProperties(
@@ -175,11 +194,11 @@ object Configuration {
         val versionId: String = this["virksomhetssertifikat.versionId"],
         val passwordProjectId: String = this["virksomhetssertifikat.passwordProjectId"],
         val passwordSecretId: String = this["virksomhetssertifikat.passwordSecretId"],
-        val passwordSecretVersionId: String = this["virksomhetssertifikat.passwordSecretVersion"]
+        val passwordSecretVersionId: String = this["virksomhetssertifikat.passwordSecretVersion"],
     )
 
     data class EnhetsregistertetProperties(
-        val baseUrl: String = this["enhetsregisteret_base_url"]
+        val baseUrl: String = this["enhetsregisteret_base_url"],
     )
 
     data class SlackProperties(
@@ -189,6 +208,6 @@ object Configuration {
     )
 
     data class GcpProperties(
-        val bucketName: String = this["gcp.bucketName"]
+        val bucketName: String = this["gcp.bucketName"],
     )
 }

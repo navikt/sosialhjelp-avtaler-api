@@ -19,11 +19,12 @@ private val log = KotlinLogging.logger { }
 fun Route.kommuneApi(avtaleService: AvtaleService) {
     route("/kommuner") {
         get {
-            val kommuner = avtaleService.hentAvtaler(
-                fnr = call.extractFnr(),
-                tjeneste = Avgiver.Tjeneste.AVTALESIGNERING,
-                this.context.getAccessToken()
-            )
+            val kommuner =
+                avtaleService.hentAvtaler(
+                    fnr = call.extractFnr(),
+                    tjeneste = Avgiver.Tjeneste.AVTALESIGNERING,
+                    this.context.getAccessToken(),
+                )
             call.respond(HttpStatusCode.OK, kommuner)
         }
     }

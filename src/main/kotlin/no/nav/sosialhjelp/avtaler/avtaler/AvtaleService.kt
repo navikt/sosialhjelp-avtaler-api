@@ -27,19 +27,24 @@ class AvtaleService(
     private val gcpBucket: GcpBucket,
     val databaseContext: DatabaseContext,
 ) {
-
-    suspend fun hentAvtaler(fnr: String, tjeneste: Avgiver.Tjeneste, token: String?): List<AvtaleResponse> {
-        val avgivereFiltrert = altinnService.hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
-            .filter { avgiver ->
-                avgiver.erKommune().also { log.info("Hentet enhet med orgnr: ${avgiver.orgnr}") }
-            }
+    suspend fun hentAvtaler(
+        fnr: String,
+        tjeneste: Avgiver.Tjeneste,
+        token: String?,
+    ): List<AvtaleResponse> {
+        val avgivereFiltrert =
+            altinnService.hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
+                .filter { avgiver ->
+                    avgiver.erKommune().also { log.info("Hentet enhet med orgnr: ${avgiver.orgnr}") }
+                }
         sikkerLog.info("Filtrert avgivere for fnr: $fnr, tjeneste: $tjeneste, avgivere: $avgivereFiltrert")
 
-        val avtaler = transaction(databaseContext) { ctx ->
-            ctx.avtaleStore.hentAvtalerForOrganisasjoner(avgivereFiltrert.map { it.orgnr }).associateBy {
-                it.orgnr
+        val avtaler =
+            transaction(databaseContext) { ctx ->
+                ctx.avtaleStore.hentAvtalerForOrganisasjoner(avgivereFiltrert.map { it.orgnr }).associateBy {
+                    it.orgnr
+                }
             }
-        }
 
         return avgivereFiltrert
             .map {
@@ -56,20 +61,26 @@ class AvtaleService(
         fnr: String,
         orgnr: String,
         tjeneste: Avgiver.Tjeneste,
-        token: String?
-    ): AvtaleResponse? = hentAvtaler(fnr = fnr, tjeneste = tjeneste, token = token).associateBy {
-        it.orgnr
-    }[orgnr]
+        token: String?,
+    ): AvtaleResponse? =
+        hentAvtaler(fnr = fnr, tjeneste = tjeneste, token = token).associateBy {
+            it.orgnr
+        }[orgnr]
 
-    suspend fun signerAvtale(fnr: String, avtaleRequest: AvtaleRequest, navnInnsender: String): URI {
+    suspend fun signerAvtale(
+        fnr: String,
+        avtaleRequest: AvtaleRequest,
+        navnInnsender: String,
+    ): URI {
         log.info("Sender avtale til e-signering for orgnummer ${avtaleRequest.orgnr}")
 
-        val avtale = Avtale(
-            orgnr = avtaleRequest.orgnr,
-            avtaleversjon = "1.0",
-            navn_innsender = navnInnsender,
-            erSignert = false
-        )
+        val avtale =
+            Avtale(
+                orgnr = avtaleRequest.orgnr,
+                avtaleversjon = "1.0",
+                navn_innsender = navnInnsender,
+                erSignert = false,
+            )
         val digipostResponse = digipostService.sendTilSignering(fnr, avtale)
 
         lagreDigipostResponse(avtaleRequest.orgnr, digipostResponse)
@@ -77,14 +88,18 @@ class AvtaleService(
         return digipostResponse.redirectUrl
     }
 
-    private suspend fun lagreDigipostResponse(orgnr: String, digipostResponse: DigipostResponse) {
-        val digipostJobbData = DigipostJobbData(
-            orgnr = orgnr,
-            directJobReference = digipostResponse.reference,
-            statusUrl = digipostResponse.signerUrl,
-            statusQueryToken = null,
-            signertDokument = null
-        )
+    private suspend fun lagreDigipostResponse(
+        orgnr: String,
+        digipostResponse: DigipostResponse,
+    ) {
+        val digipostJobbData =
+            DigipostJobbData(
+                orgnr = orgnr,
+                directJobReference = digipostResponse.reference,
+                statusUrl = digipostResponse.signerUrl,
+                statusQueryToken = null,
+                signertDokument = null,
+            )
         transaction(databaseContext) { ctx ->
             ctx.digipostJobbDataStore.lagreDigipostResponse(digipostJobbData)
         }
@@ -96,14 +111,15 @@ class AvtaleService(
         navnInnsender: String,
         orgnr: String,
         statusQueryToken: String,
-        token: String
+        token: String,
     ): AvtaleResponse? {
-        val avtale = Avtale(
-            orgnr = orgnr,
-            avtaleversjon = "1.0",
-            navn_innsender = navnInnsender,
-            erSignert = false
-        )
+        val avtale =
+            Avtale(
+                orgnr = orgnr,
+                avtaleversjon = "1.0",
+                navn_innsender = navnInnsender,
+                erSignert = false,
+            )
         val digipostJobbData = hentDigipostJobb(orgnr)
         if (digipostJobbData == null) {
             log.error("Kunne ikke hente signeringsstatus for orgnr $orgnr")
@@ -119,7 +135,7 @@ class AvtaleService(
         oppdaterDigipostJobbData(
             digipostJobbData,
             statusQueryToken = statusQueryToken,
-            signertDokument = hentSignertAvtaleDokumentFraDigipost(digipostJobbData, statusQueryToken = statusQueryToken)
+            signertDokument = hentSignertAvtaleDokumentFraDigipost(digipostJobbData, statusQueryToken = statusQueryToken),
         )
         val dbAvtale = hentAvtale(orgnr)
         if (dbAvtale == null) {
@@ -133,11 +149,14 @@ class AvtaleService(
             orgnr = dbAvtale.orgnr,
             navn = kommunenavn,
             avtaleversjon = dbAvtale.avtaleversjon,
-            opprettet = dbAvtale.opprettet
+            opprettet = dbAvtale.opprettet,
         )
     }
 
-    private suspend fun lagreSignertDokuentIBucket(avtale: Avtale, kommunenavn: String) {
+    private suspend fun lagreSignertDokuentIBucket(
+        avtale: Avtale,
+        kommunenavn: String,
+    ) {
         val digipostJobbData = hentDigipostJobb(avtale.orgnr)
         if (digipostJobbData?.signertDokument == null) {
             log.error("Signert avtale for orgnr ${avtale.orgnr} fra database er tom. Kan ikke lagre i bucket.")
@@ -150,10 +169,17 @@ class AvtaleService(
         log.info("Lagret signert avtale i bucket for orgnr ${avtale.orgnr}")
     }
 
-    suspend fun erAvtaleSignert(avtale: Avtale, digipostJobbData: DigipostJobbData, statusQueryToken: String): Boolean {
-        val avtaleErSignert = digipostService.erSigneringsstatusCompleted(
-            digipostJobbData.directJobReference, digipostJobbData.statusUrl, statusQueryToken
-        )
+    suspend fun erAvtaleSignert(
+        avtale: Avtale,
+        digipostJobbData: DigipostJobbData,
+        statusQueryToken: String,
+    ): Boolean {
+        val avtaleErSignert =
+            digipostService.erSigneringsstatusCompleted(
+                digipostJobbData.directJobReference,
+                digipostJobbData.statusUrl,
+                statusQueryToken,
+            )
 
         if (!avtaleErSignert) {
             return false
@@ -162,7 +188,10 @@ class AvtaleService(
         return true
     }
 
-    fun hentSignertAvtaleDokumentFraDigipost(digipostJobbData: DigipostJobbData, statusQueryToken: String?): InputStream? {
+    fun hentSignertAvtaleDokumentFraDigipost(
+        digipostJobbData: DigipostJobbData,
+        statusQueryToken: String?,
+    ): InputStream? {
         log.info("Henter signert avtale for orgnr ${digipostJobbData.orgnr} fra Digipost")
 
         if (statusQueryToken == null) {
@@ -172,13 +201,14 @@ class AvtaleService(
         return digipostService.hentSignertDokument(
             statusQueryToken,
             digipostJobbData.directJobReference,
-            digipostJobbData.statusUrl
+            digipostJobbData.statusUrl,
         )
     }
 
     suspend fun hentSignertAvtaleDokumentFraDatabaseEllerDigipost(orgnr: String): InputStream? {
-        val digipostJobbData = hentDigipostJobb(orgnr)
-            ?: return null.apply { log.error("Kunne ikke hente digipost jobb-info fra database for orgnr $orgnr") }
+        val digipostJobbData =
+            hentDigipostJobb(orgnr)
+                ?: return null.apply { log.error("Kunne ikke hente digipost jobb-info fra database for orgnr $orgnr") }
 
         if (digipostJobbData.signertDokument != null) {
             log.info { "Hentet signert avtale for orgnr $orgnr fra database" }
@@ -187,17 +217,19 @@ class AvtaleService(
 
         return hentSignertAvtaleDokumentFraDigipost(
             digipostJobbData,
-            digipostJobbData.statusQueryToken
+            digipostJobbData.statusQueryToken,
         )
     }
 
     private suspend fun oppdaterDigipostJobbData(
         digipostJobbData: DigipostJobbData,
         statusQueryToken: String,
-        signertDokument: InputStream? = null
+        signertDokument: InputStream? = null,
     ) {
         transaction(databaseContext) { ctx ->
-            ctx.digipostJobbDataStore.oppdaterDigipostJobbData(digipostJobbData.copy(statusQueryToken = statusQueryToken, signertDokument = signertDokument))
+            ctx.digipostJobbDataStore.oppdaterDigipostJobbData(
+                digipostJobbData.copy(statusQueryToken = statusQueryToken, signertDokument = signertDokument),
+            )
         }
     }
 
@@ -216,16 +248,21 @@ class AvtaleService(
             ctx.avtaleStore.lagreAvtale(avtale)
         }
 
-        if (Configuration.dev || Configuration.prod)
+        if (Configuration.dev || Configuration.prod) {
             Slack.post("Ny avtale opprettet for orgnr=${avtale.orgnr}")
+        }
 
         log.info("Lagret signert avtale for ${avtale.orgnr}")
         return avtale
     }
+
     companion object {
-        fun lagFilnavn(kommunenavn: String, opprettet: LocalDateTime): String {
+        fun lagFilnavn(
+            kommunenavn: String,
+            opprettet: LocalDateTime,
+        ): String {
             return "Avtale om innsynsflate for NAV Kontaktsenter - Digisos - ${kommunenavn.replace("/", "-")} - ${opprettet.format(
-                DateTimeFormatter.ofPattern("dd.MM.yyyy")
+                DateTimeFormatter.ofPattern("dd.MM.yyyy"),
             )}"
         }
     }

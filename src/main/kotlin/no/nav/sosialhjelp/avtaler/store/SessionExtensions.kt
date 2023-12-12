@@ -68,23 +68,25 @@ data class PageResultQueryAction<A>(
 ) : QueryAction<Page<A>> {
     override fun runWithSession(session: Session): Page<A> {
         var totalNumberOfItems = -1
-        val items = session.list(
-            query.let {
-                Query(
-                    "${it.statement} limit :limit offset :offset",
-                    it.params,
-                    it.paramMap.plus(
-                        mapOf(
-                            "limit" to limit + 1, // fetch one more than limit to check for "hasMore"
-                            "offset" to offset,
-                        )
+        val items =
+            session.list(
+                query.let {
+                    Query(
+                        "${it.statement} limit :limit offset :offset",
+                        it.params,
+                        it.paramMap.plus(
+                            mapOf(
+                                // fetch one more than limit to check for "hasMore"
+                                "limit" to limit + 1,
+                                "offset" to offset,
+                            ),
+                        ),
                     )
-                )
+                },
+            ) {
+                totalNumberOfItems = it.intOrNull(COLUMN_LABEL_TOTAL) ?: -1
+                extractor(it)
             }
-        ) {
-            totalNumberOfItems = it.intOrNull(COLUMN_LABEL_TOTAL) ?: -1
-            extractor(it)
-        }
         return Page(
             items = items.take(limit),
             total = totalNumberOfItems,
@@ -92,7 +94,9 @@ data class PageResultQueryAction<A>(
     }
 }
 
-fun <A> ResultQueryActionBuilder<A>.asPage(limit: Int, offset: Int): PageResultQueryAction<A> =
-    PageResultQueryAction(query, extractor, limit, offset)
+fun <A> ResultQueryActionBuilder<A>.asPage(
+    limit: Int,
+    offset: Int,
+): PageResultQueryAction<A> = PageResultQueryAction(query, extractor, limit, offset)
 
 fun <A> Session.run(action: PageResultQueryAction<A>): Page<A> = action.runWithSession(this)

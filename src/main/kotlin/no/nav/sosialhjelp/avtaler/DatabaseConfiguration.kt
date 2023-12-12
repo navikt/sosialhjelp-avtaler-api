@@ -14,22 +14,22 @@ private val log = KotlinLogging.logger { }
 
 class DatabaseConfiguration(private val props: Configuration.DatabaseProperties, private val miljo: Configuration.Profile) {
     fun dataSource(): DataSource {
-
         if (!waitForDB(10.minutes)) {
             throw RuntimeException("Databasen ble ikke tilgjengelig innenfor tidsfristen")
         }
 
-        val dataSource = HikariDataSource().apply {
-            username = props.databaseUser
-            password = props.databasePassword
-            jdbcUrl =
-                "jdbc:postgresql://${props.databaseHost}:${props.databasePort}/${props.databaseNavn}"
-            maximumPoolSize = 10
-            minimumIdle = 1
-            idleTimeout = 10001
-            connectionTimeout = 1000
-            maxLifetime = 30001
-        }
+        val dataSource =
+            HikariDataSource().apply {
+                username = props.databaseUser
+                password = props.databasePassword
+                jdbcUrl =
+                    "jdbc:postgresql://${props.databaseHost}:${props.databasePort}/${props.databaseNavn}"
+                maximumPoolSize = 10
+                minimumIdle = 1
+                idleTimeout = 10001
+                connectionTimeout = 1000
+                maxLifetime = 30001
+            }
         val flyway = Flyway.configure().dataSource(dataSource).load()
         flyway.migrate()
 

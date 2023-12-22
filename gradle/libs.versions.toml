@@ -1,7 +1,7 @@
 [versions]
 konfig = "1.6.10.0"
 ktor = "2.3.7"
-kotlin = "1.9.21"
+kotlin = "1.9.22"
 kotlinSerializationPlugin = "1.6.2"
 kotest = "5.8.0"
 ktlint = "1.0.1"
@@ -11,13 +11,13 @@ jackson = "2.16.0"
 microutils = "3.0.5"
 tokenSupport = "3.2.0"
 kotliquery = "1.9.0"
-flywaydb = "10.2.0"
+flywaydb = "10.4.1"
 hikari = "5.1.0"
 postgresql = "42.7.1"
 digipostSignatureApiClient = "7.0-RC7"
 jaxbRuntime = "2.3.7"
-googleCloudLibraries = "26.28.0"
-googleCloudSecretManager = "2.31.0"
+googleCloudLibraries = "26.29.0"
+googleCloudSecretManager = "2.32.0"
 
 [libraries]
 konfig = { module = "com.natpryce:konfig", version.ref = "konfig" }

@@ -7,10 +7,13 @@ updates:
     commit-message:
       prefix: "gradle"
     groups:
-      minor-patch:
+      minor:
         update-types:
           - "minor"
+      major:
+        update-types:
           - "patch"
+
 
   - package-ecosystem: "github-actions"
     directory: "/"

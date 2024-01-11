@@ -12,6 +12,7 @@ ktlint {
 
 group = "no.nav.sosialhjelp"
 version = "0.0.1"
+
 application {
     mainClass.set("no.nav.sosialhjelp.avtaler.ApplicationKt")
 

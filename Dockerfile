@@ -1,4 +1,4 @@
-FROM ghcr.io/navikt/baseimages/temurin:20
+FROM ghcr.io/navikt/baseimages/temurin:21
 
 ENV JAVA_OPTS="-XX:-OmitStackTraceInFastThrow \
                -Xms768m -Xmx1280m"

@@ -94,7 +94,7 @@ object Configuration {
                 "virksomhetssertifikat.versionId" to "4",
                 "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-prod",
                 "virksomhetssertifikat.passwordSecretId" to "digisos-keystore-credentials-json",
-                "virksomhetssertifikat.passwordSecretVersion" to "3",
+                "virksomhetssertifikat.passwordSecretVersion" to "4",
                 "pdl.url" to "https://pdl-api.prod-fss-pub.nais.io/graphql",
                 "pdl.audience" to "prod-fss:pdl:pdl-api",
                 "gcp.bucketName" to "digisos-nks-avtaler",

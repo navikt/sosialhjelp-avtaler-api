@@ -26,6 +26,8 @@ import java.io.ByteArrayInputStream
 import java.net.URI
 import java.util.Collections
 import java.util.UUID
+import kotlin.time.Duration.Companion.seconds
+import kotlin.time.toJavaDuration
 
 private val log = KotlinLogging.logger {}
 
@@ -51,6 +53,7 @@ class DigipostClient(
         ClientConfiguration.builder(keyStoreConfig)
             .serviceEnvironment(if (profile == Configuration.Profile.PROD) ServiceEnvironment.PRODUCTION else ServiceEnvironment.DIFITEST)
             .defaultSender(Sender(props.navOrgnr))
+            .timeouts { it.allTimeouts(5.seconds.toJavaDuration()) }
             .build()
     private val client = DirectClient(clientConfiguration)
 

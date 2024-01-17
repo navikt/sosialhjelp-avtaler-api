@@ -133,13 +133,19 @@ class AvtaleService(
         }
         log.info("Avtale for orgnr ${avtale.orgnr} er signert")
 
-        val dokumentStatus = runCatching { hentSignertAvtaleDokumentFraDigipost(digipostJobbData, statusQueryToken = statusQueryToken) }.mapCatching {
-            oppdaterDigipostJobbData(
-                digipostJobbData,
-                statusQueryToken = statusQueryToken,
-                signertDokument = it,
-            )
-        }.onFailure { log.error("Fikk ikke hentet dokument fra digipost", it) }.fold({ DokumentStatus.SUKSESS }, { DokumentStatus.ERROR })
+        val dokumentStatus =
+            runCatching { hentSignertAvtaleDokumentFraDigipost(digipostJobbData, statusQueryToken = statusQueryToken) }.mapCatching {
+                oppdaterDigipostJobbData(
+                    digipostJobbData,
+                    statusQueryToken = statusQueryToken,
+                    signertDokument = it,
+                )
+            }.onFailure {
+                log.error(
+                    "Fikk ikke hentet dokument fra digipost",
+                    it,
+                )
+            }.fold({ DokumentStatus.SUKSESS }, { DokumentStatus.ERROR })
         val dbAvtale = hentAvtale(orgnr)
         if (dbAvtale == null) {
             log.error("Kunne ikke hente avtale fra database for orgnr $orgnr")
@@ -153,7 +159,7 @@ class AvtaleService(
             navn = kommunenavn,
             avtaleversjon = dbAvtale.avtaleversjon,
             opprettet = dbAvtale.opprettet,
-            dokumentStatus = dokumentStatus
+            dokumentStatus = dokumentStatus,
         )
     }
 

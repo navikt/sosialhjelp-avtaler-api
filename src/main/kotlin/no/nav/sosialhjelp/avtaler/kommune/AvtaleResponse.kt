@@ -11,5 +11,6 @@ data class AvtaleResponse(
 )
 
 enum class DokumentStatus {
-    SUKSESS, ERROR,
+    SUKSESS,
+    ERROR,
 }

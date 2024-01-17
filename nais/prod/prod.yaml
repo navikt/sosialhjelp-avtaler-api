@@ -51,6 +51,7 @@ spec:
         - host: pdl-api.prod-fss-pub.nais.io
         - host: secretmanager.googleapis.com
         - host: hooks.slack.com
+        - host: ereg-services.dev-fss-pub.nais.io
       rules:
         - application: altinn-rettigheter-proxy
           namespace: arbeidsgiver

@@ -12,6 +12,7 @@ import no.nav.sosialhjelp.avtaler.digipost.DigipostResponse
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.gcpbucket.GcpBucket
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
+import no.nav.sosialhjelp.avtaler.kommune.DokumentStatus
 import no.nav.sosialhjelp.avtaler.slack.Slack
 import java.io.InputStream
 import java.net.URI
@@ -132,11 +133,13 @@ class AvtaleService(
         }
         log.info("Avtale for orgnr ${avtale.orgnr} er signert")
 
-        oppdaterDigipostJobbData(
-            digipostJobbData,
-            statusQueryToken = statusQueryToken,
-            signertDokument = hentSignertAvtaleDokumentFraDigipost(digipostJobbData, statusQueryToken = statusQueryToken),
-        )
+        val dokumentStatus = runCatching { hentSignertAvtaleDokumentFraDigipost(digipostJobbData, statusQueryToken = statusQueryToken) }.mapCatching {
+            oppdaterDigipostJobbData(
+                digipostJobbData,
+                statusQueryToken = statusQueryToken,
+                signertDokument = it,
+            )
+        }.onFailure { log.error("Fikk ikke hentet dokument fra digipost", it) }.fold({ DokumentStatus.SUKSESS }, { DokumentStatus.ERROR })
         val dbAvtale = hentAvtale(orgnr)
         if (dbAvtale == null) {
             log.error("Kunne ikke hente avtale fra database for orgnr $orgnr")
@@ -150,6 +153,7 @@ class AvtaleService(
             navn = kommunenavn,
             avtaleversjon = dbAvtale.avtaleversjon,
             opprettet = dbAvtale.opprettet,
+            dokumentStatus = dokumentStatus
         )
     }
 
@@ -261,9 +265,11 @@ class AvtaleService(
             kommunenavn: String,
             opprettet: LocalDateTime,
         ): String {
-            return "Avtale om innsynsflate for NAV Kontaktsenter - Digisos - ${kommunenavn.replace("/", "-")} - ${opprettet.format(
-                DateTimeFormatter.ofPattern("dd.MM.yyyy"),
-            )}"
+            return "Avtale om innsynsflate for NAV Kontaktsenter - Digisos - ${kommunenavn.replace("/", "-")} - ${
+                opprettet.format(
+                    DateTimeFormatter.ofPattern("dd.MM.yyyy"),
+                )
+            }"
         }
     }
 }

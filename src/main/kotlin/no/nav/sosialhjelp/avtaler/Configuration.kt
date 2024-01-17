@@ -37,6 +37,7 @@ object Configuration {
                 "virksomhetssertifikat.passwordSecretVersion" to "2",
                 "pdl.url" to "",
                 "pdl.audience" to "",
+                "ereg.url" to "",
             ),
         )
 
@@ -54,6 +55,7 @@ object Configuration {
                 "POSTGRES_HOST" to "",
                 "POSTGRES_PORT" to "",
                 "gcp.bucketName" to "digisos-avtaler",
+                "ereg.url" to "https://ereg-services.dev-fss-pub.nais.io",
             ),
         )
 
@@ -76,6 +78,7 @@ object Configuration {
                 "pdl.url" to "https://pdl-api.dev-fss-pub.nais.io/graphql",
                 "pdl.audience" to "dev-fss:pdl:pdl-api",
                 "gcp.bucketName" to "digisos-nks-avtaler-dev",
+                "ereg.url" to "https://ereg-services.dev-fss-pub.nais.io",
             ),
         )
 
@@ -98,6 +101,7 @@ object Configuration {
                 "pdl.url" to "https://pdl-api.prod-fss-pub.nais.io/graphql",
                 "pdl.audience" to "prod-fss:pdl:pdl-api",
                 "gcp.bucketName" to "digisos-nks-avtaler",
+                "ereg.url" to "https://ereg-services.prod-fss-pub.nais.io",
             ),
         )
 
@@ -122,7 +126,7 @@ object Configuration {
     val dbProperties = DatabaseProperties()
     val digipostProperties = DigipostProperties()
     val virksomhetssertifikatProperties = VirksomhetssertifikatProperties()
-    val enhetsregistertetProperties = EnhetsregistertetProperties()
+    val eregProperties = EregProperties()
     val slackProperties = SlackProperties()
     val gcpProperties = GcpProperties()
 
@@ -197,8 +201,8 @@ object Configuration {
         val passwordSecretVersionId: String = this["virksomhetssertifikat.passwordSecretVersion"],
     )
 
-    data class EnhetsregistertetProperties(
-        val baseUrl: String = this["enhetsregisteret_base_url"],
+    data class EregProperties(
+        val baseUrl: String = this["ereg.url"],
     )
 
     data class SlackProperties(

@@ -7,10 +7,4 @@ data class AvtaleResponse(
     val navn: String,
     val avtaleversjon: String? = null,
     val opprettet: LocalDateTime? = null,
-    val dokumentStatus: DokumentStatus? = null,
 )
-
-enum class DokumentStatus {
-    SUKSESS,
-    ERROR,
-}

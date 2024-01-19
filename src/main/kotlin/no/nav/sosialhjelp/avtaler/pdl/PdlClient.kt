@@ -11,10 +11,10 @@ import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.auth.Oauth2Client
 import no.nav.sosialhjelp.avtaler.defaultHttpClientWithJsonHeaders
-import no.nav.sosialhjelp.avtaler.pdl.api.HentPersonRequest
+import no.nav.sosialhjelp.avtaler.graphql.GraphQLRequest
 import no.nav.sosialhjelp.avtaler.pdl.api.HentPersonResponse
+import no.nav.sosialhjelp.avtaler.pdl.api.HentPersonVariables
 import no.nav.sosialhjelp.avtaler.pdl.api.PdlHentPerson
-import no.nav.sosialhjelp.avtaler.pdl.api.Variables
 
 private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
@@ -36,10 +36,10 @@ class PdlClient(
     ): PdlHentPerson? {
         val query = getHentPersonQuery()
         val request =
-            HentPersonRequest(
+            GraphQLRequest(
                 query = query,
                 variables =
-                    Variables(
+                    HentPersonVariables(
                         ident = ident,
                     ),
             )

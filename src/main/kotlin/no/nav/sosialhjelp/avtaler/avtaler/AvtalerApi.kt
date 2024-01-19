@@ -70,11 +70,9 @@ fun Route.avtaleApi(
 
             val avtaleResponse =
                 avtaleService.sjekkAvtaleStatusOgLagreSignertDokument(
-                    fnr = fnr,
                     navnInnsender = navnInnsender,
                     orgnr = signeringsstatusRequest.orgnr,
                     statusQueryToken = signeringsstatusRequest.token,
-                    token = token,
                 )
 
             if (avtaleResponse == null) {

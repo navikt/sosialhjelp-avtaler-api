@@ -27,7 +27,6 @@ spec:
   tokenx:
     enabled: true
   gcp:
-    secretmanager.host: secretmanager.googleapis.com
     sqlInstances:
       - type: POSTGRES_14
         name: sosialhjelp-avtaler-api-db-dev
@@ -53,6 +52,7 @@ spec:
         - host: secretmanager.googleapis.com
         - host: hooks.slack.com
         - host: digisos.intern.dev.nav.no
+        - host: ereg-services.dev-fss-pub.nais.io
       rules:
         - application: sosialhjelp-mock-alt-api-mock
         - application: curl-digipost-app

@@ -1,6 +1,5 @@
 package no.nav.sosialhjelp.avtaler.avtaler
 
-import com.google.common.net.MediaType
 import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService
@@ -10,9 +9,10 @@ import no.nav.sosialhjelp.avtaler.db.transaction
 import no.nav.sosialhjelp.avtaler.digipost.DigipostJobbData
 import no.nav.sosialhjelp.avtaler.digipost.DigipostResponse
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
+import no.nav.sosialhjelp.avtaler.documentjob.DocumentJobService
+import no.nav.sosialhjelp.avtaler.ereg.EregClient
 import no.nav.sosialhjelp.avtaler.gcpbucket.GcpBucket
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
-import no.nav.sosialhjelp.avtaler.kommune.DokumentStatus
 import no.nav.sosialhjelp.avtaler.slack.Slack
 import java.io.InputStream
 import java.net.URI
@@ -26,7 +26,9 @@ class AvtaleService(
     private val altinnService: AltinnService,
     private val digipostService: DigipostService,
     private val gcpBucket: GcpBucket,
-    val databaseContext: DatabaseContext,
+    private val documentJobService: DocumentJobService,
+    private val databaseContext: DatabaseContext,
+    private val eregClient: EregClient,
 ) {
     suspend fun hentAvtaler(
         fnr: String,
@@ -56,6 +58,12 @@ class AvtaleService(
                     opprettet = avtaler[it.orgnr]?.opprettet,
                 )
             }
+    }
+
+    suspend fun hentAvtalerUtenSignertDokument(): List<DigipostJobbData> {
+        return transaction(databaseContext) { ctx ->
+            ctx.digipostJobbDataStore.hentAlleUtenLagretDokument()
+        }
     }
 
     suspend fun hentAvtale(
@@ -108,11 +116,9 @@ class AvtaleService(
     }
 
     suspend fun sjekkAvtaleStatusOgLagreSignertDokument(
-        fnr: String,
         navnInnsender: String,
         orgnr: String,
         statusQueryToken: String,
-        token: String,
     ): AvtaleResponse? {
         val avtale =
             Avtale(
@@ -121,62 +127,30 @@ class AvtaleService(
                 navn_innsender = navnInnsender,
                 erSignert = false,
             )
-        val digipostJobbData = hentDigipostJobb(orgnr)
+        val digipostJobbData = digipostService.hentDigipostJobb(orgnr)
         if (digipostJobbData == null) {
             log.error("Kunne ikke hente signeringsstatus for orgnr $orgnr")
             return null
         }
         if (!erAvtaleSignert(avtale, digipostJobbData, statusQueryToken)) {
-            oppdaterDigipostJobbData(digipostJobbData, statusQueryToken = statusQueryToken)
+            digipostService.oppdaterDigipostJobbData(digipostJobbData, statusQueryToken = statusQueryToken)
             log.info("Avtale for orgnr ${avtale.orgnr} er ikke signert")
             return null
         }
         log.info("Avtale for orgnr ${avtale.orgnr} er signert")
 
-        val dokumentStatus =
-            runCatching { hentSignertAvtaleDokumentFraDigipost(digipostJobbData, statusQueryToken = statusQueryToken) }.mapCatching {
-                oppdaterDigipostJobbData(
-                    digipostJobbData,
-                    statusQueryToken = statusQueryToken,
-                    signertDokument = it,
-                )
-            }.onFailure {
-                log.error(
-                    "Fikk ikke hentet dokument fra digipost",
-                    it,
-                )
-            }.fold({ DokumentStatus.SUKSESS }, { DokumentStatus.ERROR })
         val dbAvtale = hentAvtale(orgnr)
         if (dbAvtale == null) {
             log.error("Kunne ikke hente avtale fra database for orgnr $orgnr")
             return null
         }
-        val kommunenavn =
-            altinnService.hentAvgivere(fnr, Avgiver.Tjeneste.AVTALESIGNERING, token).first { it.orgnr == orgnr }.navn
-        lagreSignertDokuentIBucket(dbAvtale, kommunenavn)
+        documentJobService.lastNedOgLagreAvtale(digipostJobbData, dbAvtale)
         return AvtaleResponse(
             orgnr = dbAvtale.orgnr,
-            navn = kommunenavn,
+            navn = eregClient.hentEnhetNavn(orgnr),
             avtaleversjon = dbAvtale.avtaleversjon,
             opprettet = dbAvtale.opprettet,
-            dokumentStatus = dokumentStatus,
         )
-    }
-
-    private suspend fun lagreSignertDokuentIBucket(
-        avtale: Avtale,
-        kommunenavn: String,
-    ) {
-        val digipostJobbData = hentDigipostJobb(avtale.orgnr)
-        if (digipostJobbData?.signertDokument == null) {
-            log.error("Signert avtale for orgnr ${avtale.orgnr} fra database er tom. Kan ikke lagre i bucket.")
-            return
-        }
-
-        val blobNavn = lagFilnavn(kommunenavn, avtale.opprettet)
-        val metadata = mapOf("navnInnsender" to avtale.navn_innsender, "signertTidspunkt" to avtale.opprettet.toString())
-        gcpBucket.lagreBlob(blobNavn, MediaType.PDF, metadata, digipostJobbData.signertDokument.readAllBytes())
-        log.info("Lagret signert avtale i bucket for orgnr ${avtale.orgnr}")
     }
 
     suspend fun erAvtaleSignert(
@@ -205,7 +179,8 @@ class AvtaleService(
         log.info("Henter signert avtale for orgnr ${digipostJobbData.orgnr} fra Digipost")
 
         if (statusQueryToken == null) {
-            return null.apply { log.error("StatusQueryToken er null. Kunne ikke hente signert avtale for orgnr ${digipostJobbData.orgnr}") }
+            log.error("StatusQueryToken er null. Kunne ikke hente signert avtale for orgnr ${digipostJobbData.orgnr}")
+            return null
         }
 
         return digipostService.hentSignertDokument(
@@ -217,7 +192,7 @@ class AvtaleService(
 
     suspend fun hentSignertAvtaleDokumentFraDatabaseEllerDigipost(orgnr: String): InputStream? {
         val digipostJobbData =
-            hentDigipostJobb(orgnr)
+            digipostService.hentDigipostJobb(orgnr)
                 ?: return null.apply { log.error("Kunne ikke hente digipost jobb-info fra database for orgnr $orgnr") }
 
         if (digipostJobbData.signertDokument != null) {
@@ -231,24 +206,7 @@ class AvtaleService(
         )
     }
 
-    private suspend fun oppdaterDigipostJobbData(
-        digipostJobbData: DigipostJobbData,
-        statusQueryToken: String,
-        signertDokument: InputStream? = null,
-    ) {
-        transaction(databaseContext) { ctx ->
-            ctx.digipostJobbDataStore.oppdaterDigipostJobbData(
-                digipostJobbData.copy(statusQueryToken = statusQueryToken, signertDokument = signertDokument),
-            )
-        }
-    }
-
-    private suspend fun hentDigipostJobb(orgnr: String): DigipostJobbData? =
-        transaction(databaseContext) { ctx ->
-            ctx.digipostJobbDataStore.hentDigipostJobb(orgnr)
-        }
-
-    private suspend fun hentAvtale(orgnr: String): Avtale? =
+    suspend fun hentAvtale(orgnr: String): Avtale? =
         transaction(databaseContext) { ctx ->
             ctx.avtaleStore.hentAvtaleForOrganisasjon(orgnr)
         }

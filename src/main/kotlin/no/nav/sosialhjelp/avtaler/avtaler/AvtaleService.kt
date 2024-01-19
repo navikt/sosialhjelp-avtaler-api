@@ -132,8 +132,8 @@ class AvtaleService(
             log.error("Kunne ikke hente signeringsstatus for orgnr $orgnr")
             return null
         }
+        digipostService.oppdaterDigipostJobbData(digipostJobbData, statusQueryToken = statusQueryToken)
         if (!erAvtaleSignert(avtale, digipostJobbData, statusQueryToken)) {
-            digipostService.oppdaterDigipostJobbData(digipostJobbData, statusQueryToken = statusQueryToken)
             log.info("Avtale for orgnr ${avtale.orgnr} er ikke signert")
             return null
         }

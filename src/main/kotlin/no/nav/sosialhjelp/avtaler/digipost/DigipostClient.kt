@@ -53,7 +53,9 @@ class DigipostClient(
         ClientConfiguration.builder(keyStoreConfig)
             .serviceEnvironment(if (profile == Configuration.Profile.PROD) ServiceEnvironment.PRODUCTION else ServiceEnvironment.DIFITEST)
             .defaultSender(Sender(props.navOrgnr))
-            .timeouts { it.allTimeouts(5.seconds.toJavaDuration()) }
+            .timeoutsForDocumentDownloads {
+                it.allTimeouts(30.seconds.toJavaDuration())
+            }
             .build()
     private val client = DirectClient(clientConfiguration)
 

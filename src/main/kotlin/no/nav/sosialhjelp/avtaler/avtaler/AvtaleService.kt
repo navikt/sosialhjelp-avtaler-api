@@ -233,7 +233,7 @@ class AvtaleService(
                 opprettet.format(
                     DateTimeFormatter.ofPattern("dd.MM.yyyy"),
                 )
-            }"
+            }.pdf"
         }
     }
 }

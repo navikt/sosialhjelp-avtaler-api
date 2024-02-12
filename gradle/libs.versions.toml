@@ -11,13 +11,13 @@ jackson = "2.16.1"
 microutils = "3.0.5"
 tokenSupport = "3.2.0"
 kotliquery = "1.9.0"
-flywaydb = "10.4.1"
+flywaydb = "10.7.2"
 hikari = "5.1.0"
 postgresql = "42.7.1"
 digipostSignatureApiClient = "7.0-RC7"
 jaxbRuntime = "2.3.7"
-googleCloudLibraries = "26.29.0"
-googleCloudSecretManager = "2.32.0"
+googleCloudLibraries = "26.31.0"
+googleCloudSecretManager = "2.35.0"
 
 [libraries]
 konfig = { module = "com.natpryce:konfig", version.ref = "konfig" }

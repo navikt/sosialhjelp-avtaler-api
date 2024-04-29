@@ -16,8 +16,8 @@ hikari = "5.1.0"
 postgresql = "42.7.1"
 digipostSignatureApiClient = "7.0-RC7"
 jaxbRuntime = "4.0.4"
-googleCloudLibraries = "26.35.0"
-googleCloudSecretManager = "2.40.0"
+googleCloudLibraries = "26.37.0"
+googleCloudSecretManager = "2.42.0"
 
 [libraries]
 konfig = { module = "com.natpryce:konfig", version.ref = "konfig" }

@@ -11,11 +11,11 @@ import java.net.http.HttpResponse
 private val log = LoggerFactory.getLogger("PostToSlack")
 
 object Slack {
-    private val username = "sosialhjelp-avtaler-api"
+    private const val USERNAME = "sosialhjelp-avtaler-api"
     private val environment = Configuration.slackProperties.environment
     private val hookUrl = Configuration.slackProperties.slackHook
-    private val channelProd = "#digisos-avtaler-varsling"
-    private val channelDev = "#digisos-alerts-dev"
+    private const val CHANNEL_PROD = "#digisos-avtaler-varsling"
+    private const val CHANNEL_DEV = "#digisos-alerts-dev"
 
     fun post(message: String) {
         try {
@@ -23,8 +23,8 @@ object Slack {
             val values =
                 mapOf(
                     "text" to slackMessage,
-                    "channel" to if (Configuration.prod) channelProd else channelDev,
-                    "username" to username,
+                    "channel" to if (Configuration.prod) CHANNEL_PROD else CHANNEL_DEV,
+                    "username" to USERNAME,
                 )
 
             val objectMapper = ObjectMapper()

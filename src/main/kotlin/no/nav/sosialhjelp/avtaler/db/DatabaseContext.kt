@@ -20,8 +20,7 @@ class DefaultDatabaseContext(
             Configuration.dbProperties,
             Configuration.profile,
         ).dataSource(),
-) :
-    DatabaseContext {
+) : DatabaseContext {
     override fun createSessionContext(sessionFactory: SessionFactory): DatabaseSessionContext =
         DefaultDatabaseSessionContext(sessionFactory)
 }

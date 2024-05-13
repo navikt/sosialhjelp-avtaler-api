@@ -6,6 +6,7 @@ import mu.KotlinLogging
 import no.digipost.signature.client.ClientConfiguration
 import no.digipost.signature.client.ServiceEnvironment
 import no.digipost.signature.client.core.DocumentType
+import no.digipost.signature.client.core.IdentifierInSignedDocuments
 import no.digipost.signature.client.core.ResponseInputStream
 import no.digipost.signature.client.core.Sender
 import no.digipost.signature.client.direct.DirectClient
@@ -18,7 +19,6 @@ import no.digipost.signature.client.direct.ExitUrls
 import no.digipost.signature.client.direct.StatusReference
 import no.digipost.signature.client.security.KeyStoreConfig
 import no.nav.sosialhjelp.avtaler.Configuration
-import no.nav.sosialhjelp.avtaler.avtaler.Avtale
 import no.nav.sosialhjelp.avtaler.exceptions.VirsomhetsertifikatException
 import no.nav.sosialhjelp.avtaler.secretmanager.DigisosKeyStoreCredentials
 import no.nav.sosialhjelp.avtaler.secretmanager.SecretManager
@@ -95,7 +95,7 @@ class DigipostClient(
 
     fun sendTilSignering(
         fnr: String,
-        avtale: Avtale,
+        avtale: DigipostAvtale,
     ): DigipostResponse {
         val exitUrls =
             ExitUrls.of(

@@ -2,7 +2,6 @@ package no.nav.sosialhjelp.avtaler.avtaler
 
 import kotliquery.Row
 import kotliquery.Session
-import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.store.Store
 import no.nav.sosialhjelp.avtaler.store.TransactionalStore
 import no.nav.sosialhjelp.avtaler.store.query
@@ -10,11 +9,12 @@ import no.nav.sosialhjelp.avtaler.store.queryList
 import no.nav.sosialhjelp.avtaler.store.update
 import org.intellij.lang.annotations.Language
 import java.time.LocalDateTime
-
-private val log = KotlinLogging.logger {}
+import java.util.UUID
 
 interface AvtaleStore : Store {
-    fun hentAvtaleForOrganisasjon(orgnr: String): Avtale?
+    fun hentAvtalerForOrganisasjon(orgnr: String): List<Avtale>
+
+    fun hentAvtale(uuid: UUID): Avtale?
 
     fun hentAvtalerForOrganisasjoner(orgnr: List<String>): List<Avtale>
 
@@ -22,16 +22,18 @@ interface AvtaleStore : Store {
 }
 
 data class Avtale(
+    val uuid: UUID,
     val orgnr: String,
     val avtaleversjon: String? = null,
     val navn_innsender: String,
     val erSignert: Boolean,
     val opprettet: LocalDateTime = LocalDateTime.now(),
+    val navn: String,
 )
 
-class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleStore,
+class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
     TransactionalStore(sessionFactory) {
-    override fun hentAvtaleForOrganisasjon(orgnr: String): Avtale? =
+    override fun hentAvtalerForOrganisasjon(orgnr: String): List<Avtale> =
         session {
             @Language("PostgreSQL")
             val sql =
@@ -40,11 +42,22 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
                 FROM avtale_v1
                 WHERE orgnr = :orgnr
                 """.trimIndent()
-            it.query(sql, mapOf("orgnr" to orgnr), ::mapper)
+            it.queryList(sql, mapOf("orgnr" to orgnr), ::mapper)
+        }
+
+    override fun hentAvtale(uuid: UUID): Avtale? =
+        session { session ->
+            @Language("PostgreSQL")
+            val sql =
+                """
+                    SELECT * from postgres.public.avtale_v1
+                    where uuid = :uuid
+                """.trimIndent()
+            session.query(sql, mapOf("uuid" to uuid), ::mapper)
         }
 
     override fun hentAvtalerForOrganisasjoner(orgnr: List<String>): List<Avtale> =
-        session {
+        session { session ->
             if (orgnr.isEmpty()) {
                 emptyList()
             } else {
@@ -56,7 +69,7 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
                     WHERE orgnr in (?)
                     """.trimIndent()
                 sql = sql.replace("(?)", "(" + (0 until orgnr.count()).joinToString { "?" } + ")")
-                it.queryList(sql, orgnr, ::mapper)
+                session.queryList(sql, orgnr, ::mapper)
             }
         }
 
@@ -89,10 +102,12 @@ class AvtaleStorePostgres(private val sessionFactory: () -> Session) : AvtaleSto
 
     private fun mapper(row: Row): Avtale =
         Avtale(
+            uuid = row.uuid("uuid"),
             orgnr = row.string("orgnr"),
             avtaleversjon = row.stringOrNull("avtaleversjon"),
             navn_innsender = row.string("navn_innsender"),
             erSignert = row.boolean("er_signert"),
             opprettet = row.localDateTime("opprettet"),
+            navn = row.string("navn")
         )
 }

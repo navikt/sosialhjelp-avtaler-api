@@ -6,18 +6,20 @@ import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
+import no.nav.sosialhjelp.avtaler.digipost.DigipostAvtale
 import no.nav.sosialhjelp.avtaler.digipost.DigipostJobbData
 import no.nav.sosialhjelp.avtaler.digipost.DigipostResponse
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.documentjob.DocumentJobService
-import no.nav.sosialhjelp.avtaler.ereg.EregClient
-import no.nav.sosialhjelp.avtaler.gcpbucket.GcpBucket
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
+import no.nav.sosialhjelp.avtaler.kommune.KommuneResponse
+import no.nav.sosialhjelp.avtaler.pdl.PersonNavnService
 import no.nav.sosialhjelp.avtaler.slack.Slack
 import java.io.InputStream
 import java.net.URI
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.UUID
 
 private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
@@ -25,37 +27,32 @@ private val sikkerLog = KotlinLogging.logger("tjenestekall")
 class AvtaleService(
     private val altinnService: AltinnService,
     private val digipostService: DigipostService,
-    private val gcpBucket: GcpBucket,
     private val documentJobService: DocumentJobService,
     private val databaseContext: DatabaseContext,
-    private val eregClient: EregClient,
+    private val personNavnService: PersonNavnService,
 ) {
-    suspend fun hentAvtaler(
+    suspend fun hentKommuner(
         fnr: String,
         tjeneste: Avgiver.Tjeneste,
         token: String?,
-    ): List<AvtaleResponse> {
-        val avgivereFiltrert =
-            altinnService.hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
-                .filter { avgiver ->
-                    avgiver.erKommune().also { log.info("Hentet enhet med orgnr: ${avgiver.orgnr}") }
-                }
-        sikkerLog.info("Filtrert avgivere for fnr: $fnr, tjeneste: $tjeneste, avgivere: $avgivereFiltrert")
+    ): List<KommuneResponse> {
+        val avgivereFiltrert = hentAvgivere(fnr, tjeneste, token)
 
         val avtaler =
             transaction(databaseContext) { ctx ->
-                ctx.avtaleStore.hentAvtalerForOrganisasjoner(avgivereFiltrert.map { it.orgnr }).associateBy {
-                    it.orgnr
-                }
+                ctx.avtaleStore.hentAvtalerForOrganisasjoner(avgivereFiltrert.map { it.orgnr })
             }
 
+        val avtalerByOrgnr = avtaler.groupBy { it.orgnr }
         return avgivereFiltrert
-            .map {
-                AvtaleResponse(
-                    orgnr = it.orgnr,
-                    navn = it.navn,
-                    avtaleversjon = avtaler[it.orgnr]?.avtaleversjon,
-                    opprettet = avtaler[it.orgnr]?.opprettet,
+            .map { avgiver ->
+                KommuneResponse(
+                    orgnr = avgiver.orgnr,
+                    navn = avgiver.navn,
+                    avtaler =
+                        avtalerByOrgnr[avgiver.orgnr]?.map {
+                            AvtaleResponse(it.uuid, it.navn_innsender, it.avtaleversjon, it.opprettet)
+                        } ?: emptyList(),
                 )
             }
     }
@@ -68,13 +65,40 @@ class AvtaleService(
 
     suspend fun hentAvtale(
         fnr: String,
-        orgnr: String,
+        uuid: UUID,
         tjeneste: Avgiver.Tjeneste,
         token: String?,
-    ): AvtaleResponse? =
-        hentAvtaler(fnr = fnr, tjeneste = tjeneste, token = token).associateBy {
-            it.orgnr
-        }[orgnr]
+    ): AvtaleResponse? {
+        val avgivereFiltrert = hentAvgivere(fnr, tjeneste, token)
+
+        val avtale =
+            transaction(databaseContext) { ctx ->
+                ctx.avtaleStore.hentAvtale(uuid)
+            }
+
+        check(avtale?.orgnr in avgivereFiltrert.map { it.orgnr }) {
+            "Forespurt avtale $uuid er ikke fra en kommune som er tilknyttet brukerens fnr"
+        }
+
+        return avtale?.let {
+            AvtaleResponse(
+                uuid = it.uuid,
+                avtaleversjon = it.avtaleversjon,
+                opprettet = it.opprettet,
+                navn = it.navn,
+            )
+        }
+    }
+
+    private suspend fun hentAvgivere(
+        fnr: String,
+        tjeneste: Avgiver.Tjeneste,
+        token: String?,
+    ): List<Avgiver> =
+        altinnService.hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
+            .filter { avgiver ->
+                avgiver.erKommune().also { log.info("Hentet enhet med orgnr: ${avgiver.orgnr}") }
+            }.also { sikkerLog.info("Filtrert avgivere for fnr: $fnr, tjeneste: $tjeneste, avgivere: $this") }
 
     suspend fun signerAvtale(
         fnr: String,
@@ -84,7 +108,7 @@ class AvtaleService(
         log.info("Sender avtale til e-signering for orgnummer ${avtaleRequest.orgnr}")
 
         val avtale =
-            Avtale(
+            DigipostAvtale(
                 orgnr = avtaleRequest.orgnr,
                 avtaleversjon = "1.0",
                 navn_innsender = navnInnsender,
@@ -103,7 +127,7 @@ class AvtaleService(
     ) {
         val digipostJobbData =
             DigipostJobbData(
-                orgnr = orgnr,
+                uuid = UUID.randomUUID(),
                 directJobReference = digipostResponse.reference,
                 statusUrl = digipostResponse.signerUrl,
                 statusQueryToken = null,
@@ -116,70 +140,56 @@ class AvtaleService(
     }
 
     suspend fun sjekkAvtaleStatusOgLagreSignertDokument(
-        navnInnsender: String,
-        orgnr: String,
+        uuid: UUID,
+        fnr: String,
+        token: String,
         statusQueryToken: String,
     ): AvtaleResponse? {
-        val avtale =
-            Avtale(
-                orgnr = orgnr,
-                avtaleversjon = "1.0",
-                navn_innsender = navnInnsender,
-                erSignert = false,
-            )
-        val digipostJobbData = digipostService.hentDigipostJobb(orgnr)
+        val digipostJobbData = digipostService.hentDigipostJobb(uuid)
         if (digipostJobbData == null) {
-            log.error("Kunne ikke hente signeringsstatus for orgnr $orgnr")
+            log.error("Kunne ikke hente signeringsstatus for uuid $uuid")
             return null
         }
         digipostService.oppdaterDigipostJobbData(digipostJobbData, statusQueryToken = statusQueryToken)
-        if (!erAvtaleSignert(avtale, digipostJobbData, statusQueryToken)) {
-            log.info("Avtale for orgnr ${avtale.orgnr} er ikke signert")
-            return null
-        }
+        val avtale = hentAvtale(uuid) ?: error("Finnes ikke noen avtale med uuid $uuid")
+        val signertAvtale =
+            if (!erAvtaleSignert(digipostJobbData, statusQueryToken)) {
+                log.info("Avtale for orgnr ${avtale.orgnr} er ikke signert")
+                return null
+            } else {
+                val navn = personNavnService.getFulltNavn(fnr, token)
+                lagreAvtale(avtale.copy(erSignert = true, navn_innsender = navn))
+            }
+
         log.info("Avtale for orgnr ${avtale.orgnr} er signert")
 
-        val dbAvtale = hentAvtale(orgnr)
-        if (dbAvtale == null) {
-            log.error("Kunne ikke hente avtale fra database for orgnr $orgnr")
-            return null
-        }
-        documentJobService.lastNedOgLagreAvtale(digipostJobbData, dbAvtale)
+        documentJobService.lastNedOgLagreAvtale(digipostJobbData, signertAvtale)
         return AvtaleResponse(
-            orgnr = dbAvtale.orgnr,
-            navn = eregClient.hentEnhetNavn(orgnr),
-            avtaleversjon = dbAvtale.avtaleversjon,
-            opprettet = dbAvtale.opprettet,
+            uuid = signertAvtale.uuid,
+            avtaleversjon = signertAvtale.avtaleversjon,
+            opprettet = signertAvtale.opprettet,
+            navn = signertAvtale.navn,
         )
     }
 
-    suspend fun erAvtaleSignert(
-        avtale: Avtale,
+    private fun erAvtaleSignert(
         digipostJobbData: DigipostJobbData,
         statusQueryToken: String,
-    ): Boolean {
-        val avtaleErSignert =
-            digipostService.erSigneringsstatusCompleted(
-                digipostJobbData.directJobReference,
-                digipostJobbData.statusUrl,
-                statusQueryToken,
-            )
+    ): Boolean =
+        digipostService.erSigneringsstatusCompleted(
+            digipostJobbData.directJobReference,
+            digipostJobbData.statusUrl,
+            statusQueryToken,
+        )
 
-        if (!avtaleErSignert) {
-            return false
-        }
-        lagreAvtale(avtale.copy(erSignert = true))
-        return true
-    }
-
-    fun hentSignertAvtaleDokumentFraDigipost(
+    private fun hentSignertAvtaleDokumentFraDigipost(
         digipostJobbData: DigipostJobbData,
         statusQueryToken: String?,
     ): InputStream? {
-        log.info("Henter signert avtale for orgnr ${digipostJobbData.orgnr} fra Digipost")
+        log.info("Henter signert avtale for uuid ${digipostJobbData.uuid} fra Digipost")
 
         if (statusQueryToken == null) {
-            log.error("StatusQueryToken er null. Kunne ikke hente signert avtale for orgnr ${digipostJobbData.orgnr}")
+            log.error("StatusQueryToken er null. Kunne ikke hente signert avtale for uuid ${digipostJobbData.uuid}")
             return null
         }
 
@@ -190,13 +200,17 @@ class AvtaleService(
         )
     }
 
-    suspend fun hentSignertAvtaleDokumentFraDatabaseEllerDigipost(orgnr: String): InputStream? {
+    suspend fun hentSignertAvtaleDokumentFraDatabaseEllerDigipost(uuid: UUID): InputStream? {
         val digipostJobbData =
-            digipostService.hentDigipostJobb(orgnr)
-                ?: return null.apply { log.error("Kunne ikke hente digipost jobb-info fra database for orgnr $orgnr") }
+            digipostService.hentDigipostJobb(uuid)
+
+        if (digipostJobbData == null) {
+            log.error("Kunne ikke hente digipost jobb-info fra database for uuid $uuid")
+            return null
+        }
 
         if (digipostJobbData.signertDokument != null) {
-            log.info { "Hentet signert avtale for orgnr $orgnr fra database" }
+            log.info { "Hentet signert avtale for uuid $uuid fra database" }
             return digipostJobbData.signertDokument
         }
 
@@ -206,9 +220,9 @@ class AvtaleService(
         )
     }
 
-    suspend fun hentAvtale(orgnr: String): Avtale? =
+    suspend fun hentAvtale(uuid: UUID): Avtale? =
         transaction(databaseContext) { ctx ->
-            ctx.avtaleStore.hentAvtaleForOrganisasjon(orgnr)
+            ctx.avtaleStore.hentAvtale(uuid)
         }
 
     private suspend fun lagreAvtale(avtale: Avtale): Avtale {

@@ -51,7 +51,7 @@ fun Application.module() {
     val port = environment.config.propertyOrNull("ktor.deployment.port")?.getString() ?: "8080"
 
     log.info("sosialhjelp-avtaler-api starting up on $host:$port...")
-    val databaseContext = DefaultDatabaseContext(DatabaseConfiguration(Configuration.dbProperties, Configuration.profile).dataSource())
+    val databaseContext = DefaultDatabaseContext(DatabaseConfiguration(Configuration.dbProperties).dataSource())
 
     configure()
 
@@ -74,8 +74,8 @@ fun Application.module() {
     val gcpBucket = GcpBucket(Configuration.gcpProperties.bucketName)
     val eregClient = EregClient(Configuration.eregProperties)
     val documentJobService = DocumentJobService(digipostService, gcpBucket, eregClient)
-    val avtaleService = AvtaleService(altinnService, digipostService, gcpBucket, documentJobService, databaseContext, eregClient)
     val personNavnService = PersonNavnService(PdlClient(Configuration.pdlProperties, tokenExchangeClient))
+    val avtaleService = AvtaleService(altinnService, digipostService, documentJobService, databaseContext, personNavnService)
     setupJobs(avtaleService, documentJobService)
     setupRoutes(avtaleService, personNavnService)
 }
@@ -103,10 +103,10 @@ private fun Application.setupJobs(
             val resultat =
                 documentJobService.lastNedOgLagreAvtale(
                     digipostJobbData,
-                    avtaleService.hentAvtale(digipostJobbData.orgnr) ?: return@forEach,
+                    avtaleService.hentAvtale(digipostJobbData.uuid) ?: return@forEach,
                 )
             resultat.fold({
-                log.info("Fikk lagret avtale for orgnr: ${digipostJobbData.orgnr} i batch-jobb")
+                log.info("Fikk lagret avtale med uuid ${digipostJobbData.uuid} i batch-jobb")
             }, {
                 log.error("Fikk ikke lagret dokument i databasen", it)
             })

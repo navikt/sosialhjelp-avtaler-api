@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.seconds
 
 private val log = KotlinLogging.logger { }
 
-class DatabaseConfiguration(private val props: Configuration.DatabaseProperties, private val miljo: Configuration.Profile) {
+class DatabaseConfiguration(private val props: Configuration.DatabaseProperties) {
     fun dataSource(): DataSource {
         if (!waitForDB(10.minutes)) {
             throw RuntimeException("Databasen ble ikke tilgjengelig innenfor tidsfristen")

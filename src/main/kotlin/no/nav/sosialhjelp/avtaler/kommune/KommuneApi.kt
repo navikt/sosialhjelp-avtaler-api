@@ -20,7 +20,7 @@ fun Route.kommuneApi(avtaleService: AvtaleService) {
     route("/kommuner") {
         get {
             val kommuner =
-                avtaleService.hentAvtaler(
+                avtaleService.hentKommuner(
                     fnr = call.extractFnr(),
                     tjeneste = Avgiver.Tjeneste.AVTALESIGNERING,
                     this.context.getAccessToken(),

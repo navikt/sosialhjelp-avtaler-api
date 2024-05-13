@@ -26,29 +26,30 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
         tjeneste: Avgiver.Tjeneste,
         token: String?,
     ): List<Avgiver> {
-        token?.let {
-            val scopedAccessToken = tokenClient.exchangeToken(token, altinnRettigheterAudience).accessToken
-
-            val response =
-                client.get("$baseUrl/ekstern/altinn/api/serviceowner/reportees") {
-                    url {
-                        parameters.append("ForceEIAuthentication", "")
-                        parameters.append("subject", fnr)
-                        parameters.append("serviceCode", tjeneste.kode)
-                        parameters.append("serviceEdition", tjeneste.versjon.toString())
-                        parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active' and OrganizationForm eq 'KOMM'")
-                        parameters.append("\$top", "200")
-                        header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
-                    }
-                }
-            sikkerLog.info { "Hentet avgivere med url: ${response.request.url}" }
-            if (response.status == HttpStatusCode.OK) {
-                return response.body() ?: emptyList()
-            }
-            log.warn { "Kunne ikke hente avgivere, status: ${response.status}" }
+        if (token == null) {
+            log.warn("Ingen access token i request, kan ikke hente ny token til altinn-proxy")
             return emptyList()
         }
-        log.warn("Ingen access token i request, kan ikke hente ny token til altinn-proxy")
+
+        val scopedAccessToken = tokenClient.exchangeToken(token, altinnRettigheterAudience).accessToken
+
+        val response =
+            client.get("$baseUrl/ekstern/altinn/api/serviceowner/reportees") {
+                url {
+                    parameters.append("ForceEIAuthentication", "")
+                    parameters.append("subject", fnr)
+                    parameters.append("serviceCode", tjeneste.kode)
+                    parameters.append("serviceEdition", tjeneste.versjon.toString())
+                    parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active' and OrganizationForm eq 'KOMM'")
+                    parameters.append("\$top", "200")
+                    header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
+                }
+            }
+        sikkerLog.info { "Hentet avgivere med url: ${response.request.url}" }
+        if (response.status == HttpStatusCode.OK) {
+            return response.body() ?: emptyList()
+        }
+        log.warn { "Kunne ikke hente avgivere, status: ${response.status}" }
         return emptyList()
     }
 

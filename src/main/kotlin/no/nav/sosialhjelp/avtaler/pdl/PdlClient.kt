@@ -17,7 +17,6 @@ import no.nav.sosialhjelp.avtaler.pdl.api.HentPersonVariables
 import no.nav.sosialhjelp.avtaler.pdl.api.PdlHentPerson
 
 private val log = KotlinLogging.logger { }
-private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
 private const val HEADER_BEHANDLINGSNUMMER = "behandlingsnummer"
 private const val BEHANDLINGSNUMMER_AVTALER = "B563"
@@ -53,22 +52,19 @@ class PdlClient(
                 header(HEADER_BEHANDLINGSNUMMER, BEHANDLINGSNUMMER_AVTALER)
             }
 
-        when (response.status) {
-            HttpStatusCode.OK -> {
-                val hentPersonResponse = response.body<HentPersonResponse>()
-                return if (!hentPersonResponse.errors.isNullOrEmpty()) {
-                    hentPersonResponse.errors.forEach {
-                        log.error("Pdl - hentPerson feilet: ${it.errorMessage()}")
-                    }
-                    null
-                } else {
-                    hentPersonResponse.data
+        if (response.status == HttpStatusCode.OK) {
+            val hentPersonResponse = response.body<HentPersonResponse>()
+            return if (!hentPersonResponse.errors.isNullOrEmpty()) {
+                hentPersonResponse.errors.forEach {
+                    log.error("Pdl - hentPerson feilet: ${it.errorMessage()}")
                 }
+                null
+            } else {
+                hentPersonResponse.data
             }
-            else -> {
-                log.error("Pdl - hentPerson feilet. url: $pdlUrl, feil: ${response.status.value}")
-                return null
-            }
+        } else {
+            log.error("Pdl - hentPerson feilet. url: $pdlUrl, feil: ${response.status.value}")
+            return null
         }
     }
 

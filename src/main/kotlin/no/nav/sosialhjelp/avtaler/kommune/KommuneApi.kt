@@ -13,10 +13,13 @@ import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.extractFnr
+import org.koin.ktor.ext.inject
 
 private val log = KotlinLogging.logger { }
 
-fun Route.kommuneApi(avtaleService: AvtaleService) {
+fun Route.kommuneApi() {
+    val avtaleService by inject<AvtaleService>()
+
     route("/kommuner") {
         get {
             val kommuner =

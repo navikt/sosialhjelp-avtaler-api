@@ -1,7 +1,6 @@
 package no.nav.sosialhjelp.avtaler.digipost
 
 import no.digipost.signature.client.direct.DirectJobStatus
-import no.nav.sosialhjelp.avtaler.avtaler.Avtale
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
 import java.io.InputStream

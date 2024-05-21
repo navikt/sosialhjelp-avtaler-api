@@ -4,12 +4,16 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod
+import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
+import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.response.respond
 import io.ktor.server.routing.IgnoreTrailingSlash
+import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.CoroutineScope
@@ -60,6 +64,12 @@ fun Application.module() {
 
     configure()
 
+    setupKoin()
+    setupJobs()
+    setupRoutes()
+}
+
+private fun Application.setupKoin() {
     install(Koin) {
         slf4jLogger()
         val avtaleModule =
@@ -94,8 +104,6 @@ fun Application.module() {
             }
         modules(avtaleModule)
     }
-    setupJobs()
-    setupRoutes()
 }
 
 private fun Application.setupJobs() {
@@ -144,10 +152,8 @@ fun Application.configure() {
 }
 
 fun Application.setupRoutes() {
-    val avtaleService by inject<AvtaleService>()
-    val personNavnService by inject<PersonNavnService>()
-
     installAuthentication(httpClient(engineFactory { StubEngine.tokenX() }))
+    val avtaleService by inject<AvtaleService>()
 
     routing {
         route("/sosialhjelp/avtaler-api") {
@@ -156,6 +162,10 @@ fun Application.setupRoutes() {
                 authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
                     avtaleApi()
                     kommuneApi()
+                    post("/masse-signer") {
+                        val uri = avtaleService.masseSigner(call.extractFnr())
+                        call.respond(HttpStatusCode.Created, uri)
+                    }
                 }
             }
         }

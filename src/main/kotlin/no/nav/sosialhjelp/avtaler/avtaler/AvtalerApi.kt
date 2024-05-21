@@ -14,16 +14,17 @@ import io.ktor.server.routing.route
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.extractFnr
 import no.nav.sosialhjelp.avtaler.pdl.PersonNavnService
+import org.koin.ktor.ext.inject
 import java.util.UUID
 
 data class AvtaleRequest(val orgnr: String)
 
 data class SigneringsstatusRequest(val uuid: UUID, val token: String)
 
-fun Route.avtaleApi(
-    avtaleService: AvtaleService,
-    personNavnService: PersonNavnService,
-) {
+fun Route.avtaleApi() {
+    val avtaleService by inject<AvtaleService>()
+    val personNavnService by inject<PersonNavnService>()
+
     route("/avtale") {
         get("/{uuid}") {
             val uuid = call.uuid()

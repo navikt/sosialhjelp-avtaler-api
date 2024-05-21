@@ -37,6 +37,11 @@ import no.nav.sosialhjelp.avtaler.internal.internalRoutes
 import no.nav.sosialhjelp.avtaler.kommune.kommuneApi
 import no.nav.sosialhjelp.avtaler.pdl.PdlClient
 import no.nav.sosialhjelp.avtaler.pdl.PersonNavnService
+import org.koin.core.module.dsl.singleOf
+import org.koin.dsl.module
+import org.koin.ktor.ext.inject
+import org.koin.ktor.plugin.Koin
+import org.koin.logger.slf4jLogger
 import java.util.TimeZone
 import kotlin.time.Duration.Companion.minutes
 
@@ -51,39 +56,50 @@ fun Application.module() {
     val port = environment.config.propertyOrNull("ktor.deployment.port")?.getString() ?: "8080"
 
     log.info("sosialhjelp-avtaler-api starting up on $host:$port...")
-    val databaseContext = DefaultDatabaseContext(DatabaseConfiguration(Configuration.dbProperties).dataSource())
 
     configure()
 
-    val authProperties =
-        ClientAuthenticationProperties.builder()
-            .clientId(Configuration.tokenXProperties.clientId)
-            .clientJwk(Configuration.tokenXProperties.privateJwk)
-            .clientAuthMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
-            .build()
-
-    val defaultHttpClient = defaultHttpClient()
-
-    val tokenExchangeClient = Oauth2Client(defaultHttpClient, authProperties, Configuration.tokenXProperties)
-    val altinnService = AltinnService(AltinnClient(Configuration.altinnProperties, tokenExchangeClient))
-    val digipostService =
-        DigipostService(
-            DigipostClient(Configuration.digipostProperties, Configuration.virksomhetssertifikatProperties, Configuration.profile),
-            databaseContext,
-        )
-    val gcpBucket = GcpBucket(Configuration.gcpProperties.bucketName)
-    val eregClient = EregClient(Configuration.eregProperties)
-    val documentJobService = DocumentJobService(digipostService, gcpBucket, eregClient)
-    val personNavnService = PersonNavnService(PdlClient(Configuration.pdlProperties, tokenExchangeClient))
-    val avtaleService = AvtaleService(altinnService, digipostService, documentJobService, databaseContext, personNavnService)
-    setupJobs(avtaleService, documentJobService)
-    setupRoutes(avtaleService, personNavnService)
+    install(Koin) {
+        slf4jLogger()
+        val avtaleModule =
+            module {
+                single {
+                    DefaultDatabaseContext(DatabaseConfiguration(Configuration.dbProperties).dataSource())
+                }
+                single { defaultHttpClient() }
+                single {
+                    ClientAuthenticationProperties.builder()
+                        .clientId(Configuration.tokenXProperties.clientId)
+                        .clientJwk(Configuration.tokenXProperties.privateJwk)
+                        .clientAuthMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
+                        .build()
+                }
+                single { Oauth2Client(get(), get(), Configuration.tokenXProperties) }
+                single { AltinnService(AltinnClient(Configuration.altinnProperties, get())) }
+                single {
+                    DigipostClient(
+                        Configuration.digipostProperties,
+                        Configuration.virksomhetssertifikatProperties,
+                        Configuration.profile,
+                    )
+                }
+                single { GcpBucket(Configuration.gcpProperties.bucketName) }
+                single { EregClient(Configuration.eregProperties) }
+                single { PdlClient(Configuration.pdlProperties, get()) }
+                singleOf(::DigipostService)
+                singleOf(::DocumentJobService)
+                singleOf(::PersonNavnService)
+                singleOf(::AvtaleService)
+            }
+        modules(avtaleModule)
+    }
+    setupJobs()
+    setupRoutes()
 }
 
-private fun Application.setupJobs(
-    avtaleService: AvtaleService,
-    documentJobService: DocumentJobService,
-) {
+private fun Application.setupJobs() {
+    val avtaleService by inject<AvtaleService>()
+    val documentJobService by inject<DocumentJobService>()
     log.info("Setter opp oppryddingsjobb")
     val scope = CoroutineScope(Dispatchers.IO)
     val flow =
@@ -126,10 +142,10 @@ fun Application.configure() {
     install(IgnoreTrailingSlash)
 }
 
-fun Application.setupRoutes(
-    avtaleService: AvtaleService,
-    personNavnService: PersonNavnService,
-) {
+fun Application.setupRoutes() {
+    val avtaleService by inject<AvtaleService>()
+    val personNavnService by inject<PersonNavnService>()
+
     installAuthentication(httpClient(engineFactory { StubEngine.tokenX() }))
 
     routing {
@@ -137,8 +153,8 @@ fun Application.setupRoutes(
             internalRoutes()
             route("/api") {
                 authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
-                    avtaleApi(avtaleService, personNavnService)
-                    kommuneApi(avtaleService)
+                    avtaleApi()
+                    kommuneApi()
                 }
             }
         }

@@ -121,6 +121,14 @@ class AvtaleService(
         return digipostResponse.redirectUrl
     }
 
+    fun masseSigner(fnr: String): URI {
+        val digipostResponse = digipostService.sendMangeTilSignering(fnr)
+
+//        lagreDigipostResponse(avtaleRequest.orgnr, digipostResponse)
+
+        return digipostResponse.redirectUrl
+    }
+
     private suspend fun lagreDigipostResponse(
         orgnr: String,
         digipostResponse: DigipostResponse,

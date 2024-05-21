@@ -50,8 +50,8 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
             @Language("PostgreSQL")
             val sql =
                 """
-                    SELECT * from postgres.public.avtale_v1
-                    where uuid = :uuid
+                SELECT * from postgres.public.avtale_v1
+                where uuid = :uuid
                 """.trimIndent()
             session.query(sql, mapOf("uuid" to uuid), ::mapper)
         }
@@ -108,6 +108,6 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
             navn_innsender = row.string("navn_innsender"),
             erSignert = row.boolean("er_signert"),
             opprettet = row.localDateTime("opprettet"),
-            navn = row.string("navn")
+            navn = row.string("navn"),
         )
 }

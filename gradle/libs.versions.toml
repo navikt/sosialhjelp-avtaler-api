@@ -18,6 +18,7 @@ digipostSignatureApiClient = "7.0-RC7"
 jaxbRuntime = "4.0.4"
 googleCloudLibraries = "26.35.0"
 googleCloudSecretManager = "2.40.0"
+koin = "3.5.6"
 
 [libraries]
 konfig = { module = "com.natpryce:konfig", version.ref = "konfig" }
@@ -51,6 +52,10 @@ libraries-bom = { module = "com.google.cloud:libraries-bom", version.ref = "goog
 google-cloud-secretmanager = { module = "com.google.cloud:google-cloud-secretmanager", version.ref = "googleCloudSecretManager" }
 google-cloud-storage = { module = "com.google.cloud:google-cloud-storage" }
 logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logbackEncoder" }
+koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin" }
+koin-ktor = { module = "io.insert-koin:koin-ktor"}
+koin-logging = { module = "io.insert-koin:koin-logger-slf4j"}
+
 
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 ktor-server-tests-jvm = { module = "io.ktor:ktor-server-tests-jvm", version.ref = "ktor" }

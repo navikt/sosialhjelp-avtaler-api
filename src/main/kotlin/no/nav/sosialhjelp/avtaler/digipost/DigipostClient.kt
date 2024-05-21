@@ -6,7 +6,6 @@ import mu.KotlinLogging
 import no.digipost.signature.client.ClientConfiguration
 import no.digipost.signature.client.ServiceEnvironment
 import no.digipost.signature.client.core.DocumentType
-import no.digipost.signature.client.core.IdentifierInSignedDocuments
 import no.digipost.signature.client.core.ResponseInputStream
 import no.digipost.signature.client.core.Sender
 import no.digipost.signature.client.direct.DirectClient

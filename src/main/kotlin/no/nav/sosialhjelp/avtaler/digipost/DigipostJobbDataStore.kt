@@ -19,7 +19,6 @@ interface DigipostJobbDataStore : Store {
     fun oppdaterDigipostJobbData(digipostJobbData: DigipostJobbData): DigipostJobbData
 
     fun hentAlleUtenLagretDokument(): List<DigipostJobbData>
-
 }
 
 class DigipostJobbDataStorePostgres(sessionFactory: () -> Session) : DigipostJobbDataStore, TransactionalStore(sessionFactory) {

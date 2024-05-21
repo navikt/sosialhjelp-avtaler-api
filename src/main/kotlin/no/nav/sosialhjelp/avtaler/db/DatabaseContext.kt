@@ -18,7 +18,6 @@ class DefaultDatabaseContext(
     override val dataSource: DataSource =
         DatabaseConfiguration(
             Configuration.dbProperties,
-            Configuration.profile,
         ).dataSource(),
 ) : DatabaseContext {
     override fun createSessionContext(sessionFactory: SessionFactory): DatabaseSessionContext =

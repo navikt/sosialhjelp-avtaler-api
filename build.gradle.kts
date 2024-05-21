@@ -34,6 +34,10 @@ dependencies {
 
     implementation(libs.bundles.serialization)
 
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.ktor)
+    implementation(libs.koin.logging)
+
     implementation(libs.bundles.logging)
 
     implementation(libs.bundles.database)

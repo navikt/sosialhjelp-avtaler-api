@@ -30,7 +30,7 @@ class DatabaseConfiguration(private val props: Configuration.DatabaseProperties)
                 connectionTimeout = 1000
                 maxLifetime = 30001
             }
-        val flyway = Flyway.configure().dataSource(dataSource).load()
+        val flyway = Flyway.configure().dataSource(dataSource).locations("classpath:db/migration").load()
         flyway.migrate()
 
         return dataSource

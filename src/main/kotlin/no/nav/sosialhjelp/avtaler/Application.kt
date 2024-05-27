@@ -75,7 +75,7 @@ private fun Application.setupKoin() {
         slf4jLogger()
         val avtaleModule =
             module {
-                single<DatabaseContext> {
+                single<DatabaseContext>(createdAtStart = true) {
                     DefaultDatabaseContext(DatabaseConfiguration(Configuration.dbProperties).dataSource())
                 }
                 single { defaultHttpClient() }

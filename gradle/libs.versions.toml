@@ -11,7 +11,7 @@ jackson = "2.16.1"
 microutils = "3.0.5"
 tokenSupport = "3.2.0"
 kotliquery = "1.9.0"
-flywaydb = "9.22.3"
+flywaydb = "10.13.0"
 hikari = "5.1.0"
 postgresql = "42.7.1"
 digipostSignatureApiClient = "7.0-RC7"
@@ -41,7 +41,7 @@ kotlin-logging = { module = "io.github.microutils:kotlin-logging", version.ref =
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flywaydb" }
-#flyway-postgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flywaydb" }
+flyway-postgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flywaydb" }
 hikariCP = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
 kotliquery = { module = "com.github.seratch:kotliquery", version.ref = "kotliquery" }
 token-validation-ktor = { module = "no.nav.security:token-validation-ktor", version.ref = "tokenSupport" }
@@ -95,7 +95,7 @@ logging = [
 database = [
     "postgresql",
     "flyway-core",
-#    "flyway-postgresql",
+    "flyway-postgresql",
     "hikariCP",
     "kotliquery",
 ]

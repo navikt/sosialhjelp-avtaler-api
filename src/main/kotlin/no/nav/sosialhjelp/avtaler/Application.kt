@@ -66,6 +66,7 @@ fun Application.module() {
 
     setupKoin()
     setupJobs()
+
     setupRoutes()
 }
 

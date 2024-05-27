@@ -35,7 +35,7 @@ class DatabaseConfiguration(private val props: Configuration.DatabaseProperties)
                 dataSource,
             ).locations(
                 "classpath:db/migration",
-            ).validateMigrationNaming(true).sqlMigrationPrefix("V").sqlMigrationSeparator("__").sqlMigrationSuffixes(".sql").load()
+            ).load()
         flyway.validate()
         flyway.migrate()
 

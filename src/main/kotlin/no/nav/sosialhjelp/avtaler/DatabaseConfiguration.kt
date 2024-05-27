@@ -36,7 +36,9 @@ class DatabaseConfiguration(private val props: Configuration.DatabaseProperties)
             ).locations(
                 "classpath:db/migration",
             ).load()
-        flyway.validate()
+        flyway.validateWithResult().invalidMigrations.onEach {
+            log.info { "Fant invalid migration på path ${it.filepath}:\n${it.errorDetails.errorCode}:${it.errorDetails.errorMessage}." }
+        }
         flyway.migrate()
 
         return dataSource

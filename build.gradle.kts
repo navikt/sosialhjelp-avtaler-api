@@ -60,6 +60,7 @@ dependencies {
     implementation(libs.google.cloud.storage)
 
     implementation(libs.ktor.client.mock)
+    implementation(libs.apache.poi)
 
     testImplementation(libs.bundles.test)
 }

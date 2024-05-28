@@ -29,6 +29,7 @@ data class Avtale(
     val erSignert: Boolean,
     val opprettet: LocalDateTime = LocalDateTime.now(),
     val navn: String,
+    val avtalemal_uuid: UUID? = null,
 )
 
 class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
@@ -38,7 +39,7 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
             @Language("PostgreSQL")
             val sql =
                 """
-                SELECT orgnr, avtaleversjon, navn_innsender, er_signert, opprettet
+                SELECT uuid, orgnr, avtaleversjon, navn_innsender, er_signert, opprettet
                 FROM avtale_v1
                 WHERE orgnr = :orgnr
                 """.trimIndent()
@@ -64,7 +65,7 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
                 @Language("PostgreSQL")
                 var sql =
                     """
-                    SELECT orgnr, avtaleversjon, navn_innsender, er_signert, opprettet
+                    SELECT uuid, orgnr, avtaleversjon, navn_innsender, er_signert, opprettet
                     FROM avtale_v1
                     WHERE orgnr in (?)
                     """.trimIndent()
@@ -78,23 +79,35 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
             @Language("PostgreSQL")
             val sql =
                 """
-                INSERT INTO avtale_v1 (orgnr,
+                INSERT INTO avtale_v1 (uuid,
+                                        orgnr,
                                        avtaleversjon,
                                        navn_innsender,
                                        er_signert,
-                                       opprettet
+                                       opprettet,
+                                        navn,
+                                        avtalemal_uuid
                                        )
-                VALUES (:orgnr, :avtaleversjon, :navn_innsender, :er_signert, :opprettet)
-                ON CONFLICT DO NOTHING
+                VALUES (:orgnr, :avtaleversjon, :navn_innsender, :er_signert, :opprettet, :navn, :avtalemal_uuid)
+                ON CONFLICT on constraint avtale_v1_pkey do update set orgnr = :orgnr,
+                                                                    avtaleversjon = :avtaleversjon,
+                                                                    navn_innsender = :navn_innsender,
+                                                                    er_signert = :er_signert,
+                                                                    opprettet = :opprettet,
+                                                                    navn = :navn,
+                                                                    avtalemal_uuid = :avtalemal_uuid
                 """.trimIndent()
             it.update(
                 sql,
                 mapOf(
+                    "uuid" to avtale.uuid,
                     "orgnr" to avtale.orgnr,
                     "avtaleversjon" to avtale.avtaleversjon,
                     "navn_innsender" to avtale.navn_innsender,
                     "er_signert" to avtale.erSignert,
                     "opprettet" to avtale.opprettet,
+                    "navn" to avtale.navn,
+                    "avtalemal_uuid" to avtale.avtalemal_uuid,
                 ),
             ).validate()
             avtale
@@ -109,5 +122,6 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
             erSignert = row.boolean("er_signert"),
             opprettet = row.localDateTime("opprettet"),
             navn = row.string("navn"),
+            avtalemal_uuid = row.uuidOrNull("avtalemal_uuid"),
         )
 }

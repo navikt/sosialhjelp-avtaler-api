@@ -4,16 +4,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod
-import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
-import io.ktor.server.application.call
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.response.respond
 import io.ktor.server.routing.IgnoreTrailingSlash
-import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import kotlinx.coroutines.CoroutineScope
@@ -29,6 +25,8 @@ import no.nav.sosialhjelp.avtaler.HttpClientConfig.httpClient
 import no.nav.sosialhjelp.avtaler.altinn.AltinnClient
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.auth.Oauth2Client
+import no.nav.sosialhjelp.avtaler.avtalemaler.AvtalemalerService
+import no.nav.sosialhjelp.avtaler.avtalemaler.avtalemalerApi
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
@@ -102,6 +100,7 @@ private fun Application.setupKoin() {
                 singleOf(::DocumentJobService)
                 singleOf(::PersonNavnService)
                 singleOf(::AvtaleService)
+                singleOf(::AvtalemalerService)
             }
         modules(avtaleModule)
     }
@@ -154,7 +153,6 @@ fun Application.configure() {
 
 fun Application.setupRoutes() {
     installAuthentication(httpClient(engineFactory { StubEngine.tokenX() }))
-    val avtaleService by inject<AvtaleService>()
 
     routing {
         route("/sosialhjelp/avtaler-api") {
@@ -163,10 +161,7 @@ fun Application.setupRoutes() {
                 authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
                     avtaleApi()
                     kommuneApi()
-                    post("/masse-signer") {
-                        val uri = avtaleService.masseSigner(call.extractFnr())
-                        call.respond(HttpStatusCode.Created, uri)
-                    }
+                    avtalemalerApi()
                 }
             }
         }

@@ -2,7 +2,7 @@ services:
   avtaler-api:
     build: .
     ports:
-      - "9090:9090"
+      - "80:9090"
     environment:
       - POSTGRES_USERNAME=avtaler-api
       - POSTGRES_PASSWORD=passord123

@@ -24,10 +24,6 @@ class DigipostService(private val digipostClient: DigipostClient, private val da
         return digipostClient.sendTilSignering(fnr, avtale)
     }
 
-    fun sendMangeTilSignering(fnr: String): DigipostResponse {
-        return digipostClient.sendMangeTilSignering(fnr)
-    }
-
     fun erSigneringsstatusCompleted(
         jobbReference: String,
         statusUrl: URI,

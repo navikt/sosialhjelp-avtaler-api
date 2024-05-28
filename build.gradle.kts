@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     application
     alias(libs.plugins.kotlin.jvm)
@@ -12,6 +14,10 @@ ktlint {
 
 group = "no.nav.sosialhjelp"
 version = "1.0.0"
+
+tasks.named<ShadowJar>("shadowJar") {
+    mergeServiceFiles()
+}
 
 application {
     mainClass.set("no.nav.sosialhjelp.avtaler.ApplicationKt")

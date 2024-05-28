@@ -53,8 +53,8 @@ google-cloud-secretmanager = { module = "com.google.cloud:google-cloud-secretman
 google-cloud-storage = { module = "com.google.cloud:google-cloud-storage" }
 logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logbackEncoder" }
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin" }
-koin-ktor = { module = "io.insert-koin:koin-ktor"}
-koin-logging = { module = "io.insert-koin:koin-logger-slf4j"}
+koin-ktor = { module = "io.insert-koin:koin-ktor" }
+koin-logging = { module = "io.insert-koin:koin-logger-slf4j" }
 
 
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }

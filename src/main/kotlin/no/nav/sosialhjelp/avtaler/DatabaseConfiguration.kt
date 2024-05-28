@@ -30,15 +30,12 @@ class DatabaseConfiguration(private val props: Configuration.DatabaseProperties)
                 connectionTimeout = 1000
                 maxLifetime = 30001
             }
+
         val flyway =
             Flyway.configure().dataSource(
                 dataSource,
-            ).locations(
-                "classpath:db/migration",
-            ).load()
-        flyway.validateWithResult().invalidMigrations.onEach {
-            log.info { "Fant invalid migration på path ${it.filepath}:\n${it.errorDetails.errorCode}:${it.errorDetails.errorMessage}." }
-        }
+            ).validateMigrationNaming(true).load()
+        flyway.validate()
         flyway.migrate()
 
         return dataSource

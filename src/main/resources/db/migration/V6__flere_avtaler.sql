@@ -4,7 +4,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 alter table avtale_v1
     drop constraint avtale_v1_pkey,
     add column uuid uuid not null default uuid_generate_v4(),
-    add column navn text not null;
+    add column navn text;
 
 alter table digipost_jobb_data
     drop constraint digipost_jobb_data_pkey,
@@ -23,6 +23,9 @@ update digipost_jobb_data set uuid = (avtaler.uuid) from (select uuid, orgnr fro
 
 -- Sett navn på avtale_v1. Alle avtalene  i databasen på dette tidspunktet er like
 update avtale_v1 set navn = 'Avtale for tilgjengeliggjøring av sentrale stønadsopplysninger til innsynsflate NKS';
+
+alter table avtale_v1
+    alter column navn set not null;
 
 -- Legg til ny fk constraint
 alter table digipost_jobb_data

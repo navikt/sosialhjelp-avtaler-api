@@ -92,51 +92,6 @@ class DigipostClient(
         )
     }
 
-    fun sendMangeTilSignering(fnr: String): DigipostResponse {
-        val exitUrls =
-            ExitUrls.of(
-                URI.create(onCompletionUrl),
-                URI.create(onRejectionUrl),
-                URI.create(onErrorUrl),
-            )
-
-        val avtalePdf: ByteArray
-        try {
-            avtalePdf = getAvtalePdf()
-        } catch (e: NullPointerException) {
-            log.error("Kunne ikke laste inn avtale.pdf")
-            throw e
-        }
-
-        val avtaleTittel = "Avtale om påkobling til innsynsflate NKS"
-        val documents: List<DirectDocument> =
-            listOf(
-                DirectDocument.builder(avtaleTittel + " 1", avtalePdf).type(DocumentType.PDF).build(),
-                DirectDocument.builder(avtaleTittel + " 2", avtalePdf).type(DocumentType.PDF).build(),
-                DirectDocument.builder(avtaleTittel + " 3", avtalePdf).type(DocumentType.PDF).build(),
-            )
-
-        val signers: List<DirectSigner> =
-            Collections.singletonList(
-                DirectSigner
-                    .withPersonalIdentificationNumber(fnr)
-                    .build(),
-            )
-
-        val job =
-            DirectJob
-                .builder(avtaleTittel, documents, signers, exitUrls)
-                .withReference(UUID.randomUUID().toString())
-                .build()
-
-        val directJobResponse = client.create(job)
-        if (directJobResponse.singleSigner.redirectUrl == null) {
-            log.error("Kan ikke redirecte bruker til e-signering. Redirect URL fra Digipost er null.")
-            throw DigipostException("Redirect URL fra Digipost er null.")
-        }
-        return DigipostResponse(directJobResponse.singleSigner.redirectUrl, directJobResponse.statusUrl, directJobResponse.reference)
-    }
-
     fun sendTilSignering(
         fnr: String,
         avtale: DigipostAvtale,

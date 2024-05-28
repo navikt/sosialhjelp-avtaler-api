@@ -8,6 +8,7 @@ import no.nav.sosialhjelp.avtaler.store.query
 import no.nav.sosialhjelp.avtaler.store.queryList
 import no.nav.sosialhjelp.avtaler.store.update
 import org.intellij.lang.annotations.Language
+import java.io.InputStream
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -29,6 +30,7 @@ data class Avtale(
     val erSignert: Boolean,
     val opprettet: LocalDateTime = LocalDateTime.now(),
     val navn: String,
+    val usignertAvtale: InputStream? = null,
 )
 
 class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
@@ -82,9 +84,11 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
                                        avtaleversjon,
                                        navn_innsender,
                                        er_signert,
-                                       opprettet
+                                       opprettet,
+                                        navn,
+                                        usignert_avtale
                                        )
-                VALUES (:orgnr, :avtaleversjon, :navn_innsender, :er_signert, :opprettet)
+                VALUES (:orgnr, :avtaleversjon, :navn_innsender, :er_signert, :opprettet, :navn, :usignert_avtale)
                 ON CONFLICT DO NOTHING
                 """.trimIndent()
             it.update(
@@ -95,6 +99,8 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
                     "navn_innsender" to avtale.navn_innsender,
                     "er_signert" to avtale.erSignert,
                     "opprettet" to avtale.opprettet,
+                    "navn" to avtale.navn,
+                    "usignert_avtale" to avtale.usignertAvtale?.readAllBytes(),
                 ),
             ).validate()
             avtale

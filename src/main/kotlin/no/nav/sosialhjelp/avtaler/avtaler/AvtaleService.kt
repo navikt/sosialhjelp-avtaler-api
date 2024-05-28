@@ -121,14 +121,6 @@ class AvtaleService(
         return digipostResponse.redirectUrl
     }
 
-    fun masseSigner(fnr: String): URI {
-        val digipostResponse = digipostService.sendMangeTilSignering(fnr)
-
-//        lagreDigipostResponse(avtaleRequest.orgnr, digipostResponse)
-
-        return digipostResponse.redirectUrl
-    }
-
     private suspend fun lagreDigipostResponse(
         orgnr: String,
         digipostResponse: DigipostResponse,
@@ -244,6 +236,16 @@ class AvtaleService(
 
         log.info("Lagret signert avtale for ${avtale.orgnr}")
         return avtale
+    }
+
+    private suspend fun lagNyAvtale(
+        orgnr: String,
+        navn: String,
+        usignertAvtale: InputStream,
+    ): Avtale {
+        return transaction(databaseContext) { ctx ->
+            ctx.avtaleStore.lagreAvtale(Avtale(UUID.randomUUID(), orgnr, "1", "null", false, navn = navn, usignertAvtale = usignertAvtale))
+        }
     }
 
     companion object {

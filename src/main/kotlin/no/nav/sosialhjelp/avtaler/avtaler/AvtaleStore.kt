@@ -25,7 +25,7 @@ data class Avtale(
     val uuid: UUID,
     val orgnr: String,
     val avtaleversjon: String? = null,
-    val navn_innsender: String,
+    val navn_innsender: String? = null,
     val erSignert: Boolean,
     val opprettet: LocalDateTime = LocalDateTime.now(),
     val navn: String,

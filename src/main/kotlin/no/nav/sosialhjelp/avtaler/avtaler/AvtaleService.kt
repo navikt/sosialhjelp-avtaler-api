@@ -51,7 +51,7 @@ class AvtaleService(
                     navn = avgiver.navn,
                     avtaler =
                         avtalerByOrgnr[avgiver.orgnr]?.map {
-                            AvtaleResponse(it.uuid, it.navn_innsender, it.avtaleversjon, it.opprettet, erSignert = it.erSignert)
+                            AvtaleResponse(it.uuid, it.navn, it.navn_innsender, it.avtaleversjon, it.opprettet, it.erSignert)
                         } ?: emptyList(),
                 )
             }
@@ -86,6 +86,7 @@ class AvtaleService(
                 avtaleversjon = it.avtaleversjon,
                 opprettet = it.opprettet,
                 navn = it.navn,
+                navnInnsender = it.navn_innsender,
             )
         }
     }
@@ -169,6 +170,7 @@ class AvtaleService(
             avtaleversjon = signertAvtale.avtaleversjon,
             opprettet = signertAvtale.opprettet,
             navn = signertAvtale.navn,
+            navnInnsender = signertAvtale.navn_innsender,
         )
     }
 

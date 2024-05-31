@@ -51,7 +51,7 @@ class AvtaleService(
                     navn = avgiver.navn,
                     avtaler =
                         avtalerByOrgnr[avgiver.orgnr]?.map {
-                            AvtaleResponse(it.uuid, it.navn_innsender, it.avtaleversjon, it.opprettet)
+                            AvtaleResponse(it.uuid, it.navn_innsender, it.avtaleversjon, it.opprettet, erSignert = it.erSignert)
                         } ?: emptyList(),
                 )
             }

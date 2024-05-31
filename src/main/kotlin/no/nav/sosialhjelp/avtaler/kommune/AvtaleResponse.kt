@@ -8,6 +8,7 @@ data class AvtaleResponse(
     val navn: String,
     val avtaleversjon: String? = null,
     val opprettet: LocalDateTime? = null,
+    val erSignert: Boolean = false,
 )
 
 data class KommuneResponse(

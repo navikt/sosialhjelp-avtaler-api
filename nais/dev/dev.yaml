@@ -68,8 +68,5 @@ spec:
       memory: 512Mi
   secureLogs:
     enabled: true
-  env:
-    - name: APP_ENV
-      value: dev
   envFrom:
     - secret: digisos-slack-hook

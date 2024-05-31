@@ -27,7 +27,7 @@ import java.util.UUID
 
 data class AvtalemalMetadata(val name: String)
 
-val objectMapper = ObjectMapper().registerKotlinModule()
+private val objectMapper = ObjectMapper().registerKotlinModule()
 
 data class AvtalemalDto(
     val uuid: UUID,

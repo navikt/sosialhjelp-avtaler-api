@@ -10,6 +10,7 @@ import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.server.request.path
 import io.ktor.server.routing.IgnoreTrailingSlash
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
@@ -150,7 +151,11 @@ fun Application.configure() {
         }
     }
     install(IgnoreTrailingSlash)
-    install(CallLogging)
+    install(CallLogging) {
+        this.filter {
+            !it.request.path().contains("/internal")
+        }
+    }
 }
 
 fun Application.setupRoutes() {

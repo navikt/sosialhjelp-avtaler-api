@@ -9,20 +9,19 @@ import no.nav.sosialhjelp.avtaler.store.queryList
 import no.nav.sosialhjelp.avtaler.store.update
 import org.intellij.lang.annotations.Language
 import java.net.URI
+import java.util.UUID
 
 interface DigipostJobbDataStore : Store {
     fun lagreDigipostResponse(digipostJobbData: DigipostJobbData): DigipostJobbData
 
-    fun hentDigipostJobb(orgnr: String): DigipostJobbData?
+    fun hentDigipostJobb(uuid: UUID): DigipostJobbData?
 
     fun oppdaterDigipostJobbData(digipostJobbData: DigipostJobbData): DigipostJobbData
 
     fun hentAlleUtenLagretDokument(): List<DigipostJobbData>
-
-    fun hentAlle(): List<DigipostJobbData>
 }
 
-class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) : DigipostJobbDataStore, TransactionalStore(sessionFactory) {
+class DigipostJobbDataStorePostgres(sessionFactory: () -> Session) : DigipostJobbDataStore, TransactionalStore(sessionFactory) {
     override fun lagreDigipostResponse(digipostJobbData: DigipostJobbData): DigipostJobbData =
         session {
             @Language("PostgreSQL")
@@ -41,7 +40,7 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
             it.update(
                 sql,
                 mapOf(
-                    "orgnr" to digipostJobbData.orgnr,
+                    "uuid" to digipostJobbData.uuid,
                     "direct_job_reference" to digipostJobbData.directJobReference,
                     "status_url" to digipostJobbData.statusUrl.toString(),
                     "status_query_token" to digipostJobbData.statusQueryToken,
@@ -51,16 +50,16 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
             digipostJobbData
         }
 
-    override fun hentDigipostJobb(orgnr: String): DigipostJobbData? =
+    override fun hentDigipostJobb(uuid: UUID): DigipostJobbData? =
         session {
             @Language("PostgreSQL")
             val sql =
                 """
                 SELECT * 
                 FROM digipost_jobb_data 
-                WHERE orgnr = :orgnr
+                WHERE uuid = :uuid
                 """.trimIndent()
-            it.query(sql, mapOf("orgnr" to orgnr), ::mapper)
+            it.query(sql, mapOf("uuid" to uuid), ::mapper)
         }
 
     override fun oppdaterDigipostJobbData(digipostJobbData: DigipostJobbData): DigipostJobbData =
@@ -70,12 +69,12 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
                 """
                 UPDATE digipost_jobb_data 
                 SET status_query_token = :status_query_token, signert_dokument = :signert_dokument
-                WHERE orgnr = :orgnr
+                WHERE uuid = :uuid
                 """.trimIndent()
             it.update(
                 sql,
                 mapOf(
-                    "orgnr" to digipostJobbData.orgnr,
+                    "orgnr" to digipostJobbData.uuid,
                     "status_query_token" to digipostJobbData.statusQueryToken,
                     "signert_dokument" to digipostJobbData.signertDokument,
                 ),
@@ -95,21 +94,9 @@ class DigipostJobbDataStorePostgres(private val sessionFactory: () -> Session) :
             it.queryList(sql, mapOf(), ::mapper)
         }
 
-    override fun hentAlle(): List<DigipostJobbData> =
-        session {
-            @Language("PostgreSQL")
-            val sql =
-                """
-                SELECT * 
-                FROM digipost_jobb_data 
-                WHERE signert_dokument IS NOT NULL
-                """.trimIndent()
-            it.queryList(sql, mapOf(), ::mapper)
-        }
-
     private fun mapper(row: Row): DigipostJobbData =
         DigipostJobbData(
-            orgnr = row.string("orgnr"),
+            uuid = row.uuid("uuid"),
             directJobReference = row.string("direct_job_reference"),
             statusUrl = URI(row.string("status_url")),
             statusQueryToken = row.stringOrNull("status_query_token"),

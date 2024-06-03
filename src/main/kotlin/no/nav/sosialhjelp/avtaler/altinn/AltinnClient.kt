@@ -1,6 +1,5 @@
 package no.nav.sosialhjelp.avtaler.altinn
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.get
@@ -26,65 +25,30 @@ class AltinnClient(props: Configuration.AltinnProperties, private val tokenClien
         tjeneste: Avgiver.Tjeneste,
         token: String?,
     ): List<Avgiver> {
-        token?.let {
-            val scopedAccessToken = tokenClient.exchangeToken(token, altinnRettigheterAudience).accessToken
-
-            val response =
-                client.get("$baseUrl/ekstern/altinn/api/serviceowner/reportees") {
-                    url {
-                        parameters.append("ForceEIAuthentication", "")
-                        parameters.append("subject", fnr)
-                        parameters.append("serviceCode", tjeneste.kode)
-                        parameters.append("serviceEdition", tjeneste.versjon.toString())
-                        parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active' and OrganizationForm eq 'KOMM'")
-                        parameters.append("\$top", "200")
-                        header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
-                    }
-                }
-            sikkerLog.info { "Hentet avgivere med url: ${response.request.url}" }
-            if (response.status == HttpStatusCode.OK) {
-                return response.body() ?: emptyList()
-            }
-            log.warn { "Kunne ikke hente avgivere, status: ${response.status}" }
+        if (token == null) {
+            log.warn("Ingen access token i request, kan ikke hente ny token til altinn-proxy")
             return emptyList()
         }
-        log.warn("Ingen access token i request, kan ikke hente ny token til altinn-proxy")
-        return emptyList()
-    }
 
-    suspend fun hentRettigheter(
-        fnr: String,
-        orgnr: String,
-    ): Set<Avgiver.Tjeneste> {
+        val scopedAccessToken = tokenClient.exchangeToken(token, altinnRettigheterAudience).accessToken
+
         val response =
-            client.get("$baseUrl/ekstern/altinn/api/serviceowner/authorization/rights") {
+            client.get("$baseUrl/ekstern/altinn/api/serviceowner/reportees") {
                 url {
-                    parameters.append("ForceEIAuthentication", "true")
+                    parameters.append("ForceEIAuthentication", "")
                     parameters.append("subject", fnr)
-                    parameters.append("reportee", orgnr)
-                    parameters.append("\$filter", Avgiver.Tjeneste.FILTER)
+                    parameters.append("serviceCode", tjeneste.kode)
+                    parameters.append("serviceEdition", tjeneste.versjon.toString())
+                    parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active' and OrganizationForm eq 'KOMM'")
+                    parameters.append("\$top", "200")
+                    header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
                 }
             }
-
-        sikkerLog.info { "Hentet rettigheter med url: ${response.request.url}" }
+        sikkerLog.info { "Hentet avgivere med url: ${response.request.url}" }
         if (response.status == HttpStatusCode.OK) {
-            return response.body<HentRettigheterResponse?>()?.tilSet() ?: emptySet()
+            return response.body() ?: emptyList()
         }
-        log.warn { "Kunne ikke hente rettigheter, status: ${response.status}" }
-        return emptySet()
-    }
-
-    private data class Rettighet(
-        @JsonProperty("ServiceCode") val kode: String,
-        @JsonProperty("ServiceEditionCode") val versjon: Int,
-    )
-
-    private data class HentRettigheterResponse(
-        @JsonProperty("Rights") val rettigheter: List<Rettighet>,
-    ) {
-        fun tilSet(): Set<Avgiver.Tjeneste> =
-            rettigheter.mapNotNull {
-                Avgiver.Tjeneste.fra(it.kode, it.versjon)
-            }.toSet()
+        log.warn { "Kunne ikke hente avgivere, status: ${response.status}" }
+        return emptyList()
     }
 }

@@ -1,16 +1,25 @@
 package no.nav.sosialhjelp.avtaler.digipost
 
 import no.digipost.signature.client.direct.DirectJobStatus
-import no.nav.sosialhjelp.avtaler.avtaler.Avtale
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
 import java.io.InputStream
 import java.net.URI
+import java.time.LocalDateTime
+import java.util.UUID
+
+data class DigipostAvtale(
+    val orgnr: String,
+    val avtaleversjon: String? = null,
+    val navn_innsender: String,
+    val erSignert: Boolean,
+    val opprettet: LocalDateTime = LocalDateTime.now(),
+)
 
 class DigipostService(private val digipostClient: DigipostClient, private val databaseContext: DatabaseContext) {
     fun sendTilSignering(
         fnr: String,
-        avtale: Avtale,
+        avtale: DigipostAvtale,
     ): DigipostResponse {
         return digipostClient.sendTilSignering(fnr, avtale)
     }
@@ -43,8 +52,8 @@ class DigipostService(private val digipostClient: DigipostClient, private val da
         }
     }
 
-    suspend fun hentDigipostJobb(orgnr: String): DigipostJobbData? =
+    suspend fun hentDigipostJobb(uuid: UUID): DigipostJobbData? =
         transaction(databaseContext) { ctx ->
-            ctx.digipostJobbDataStore.hentDigipostJobb(orgnr)
+            ctx.digipostJobbDataStore.hentDigipostJobb(uuid)
         }
 }

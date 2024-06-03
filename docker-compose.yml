@@ -1,0 +1,20 @@
+services:
+  avtaler-api:
+    build: .
+    ports:
+      - "80:9090"
+    environment:
+      - POSTGRES_USERNAME=avtaler-api
+      - POSTGRES_PASSWORD=passord123
+      - POSTGRES_DB=postgres
+      - POSTGRES_PORT=5432
+      - SLACK_HOOK=whatever
+      - POSTGRES_HOST=avtaler-api-db
+
+  avtaler-api-db:
+    image: "postgres"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=avtaler-api
+      - POSTGRES_PASSWORD=passord123

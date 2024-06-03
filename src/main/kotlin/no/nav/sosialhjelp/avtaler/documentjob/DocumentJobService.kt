@@ -45,12 +45,16 @@ class DocumentJobService(
             )
         }
 
-        val kommunenavn = eregClient.hentEnhetNavn(digipostJobbData.orgnr)
+        val kommunenavn = eregClient.hentEnhetNavn(avtale.orgnr)
         val blobNavn = AvtaleService.lagFilnavn(kommunenavn, avtale.opprettet)
-        val metadata = mapOf("navnInnsender" to avtale.navn_innsender, "signertTidspunkt" to avtale.opprettet.toString())
+        val metadata =
+            mapOf(
+                "navnInnsender" to (avtale.navn_innsender ?: error("Har ikke navn på innsender")),
+                "signertTidspunkt" to avtale.opprettet.toString(),
+            )
         bucketInputStream.use {
             gcpBucket.lagreBlob(blobNavn, MediaType.PDF, metadata, bucketInputStream.readAllBytes())
         }
-        log.info("Lagret signert avtale i bucket for orgnr ${avtale.orgnr}")
+        log.info("Lagret signert avtale i bucket for orgnr ${avtale.orgnr}, uuid ${avtale.uuid}")
     }
 }

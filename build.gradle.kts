@@ -1,3 +1,5 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     application
     alias(libs.plugins.kotlin.jvm)
@@ -11,7 +13,11 @@ ktlint {
 }
 
 group = "no.nav.sosialhjelp"
-version = "0.0.1"
+version = "1.0.0"
+
+tasks.named<ShadowJar>("shadowJar") {
+    mergeServiceFiles()
+}
 
 application {
     mainClass.set("no.nav.sosialhjelp.avtaler.ApplicationKt")
@@ -34,6 +40,10 @@ dependencies {
 
     implementation(libs.bundles.serialization)
 
+    implementation(platform(libs.koin.bom))
+    implementation(libs.koin.ktor)
+    implementation(libs.koin.logging)
+
     implementation(libs.bundles.logging)
 
     implementation(libs.bundles.database)
@@ -50,6 +60,7 @@ dependencies {
     implementation(libs.google.cloud.storage)
 
     implementation(libs.ktor.client.mock)
+    implementation(libs.apache.poi)
 
     testImplementation(libs.bundles.test)
 }

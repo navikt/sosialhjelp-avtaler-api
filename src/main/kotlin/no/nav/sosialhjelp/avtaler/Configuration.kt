@@ -115,7 +115,6 @@ object Configuration {
     private val config = systemProperties() overriding EnvironmentVariables() overriding resourceProperties overriding defaultProperties
 
     val profile: Profile = this["application.profile"].let { Profile.valueOf(it) }
-    val cluster: Cluster = this["application.cluster"].let { Cluster.fromNaisString(it) }
     val local: Boolean = profile == Profile.LOCAL
     val dev: Boolean = profile == Profile.DEV
     val prod: Boolean = profile == Profile.PROD

@@ -43,6 +43,7 @@ spec:
     inbound:
       rules:
         - application: sosialhjelp-avtaler-dev
+        - application: sosialhjelp-avtaler-admin-dev
         - application: curl-digipost-app
     outbound:
       external:

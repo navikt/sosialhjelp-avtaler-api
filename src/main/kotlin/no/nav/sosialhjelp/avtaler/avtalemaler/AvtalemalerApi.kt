@@ -109,6 +109,16 @@ fun Route.avtalemalerApi() {
                 val uuid = call.uuid()
                 avtalemalerService.publiser(uuid)
             }
+
+            get("/preview") {
+                val uuid = call.uuid()
+                val avtale = avtalemalerService.hentAvtalemal(uuid)
+                if (avtale?.mal == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@get
+                }
+                call.respondBytes(avtale.mal!!, ContentType.Application.Pdf)
+            }
         }
     }
 }

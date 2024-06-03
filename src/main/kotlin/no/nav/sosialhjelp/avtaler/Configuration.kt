@@ -17,6 +17,10 @@ object Configuration {
                 "TOKEN_X_WELL_KNOWN_URL" to "abc",
                 "TOKEN_X_TOKEN_ENDPOINT" to "",
                 "TOKEN_X_PRIVATE_JWK" to "",
+                "AZURE_APP_CLIENT_ID" to "",
+                "AZURE_APP_WELL_KNOWN_URL" to "",
+                "AZURE_OPENID_CONFIG_JWKS_URI" to "",
+                "AZURE_OPENID_CONFIG_ISSUER" to "",
                 "altinn.altinnUrl" to "",
                 "altinn.proxyConsumerId" to "",
                 "altinn.altinnRettigheterAudience" to "",
@@ -128,6 +132,7 @@ object Configuration {
     val eregProperties = EregProperties()
     val slackProperties = SlackProperties()
     val gcpProperties = GcpProperties()
+    val azureProperties = AzureProperties()
 
     operator fun get(key: String): String = config[Key(key, stringType)]
 
@@ -137,6 +142,14 @@ object Configuration {
         val userclaim: String = this["userclaim"],
         val privateJwk: String = this["TOKEN_X_PRIVATE_JWK"],
         val tokenXTokenEndpoint: String = this["TOKEN_X_TOKEN_ENDPOINT"],
+    )
+
+    data class AzureProperties(
+        val clientId: String = this["AZURE_APP_CLIENT_ID"],
+        val wellKnownUrl: String = this["AZURE_APP_WELL_KNOWN_URL"],
+        val userclaim: String = this["userclaim"],
+        val privateJwk: String = this["AZURE_OPENID_CONFIG_JWKS_URI"],
+        val issuer: String = this["AZURE_OPENID_CONFIG_ISSUER"],
     )
 
     enum class Profile {

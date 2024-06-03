@@ -161,6 +161,8 @@ fun Application.setupRoutes() {
                 authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
                     avtaleApi()
                     kommuneApi()
+                }
+                authenticate(if (Configuration.local) "local" else AZURE_AUTH) {
                     avtalemalerApi()
                 }
             }

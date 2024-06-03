@@ -26,6 +26,11 @@ spec:
     max: 1
   tokenx:
     enabled: true
+  azure:
+    application:
+      enabled: true
+      tenant: nav.no
+      allowAllUsers: true
   gcp:
     sqlInstances:
       - type: POSTGRES_14

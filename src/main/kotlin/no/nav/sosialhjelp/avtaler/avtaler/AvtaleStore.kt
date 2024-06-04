@@ -19,6 +19,13 @@ interface AvtaleStore : Store {
     fun hentAvtalerForOrganisasjoner(orgnr: List<String>): List<Avtale>
 
     fun lagreAvtale(avtale: Avtale): Avtale
+
+    fun lagreAvtaleDokument(
+        uuid: UUID,
+        dokument: ByteArray,
+    )
+
+    fun hentAvtaleDokument(uuid: UUID): ByteArray?
 }
 
 data class Avtale(
@@ -39,7 +46,15 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
             @Language("PostgreSQL")
             val sql =
                 """
-                SELECT *
+                SELECT 
+                    uuid,
+                    orgnr,
+                    avtaleversjon,
+                    navn_innsender,
+                    er_signert,
+                    opprettet,
+                    navn,
+                    avtalemal_uuid
                 FROM avtale_v1
                 WHERE orgnr = :orgnr
                 """.trimIndent()
@@ -51,7 +66,16 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
             @Language("PostgreSQL")
             val sql =
                 """
-                SELECT * from postgres.public.avtale_v1
+                SELECT 
+                    uuid,
+                    orgnr,
+                    avtaleversjon,
+                    navn_innsender,
+                    er_signert,
+                    opprettet,
+                    navn,
+                    avtalemal_uuid
+                from postgres.public.avtale_v1
                 where uuid = :uuid
                 """.trimIndent()
             session.query(sql, mapOf("uuid" to uuid), ::mapper)
@@ -65,7 +89,15 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
                 @Language("PostgreSQL")
                 var sql =
                     """
-                    SELECT *
+                    SELECT 
+                        uuid,
+                        orgnr,
+                        avtaleversjon,
+                        navn_innsender,
+                        er_signert,
+                        opprettet,
+                        navn,
+                        avtalemal_uuid
                     FROM avtale_v1
                     WHERE orgnr in (?)
                     """.trimIndent()
@@ -79,7 +111,8 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
             @Language("PostgreSQL")
             val sql =
                 """
-                INSERT INTO avtale_v1 (uuid,
+                INSERT INTO avtale_v1 (
+                                        uuid,
                                         orgnr,
                                        avtaleversjon,
                                        navn_innsender,
@@ -88,7 +121,7 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
                                         navn,
                                         avtalemal_uuid
                                        )
-                VALUES (:orgnr, :avtaleversjon, :navn_innsender, :er_signert, :opprettet, :navn, :avtalemal_uuid)
+                VALUES (:uuid, :orgnr, :avtaleversjon, :navn_innsender, :er_signert, :opprettet, :navn, :avtalemal_uuid)
                 ON CONFLICT on constraint avtale_v1_pkey do update set orgnr = :orgnr,
                                                                     avtaleversjon = :avtaleversjon,
                                                                     navn_innsender = :navn_innsender,
@@ -111,6 +144,28 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
                 ),
             ).validate()
             avtale
+        }
+
+    override fun lagreAvtaleDokument(
+        uuid: UUID,
+        dokument: ByteArray,
+    ) = session {
+        @Language("PostgreSQL")
+        val sql =
+            """
+            update avtale_v1 set avtale = :dokument where uuid = :uuid
+            """.trimIndent()
+        it.update(sql, mapOf("dokument" to dokument, "uuid" to uuid)).validate()
+    }
+
+    override fun hentAvtaleDokument(uuid: UUID): ByteArray? =
+        session {
+            @Language("PostgreSQL")
+            val sql =
+                """
+                select avtale from avtale_v1 where uuid = :uuid
+                """.trimIndent()
+            it.query(sql, mapOf("uuid" to uuid)) { row -> row.bytesOrNull("avtale") }
         }
 
     private fun mapper(row: Row): Avtale =

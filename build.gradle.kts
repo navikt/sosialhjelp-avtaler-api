@@ -59,8 +59,10 @@ dependencies {
 
     implementation(libs.google.cloud.storage)
 
+//    implementation(libs.log4j.core)
+
     implementation(libs.ktor.client.mock)
-    implementation(libs.apache.poi)
+    implementation(libs.bundles.apache.poi)
 
     testImplementation(libs.bundles.test)
 }

@@ -22,6 +22,7 @@ import no.nav.sosialhjelp.avtaler.exceptions.VirsomhetsertifikatException
 import no.nav.sosialhjelp.avtaler.secretmanager.DigisosKeyStoreCredentials
 import no.nav.sosialhjelp.avtaler.secretmanager.SecretManager
 import java.io.ByteArrayInputStream
+import java.io.InputStream
 import java.net.URI
 import java.util.Collections
 import java.util.UUID
@@ -32,11 +33,30 @@ private val log = KotlinLogging.logger {}
 
 data class DigipostResponse(val redirectUrl: URI, val signerUrl: URI, val reference: String)
 
-class DigipostClient(
+interface DigipostClient {
+    fun sendTilSignering(
+        fnr: String,
+        avtale: DigipostAvtale,
+    ): DigipostResponse
+
+    fun sjekkSigneringsstatus(
+        directJobReference: String,
+        statusUrl: URI,
+        statusQueryToken: String,
+    ): DirectJobStatus
+
+    fun hentSignertAvtale(
+        statusQueryToken: String,
+        jobReference: String,
+        statusUrl: URI,
+    ): ResponseInputStream?
+}
+
+class DigipostClientImpl(
     props: Configuration.DigipostProperties,
     virksomhetProps: Configuration.VirksomhetssertifikatProperties,
     profile: Configuration.Profile,
-) {
+) : DigipostClient {
     private val accessSecretVersion: SecretManager = SecretManager
     private val onCompletionUrl = props.onCompletionUrl
     private val onErrorUrl = props.onErrorUrl
@@ -92,7 +112,7 @@ class DigipostClient(
         )
     }
 
-    fun sendTilSignering(
+    override fun sendTilSignering(
         fnr: String,
         avtale: DigipostAvtale,
     ): DigipostResponse {
@@ -138,7 +158,7 @@ class DigipostClient(
         return DigipostResponse(directJobResponse.singleSigner.redirectUrl, directJobResponse.statusUrl, directJobResponse.reference)
     }
 
-    fun sjekkSigneringsstatus(
+    override fun sjekkSigneringsstatus(
         directJobReference: String,
         statusUrl: URI,
         statusQueryToken: String,
@@ -152,7 +172,7 @@ class DigipostClient(
         return directJobStatusResponse.status
     }
 
-    fun hentSignertAvtale(
+    override fun hentSignertAvtale(
         statusQueryToken: String,
         jobReference: String,
         statusUrl: URI,
@@ -165,5 +185,30 @@ class DigipostClient(
 
     private fun getAvtalePdf(): ByteArray {
         return this::class.java.getResource("/avtaler/Avtale.pdf")!!.openStream().readAllBytes()
+    }
+}
+
+class DigipostClientLocal : DigipostClient {
+    override fun sendTilSignering(
+        fnr: String,
+        avtale: DigipostAvtale,
+    ): DigipostResponse {
+        return DigipostResponse(URI.create("http://localhost:8080"), URI.create("http://localhost:8080"), "1234")
+    }
+
+    override fun sjekkSigneringsstatus(
+        directJobReference: String,
+        statusUrl: URI,
+        statusQueryToken: String,
+    ): DirectJobStatus {
+        return DirectJobStatus.COMPLETED_SUCCESSFULLY
+    }
+
+    override fun hentSignertAvtale(
+        statusQueryToken: String,
+        jobReference: String,
+        statusUrl: URI,
+    ): ResponseInputStream? {
+        return ResponseInputStream(InputStream.nullInputStream(), 1L)
     }
 }

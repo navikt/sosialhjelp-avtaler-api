@@ -21,23 +21,31 @@ import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import no.nav.sosialhjelp.avtaler.gotenberg.GotenbergClient
 import org.koin.ktor.ext.inject
+import java.io.ByteArrayOutputStream
+import java.time.LocalDate
 import java.time.OffsetDateTime
+import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-data class AvtalemalMetadata(val name: String)
+data class AvtalemalMetadata(val name: String, val replacementMap: Map<String, String> = emptyMap())
 
 private val objectMapper = ObjectMapper().registerKotlinModule()
 
 data class AvtalemalDto(
     val uuid: UUID,
     val navn: String,
-    val dokumentUrl: String,
     val publisert: OffsetDateTime?,
+    val dokumentUrl: String = "/sosialhjelp/avtaler-api/api/avtalemal/$uuid/dokument",
+    val previewUrl: String = "/sosialhjelp/avtaler-api/api/avtalemal/$uuid/preview",
+    val replacementMap: Map<String, String> = emptyMap(),
 )
 
 fun Route.avtalemalerApi() {
     val avtalemalerService by inject<AvtalemalerService>()
+    val injectionService by inject<InjectionService>()
+    val gotenbergClient by inject<GotenbergClient>()
 
     route("/avtalemal") {
         get {
@@ -56,10 +64,6 @@ fun Route.avtalemalerApi() {
                                 avtale.mal = part.streamProvider().readAllBytes()
                             }
 
-                            "metadata" -> {
-                                avtale.navn = objectMapper.readValue<AvtalemalMetadata>(part.streamProvider()).name
-                            }
-
                             else -> "Ukjent filnavn: ${part.name}"
                         }
                     }
@@ -68,21 +72,24 @@ fun Route.avtalemalerApi() {
                         if (part.name == "metadata") {
                             val metadata = objectMapper.readValue<AvtalemalMetadata>(part.value)
                             avtale.navn = metadata.name
+                            avtale.replacementMap = metadata.replacementMap.mapValues { Replacement.valueOf(it.value) }
                         }
                     }
 
                     else -> {
-                        println("Ukjent part: ${part.name}")
+                        log.warn { "Ukjent part: ${part.name}" }
                     }
                 }
                 part.dispose()
             }
-
+            if (!avtale.isInitialized()) {
+                call.respond(HttpStatusCode.BadRequest, "Mangler dokument og/eller navn")
+                return@post
+            }
             avtalemalerService.lagreAvtalemal(avtale).let {
                 call.respond(HttpStatusCode.Created, it.toDto())
             }
         }
-
         route("/{uuid}") {
             delete {
                 val uuid = call.uuid()
@@ -99,25 +106,53 @@ fun Route.avtalemalerApi() {
                 }
                 call.response.header(
                     HttpHeaders.ContentDisposition,
-                    ContentDisposition.Attachment.withParameter(ContentDisposition.Parameters.FileName, "${avtale.navn}.pdf")
+                    ContentDisposition.Attachment.withParameter(ContentDisposition.Parameters.FileName, "${avtale.navn}.docx")
                         .toString(),
                 )
-                call.respondBytes(avtale.mal!!, ContentType.Application.Pdf)
+                call.respondBytes(avtale.mal, ContentType.Application.Docx)
             }
 
             post("/publiser") {
                 val uuid = call.uuid()
                 avtalemalerService.publiser(uuid)
+                call.respond(HttpStatusCode.OK)
             }
 
             get("/preview") {
                 val uuid = call.uuid()
-                val avtale = avtalemalerService.hentAvtalemal(uuid)
-                if (avtale?.mal == null) {
-                    call.respond(HttpStatusCode.NotFound)
+                val avtalemal = avtalemalerService.hentAvtalemal(uuid)
+                if (avtalemal == null) {
+                    call.respond(HttpStatusCode.NotFound, "{ \"message\": \"Fant ingen opplastet dokument på avtalemal med uuid $uuid\" }")
                     return@get
                 }
-                call.respondBytes(avtale.mal!!, ContentType.Application.Pdf)
+                val replacements =
+                    avtalemal.replacementMap.mapValues {
+                        when (it.value) {
+                            Replacement.KOMMUNENAVN -> "Oslo kommune"
+                            Replacement.KOMMUNEORGNR -> "12345789"
+                            Replacement.DATO -> LocalDate.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
+                        }
+                    }
+
+                val converted =
+                    ByteArrayOutputStream().use {
+                        injectionService.injectReplacements(replacements, avtalemal.mal.inputStream(), it)
+
+                        gotenbergClient.convertToPdf("${avtalemal.navn}_preview.docx", it.toByteArray())
+                    }
+
+                if (converted == null) {
+                    log.error { "Klarte ikke å konvertere dokumentet til PDF" }
+                    call.respond(HttpStatusCode.InternalServerError, "{ \"message\": \"Kunne ikke konvertere dokumentet til PDF\" }")
+                    return@get
+                }
+
+                call.response.header(
+                    HttpHeaders.ContentDisposition,
+                    ContentDisposition.Attachment.withParameter(ContentDisposition.Parameters.FileName, "${avtalemal.navn}_preview.pdf")
+                        .toString(),
+                )
+                call.respondBytes(converted, ContentType.Application.Pdf, HttpStatusCode.OK)
             }
         }
     }
@@ -128,4 +163,4 @@ private fun ApplicationCall.uuid(): UUID =
         "Mangler uuid i URL"
     }
 
-fun Avtalemal.toDto() = AvtalemalDto(uuid, requireNotNull(navn), "/sosialhjelp/avtaler-api/api/avtalemal/$uuid/dokument", publisert)
+fun Avtalemal.toDto() = AvtalemalDto(uuid, navn, publisert, replacementMap = replacementMap.mapValues { it.value.name })

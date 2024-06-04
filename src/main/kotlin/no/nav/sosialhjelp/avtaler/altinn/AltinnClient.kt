@@ -15,12 +15,30 @@ import no.nav.sosialhjelp.avtaler.defaultHttpClientWithJsonHeaders
 private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
-class AltinnClient(props: Configuration.AltinnProperties, private val tokenClient: Oauth2Client) {
+interface AltinnClient {
+    suspend fun hentAvgivere(
+        fnr: String,
+        tjeneste: Avgiver.Tjeneste,
+        token: String?,
+    ): List<Avgiver>
+}
+
+class AltinnClientLocal : AltinnClient {
+    override suspend fun hentAvgivere(
+        fnr: String,
+        tjeneste: Avgiver.Tjeneste,
+        token: String?,
+    ): List<Avgiver> {
+        return listOf(Avgiver("Oslo kommune", "12345789", "KOMM"))
+    }
+}
+
+class AltinnClientImpl(props: Configuration.AltinnProperties, private val tokenClient: Oauth2Client) : AltinnClient {
     private val client: HttpClient = defaultHttpClientWithJsonHeaders()
     private val baseUrl = props.baseUrl
     private val altinnRettigheterAudience = props.altinnRettigheterAudience
 
-    suspend fun hentAvgivere(
+    override suspend fun hentAvgivere(
         fnr: String,
         tjeneste: Avgiver.Tjeneste,
         token: String?,

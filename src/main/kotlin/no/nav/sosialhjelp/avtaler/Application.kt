@@ -25,20 +25,29 @@ import mu.KotlinLogging
 import no.nav.security.token.support.client.core.ClientAuthenticationProperties
 import no.nav.sosialhjelp.avtaler.HttpClientConfig.httpClient
 import no.nav.sosialhjelp.avtaler.altinn.AltinnClient
+import no.nav.sosialhjelp.avtaler.altinn.AltinnClientImpl
+import no.nav.sosialhjelp.avtaler.altinn.AltinnClientLocal
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.auth.Oauth2Client
+import no.nav.sosialhjelp.avtaler.auth.Oauth2ClientImpl
+import no.nav.sosialhjelp.avtaler.auth.Oauth2ClientLocal
 import no.nav.sosialhjelp.avtaler.avtalemaler.AvtalemalerService
+import no.nav.sosialhjelp.avtaler.avtalemaler.InjectionService
 import no.nav.sosialhjelp.avtaler.avtalemaler.avtalemalerApi
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.DefaultDatabaseContext
 import no.nav.sosialhjelp.avtaler.digipost.DigipostClient
+import no.nav.sosialhjelp.avtaler.digipost.DigipostClientImpl
+import no.nav.sosialhjelp.avtaler.digipost.DigipostClientLocal
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.documentjob.DocumentJobService
 import no.nav.sosialhjelp.avtaler.ereg.EregClient
 import no.nav.sosialhjelp.avtaler.gcpbucket.GcpBucket
+import no.nav.sosialhjelp.avtaler.gotenberg.GotenbergClient
 import no.nav.sosialhjelp.avtaler.internal.internalRoutes
+import no.nav.sosialhjelp.avtaler.kommune.KommuneService
 import no.nav.sosialhjelp.avtaler.kommune.kommuneApi
 import no.nav.sosialhjelp.avtaler.pdl.PdlClient
 import no.nav.sosialhjelp.avtaler.pdl.PersonNavnService
@@ -73,6 +82,26 @@ fun Application.module() {
 private fun Application.setupKoin() {
     install(Koin) {
         slf4jLogger()
+        val externalServices =
+            if (Configuration.local) {
+                module {
+                    single<DigipostClient> { DigipostClientLocal() }
+                    single<Oauth2Client> { Oauth2ClientLocal() }
+                    single<AltinnClient> { AltinnClientLocal() }
+                }
+            } else {
+                module {
+                    single<DigipostClient> {
+                        DigipostClientImpl(
+                            Configuration.digipostProperties,
+                            Configuration.virksomhetssertifikatProperties,
+                            Configuration.profile,
+                        )
+                    }
+                    single<Oauth2Client> { Oauth2ClientImpl(get(), get(), Configuration.tokenXProperties) }
+                    single<AltinnClient> { AltinnClientImpl(Configuration.altinnProperties, get()) }
+                }
+            }
         val avtaleModule =
             module {
                 single<DatabaseContext>(createdAtStart = true) {
@@ -86,29 +115,29 @@ private fun Application.setupKoin() {
                         .clientAuthMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
                         .build()
                 }
-                single { Oauth2Client(get(), get(), Configuration.tokenXProperties) }
-                single { AltinnService(AltinnClient(Configuration.altinnProperties, get())) }
-                single {
-                    DigipostClient(
-                        Configuration.digipostProperties,
-                        Configuration.virksomhetssertifikatProperties,
-                        Configuration.profile,
-                    )
-                }
+
                 single { GcpBucket(Configuration.gcpProperties.bucketName) }
                 single { EregClient(Configuration.eregProperties) }
                 single { PdlClient(Configuration.pdlProperties, get()) }
+                single { GotenbergClient(get(), Configuration.gotenbergProperties.url) }
+
+                singleOf(::AltinnService)
+                singleOf(::KommuneService)
+                singleOf(::InjectionService)
                 singleOf(::DigipostService)
                 singleOf(::DocumentJobService)
                 singleOf(::PersonNavnService)
                 singleOf(::AvtaleService)
                 singleOf(::AvtalemalerService)
             }
-        modules(avtaleModule)
+        modules(externalServices, avtaleModule)
     }
 }
 
 private fun Application.setupJobs() {
+    if (Configuration.profile == Configuration.Profile.LOCAL) {
+        return
+    }
     val avtaleService by inject<AvtaleService>()
     val documentJobService by inject<DocumentJobService>()
     log.info("Setter opp oppryddingsjobb")
@@ -130,7 +159,7 @@ private fun Application.setupJobs() {
             val resultat =
                 documentJobService.lastNedOgLagreAvtale(
                     digipostJobbData,
-                    avtaleService.hentAvtale(digipostJobbData.uuid) ?: return@forEach,
+                    avtaleService.checkAvtaleBelongsToUser(digipostJobbData.uuid) ?: return@forEach,
                 )
             resultat.fold({
                 log.info("Fikk lagret avtale med uuid ${digipostJobbData.uuid} i batch-jobb")
@@ -152,7 +181,7 @@ fun Application.configure() {
     }
     install(IgnoreTrailingSlash)
     install(CallLogging) {
-        this.filter {
+        filter {
             !it.request.path().contains("/internal")
         }
     }

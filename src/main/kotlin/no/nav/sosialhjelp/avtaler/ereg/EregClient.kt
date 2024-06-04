@@ -10,6 +10,8 @@ class EregClient(props: Configuration.EregProperties) {
     private val client: HttpClient = defaultHttpClientWithJsonHeaders()
     private val baseUrl = props.baseUrl
 
+    suspend fun hentKommuner(): List<EnhetResponse> = client.get("$baseUrl/v2/organisasjon/").body()
+
     suspend fun hentEnhetNavn(orgnr: String): String = client.get("$baseUrl/v2/organisasjon/$orgnr").body<EnhetResponse>().navn.navnelinje1
 }
 

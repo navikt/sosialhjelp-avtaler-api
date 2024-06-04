@@ -1,12 +1,17 @@
 package no.nav.sosialhjelp.avtaler.avtaler
 
+import io.ktor.http.ContentDisposition
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.auth.HttpAuthHeader
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.auth.parseAuthorizationHeader
 import io.ktor.server.request.receive
+import io.ktor.server.response.header
 import io.ktor.server.response.respond
+import io.ktor.server.response.respondBytes
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -26,20 +31,65 @@ fun Route.avtaleApi() {
     val personNavnService by inject<PersonNavnService>()
 
     route("/avtale") {
-        get("/{uuid}") {
-            val uuid = call.uuid()
-            val avtale =
-                avtaleService.hentAvtale(
+        get {
+            val kommuner =
+                avtaleService.hentKommuner(
                     fnr = call.extractFnr(),
-                    uuid = uuid,
                     tjeneste = Avgiver.Tjeneste.AVTALESIGNERING,
-                    token = this.context.getAccessToken(),
+                    this.context.getAccessToken(),
                 )
-            if (avtale == null) {
-                call.response.status(HttpStatusCode.NotFound)
-                return@get
+            call.respond(HttpStatusCode.OK, kommuner)
+        }
+        route("/{uuid}") {
+            get {
+                val uuid = call.uuid()
+                val avtale =
+                    avtaleService.hentAvtale(
+                        fnr = call.extractFnr(),
+                        uuid = uuid,
+                        tjeneste = Avgiver.Tjeneste.AVTALESIGNERING,
+                        token = this.context.getAccessToken(),
+                    )
+                if (avtale == null) {
+                    call.response.status(HttpStatusCode.NotFound)
+                    return@get
+                }
+                call.respond(HttpStatusCode.OK, avtale)
             }
-            call.respond(HttpStatusCode.OK, avtale)
+
+            get("/avtale") {
+                val uuid = call.uuid()
+                val avtale =
+                    avtaleService.hentAvtale(
+                        call.extractFnr(),
+                        uuid,
+                        Avgiver.Tjeneste.AVTALESIGNERING,
+                        this.context.getAccessToken(),
+                    )
+                if (avtale == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@get
+                }
+                val avtaleDokument =
+                    avtaleService.hentAvtaleDokument(
+                        call.extractFnr(),
+                        uuid,
+                        Avgiver.Tjeneste.AVTALESIGNERING,
+                        this.context.getAccessToken(),
+                    )
+
+                if (avtaleDokument == null) {
+                    call.response.status(HttpStatusCode.NotFound)
+                    return@get
+                }
+
+                call.response.header(
+                    HttpHeaders.ContentDisposition,
+                    ContentDisposition.Attachment.withParameter(ContentDisposition.Parameters.FileName, "${avtale.navn}.pdf")
+                        .toString(),
+                )
+                call.respondBytes(avtaleDokument, ContentType.Application.Pdf)
+            }
         }
 
         get("/signert-avtale/{uuid}") {

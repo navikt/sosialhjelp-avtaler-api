@@ -17,8 +17,6 @@ import no.nav.sosialhjelp.avtaler.pdl.PersonNavnService
 import no.nav.sosialhjelp.avtaler.slack.Slack
 import java.io.InputStream
 import java.net.URI
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.UUID
 
 private val log = KotlinLogging.logger { }
@@ -63,22 +61,50 @@ class AvtaleService(
         }
     }
 
+    suspend fun hentAvtaleDokument(
+        fnr: String,
+        uuid: UUID,
+        tjeneste: Avgiver.Tjeneste,
+        token: String?,
+    ): ByteArray? {
+        val avtale =
+            transaction(databaseContext) { ctx ->
+                ctx.avtaleStore.hentAvtale(uuid)
+            }
+        if (avtale == null) {
+            return null
+        }
+
+        avtale.checkAvtaleBelongsToUser(fnr, tjeneste, token)
+
+        return transaction(databaseContext) { ctx ->
+            ctx.avtaleStore.hentAvtaleDokument(uuid)
+        }
+    }
+
+    private suspend fun Avtale.checkAvtaleBelongsToUser(
+        fnr: String,
+        tjeneste: Avgiver.Tjeneste,
+        token: String?,
+    ) {
+        val avgivereFiltrert = hentAvgivere(fnr, tjeneste, token)
+
+        check(orgnr in avgivereFiltrert.map { it.orgnr }) {
+            "Forespurt avtale $uuid er ikke fra en kommune som er tilknyttet brukerens fnr"
+        }
+    }
+
     suspend fun hentAvtale(
         fnr: String,
         uuid: UUID,
         tjeneste: Avgiver.Tjeneste,
         token: String?,
     ): AvtaleResponse? {
-        val avgivereFiltrert = hentAvgivere(fnr, tjeneste, token)
-
         val avtale =
             transaction(databaseContext) { ctx ->
                 ctx.avtaleStore.hentAvtale(uuid)
             }
-
-        check(avtale?.orgnr in avgivereFiltrert.map { it.orgnr }) {
-            "Forespurt avtale $uuid er ikke fra en kommune som er tilknyttet brukerens fnr"
-        }
+        avtale?.checkAvtaleBelongsToUser(fnr, tjeneste, token)
 
         return avtale?.let {
             AvtaleResponse(
@@ -152,7 +178,7 @@ class AvtaleService(
             return null
         }
         digipostService.oppdaterDigipostJobbData(digipostJobbData, statusQueryToken = statusQueryToken)
-        val avtale = hentAvtale(uuid) ?: error("Finnes ikke noen avtale med uuid $uuid")
+        val avtale = checkAvtaleBelongsToUser(uuid) ?: error("Finnes ikke noen avtale med uuid $uuid")
         val signertAvtale =
             if (!erAvtaleSignert(digipostJobbData, statusQueryToken)) {
                 log.info("Avtale for orgnr ${avtale.orgnr} er ikke signert")
@@ -163,6 +189,9 @@ class AvtaleService(
             }
 
         log.info("Avtale for orgnr ${avtale.orgnr} er signert")
+        if (Configuration.dev || Configuration.prod) {
+            Slack.post("Ny avtale opprettet for orgnr=${avtale.orgnr}")
+        }
 
         documentJobService.lastNedOgLagreAvtale(digipostJobbData, signertAvtale)
         return AvtaleResponse(
@@ -222,34 +251,23 @@ class AvtaleService(
         )
     }
 
-    suspend fun hentAvtale(uuid: UUID): Avtale? =
+    suspend fun checkAvtaleBelongsToUser(uuid: UUID): Avtale? =
         transaction(databaseContext) { ctx ->
             ctx.avtaleStore.hentAvtale(uuid)
         }
 
-    private suspend fun lagreAvtale(avtale: Avtale): Avtale {
+    suspend fun lagreAvtale(
+        avtale: Avtale,
+        avtaleDokument: ByteArray? = null,
+    ): Avtale {
         transaction(databaseContext) { ctx ->
             ctx.avtaleStore.lagreAvtale(avtale)
+            if (avtaleDokument != null) {
+                ctx.avtaleStore.lagreAvtaleDokument(avtale.uuid, avtaleDokument)
+            }
         }
 
-        if (Configuration.dev || Configuration.prod) {
-            Slack.post("Ny avtale opprettet for orgnr=${avtale.orgnr}")
-        }
-
-        log.info("Lagret signert avtale for ${avtale.orgnr}")
+        log.info("Lagret ny avtale for ${avtale.orgnr} (usignert)")
         return avtale
-    }
-
-    companion object {
-        fun lagFilnavn(
-            kommunenavn: String,
-            opprettet: LocalDateTime,
-        ): String {
-            return "Avtale om innsynsflate for NAV Kontaktsenter - Digisos - ${kommunenavn.replace("/", "-")} - ${
-                opprettet.format(
-                    DateTimeFormatter.ofPattern("dd.MM.yyyy"),
-                )
-            }.pdf"
-        }
     }
 }

@@ -64,6 +64,7 @@ spec:
         - application: curl-digipost-app
         - application: altinn-rettigheter-proxy
           namespace: arbeidsgiver
+        - application: sosialhjelp-konvertering-til-pdf
   resources:
     limits:
       cpu: 400m

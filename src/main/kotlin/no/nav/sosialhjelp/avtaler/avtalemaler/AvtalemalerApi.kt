@@ -13,6 +13,7 @@ import io.ktor.http.content.streamProvider
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
 import io.ktor.server.request.receiveMultipart
+import io.ktor.server.request.receiveNullable
 import io.ktor.server.response.header
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytes
@@ -21,6 +22,7 @@ import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
+import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.gotenberg.GotenbergClient
 import org.koin.ktor.ext.inject
 import java.io.ByteArrayOutputStream
@@ -37,6 +39,7 @@ data class AvtalemalDto(
     val uuid: UUID,
     val navn: String,
     val publisert: OffsetDateTime?,
+    val publishedTo: List<String> = emptyList(),
     val dokumentUrl: String = "/sosialhjelp/avtaler-api/api/avtalemal/$uuid/dokument",
     val previewUrl: String = "/sosialhjelp/avtaler-api/api/avtalemal/$uuid/preview",
     val replacementMap: Map<String, String> = emptyMap(),
@@ -46,11 +49,13 @@ fun Route.avtalemalerApi() {
     val avtalemalerService by inject<AvtalemalerService>()
     val injectionService by inject<InjectionService>()
     val gotenbergClient by inject<GotenbergClient>()
+    val avtaleService by inject<AvtaleService>()
 
     route("/avtalemal") {
         get {
-            val avtaler = avtalemalerService.hentAvtalemaler()
-            call.respond(HttpStatusCode.OK, avtaler.map { it.toDto() })
+            val avtalemaler = avtalemalerService.hentAvtalemaler()
+            val avtaler = avtaleService.hentAvtalemalToOrgnrMap()
+            call.respond(HttpStatusCode.OK, avtalemaler.map { it.toDto(avtaler[it.uuid]) })
         }
         post {
             val multipart = call.receiveMultipart()
@@ -87,7 +92,7 @@ fun Route.avtalemalerApi() {
                 return@post
             }
             avtalemalerService.lagreAvtalemal(avtale).let {
-                call.respond(HttpStatusCode.Created, it.toDto())
+                call.respond(HttpStatusCode.Created)
             }
         }
         route("/{uuid}") {
@@ -114,7 +119,8 @@ fun Route.avtalemalerApi() {
 
             post("/publiser") {
                 val uuid = call.uuid()
-                avtalemalerService.publiser(uuid)
+                val kommuner = call.receiveNullable<List<String>>()
+                avtalemalerService.publiser(uuid, kommuner)
                 call.respond(HttpStatusCode.OK)
             }
 
@@ -163,4 +169,14 @@ private fun ApplicationCall.uuid(): UUID =
         "Mangler uuid i URL"
     }
 
-fun Avtalemal.toDto() = AvtalemalDto(uuid, navn, publisert, replacementMap = replacementMap.mapValues { it.value.name })
+fun Avtalemal.toDto(publishedOrgnrs: List<String>?) =
+    AvtalemalDto(
+        uuid,
+        navn,
+        publisert,
+        replacementMap =
+            replacementMap.mapValues {
+                it.value.name
+            },
+        publishedTo = publishedOrgnrs ?: emptyList(),
+    )

@@ -26,6 +26,8 @@ interface AvtaleStore : Store {
     )
 
     fun hentAvtaleDokument(uuid: UUID): ByteArray?
+
+    fun hentAlle(): Map<UUID, List<String>>
 }
 
 data class Avtale(
@@ -166,6 +168,20 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
                 select avtale from avtale_v1 where uuid = :uuid
                 """.trimIndent()
             it.query(sql, mapOf("uuid" to uuid)) { row -> row.bytesOrNull("avtale") }
+        }
+
+    override fun hentAlle(): Map<UUID, List<String>> =
+        session { session ->
+            @Language("PostgreSQL")
+            val sql =
+                """
+                select orgnr, avtalemal_uuid from avtale_v1
+                """.trimIndent()
+            session.queryList(sql, emptyMap()) { row ->
+                row.uuid("avtalemal_uuid") to row.string("orgnr")
+            }.groupBy { it.first }.mapValues { entry ->
+                entry.value.map { it.second }
+            }
         }
 
     private fun mapper(row: Row): Avtale =

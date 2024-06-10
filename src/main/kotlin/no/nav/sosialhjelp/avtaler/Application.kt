@@ -196,9 +196,9 @@ fun Application.setupRoutes() {
             route("/api") {
                 authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
                     avtaleApi()
-                    kommuneApi()
                 }
                 authenticate(if (Configuration.local) "local" else AZURE_AUTH) {
+                    kommuneApi()
                     avtalemalerApi()
                 }
             }

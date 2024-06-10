@@ -251,6 +251,12 @@ class AvtaleService(
         )
     }
 
+    suspend fun hentAvtalemalToOrgnrMap(): Map<UUID, List<String>> {
+        return transaction(databaseContext) { ctx ->
+            ctx.avtaleStore.hentAlle()
+        }
+    }
+
     suspend fun checkAvtaleBelongsToUser(uuid: UUID): Avtale? =
         transaction(databaseContext) { ctx ->
             ctx.avtaleStore.hentAvtale(uuid)

@@ -178,7 +178,8 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
                 select orgnr, avtalemal_uuid from avtale_v1
                 """.trimIndent()
             session.queryList(sql, emptyMap()) { row ->
-                row.uuid("avtalemal_uuid") to row.string("orgnr")
+                val uuidOrNull = row.uuidOrNull("avtalemal_uuid")
+                uuidOrNull?.let { it to row.string("orgnr") }
             }.groupBy { it.first }.mapValues { entry ->
                 entry.value.map { it.second }
             }

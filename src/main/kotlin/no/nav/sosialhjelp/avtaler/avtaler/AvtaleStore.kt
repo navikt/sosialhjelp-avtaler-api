@@ -77,7 +77,7 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
                     opprettet,
                     navn,
                     avtalemal_uuid
-                from postgres.public.avtale_v1
+                from avtale_v1
                 where uuid = :uuid
                 """.trimIndent()
             session.query(sql, mapOf("uuid" to uuid), ::mapper)

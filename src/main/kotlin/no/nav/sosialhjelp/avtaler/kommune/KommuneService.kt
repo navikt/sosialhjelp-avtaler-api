@@ -6,7 +6,9 @@ import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.http.CacheControl
 import io.ktor.http.headers
+import io.ktor.http.isSuccess
 import io.ktor.server.response.cacheControl
+import mu.KotlinLogging
 import java.time.LocalDate
 
 const val URL = "https://data.ssb.no/api/klass/v1/classifications/582"
@@ -19,9 +21,11 @@ data class Link(val self: Self)
 
 data class Self(val href: String)
 
+private val log = KotlinLogging.logger {}
+
 class KommuneService(private val httpClient: HttpClient) {
     suspend fun getAlleKommuner(): List<Kommune> {
-        val classResponse =
+        val request =
             httpClient.get(URL) {
                 headers {
                     header("Accept", "application/json")
@@ -29,7 +33,12 @@ class KommuneService(private val httpClient: HttpClient) {
                     // Caches i HttpClient i inntil én uke
                     cacheControl(CacheControl.MaxAge(60 * 60 * 24 * 7))
                 }
-            }.body<ClassificationResponse>()
+            }
+        if (!request.status.isSuccess()) {
+            log.error { "Fikk ${request.status.value} fra data.ssb.no" }
+            error("Kunne ikke hente kommuneklassifisering")
+        }
+        val classResponse = request.body<ClassificationResponse>()
 
         val currentVersion =
             classResponse.versions.find {
@@ -38,7 +47,7 @@ class KommuneService(private val httpClient: HttpClient) {
                 it.validFrom <= LocalDate.now() && it.validTo == null
             } ?: error("Fant ikke gyldig versjon av kommuneklassifisering")
         val versionUrl = currentVersion._links.self.href
-        val classicationVersionResponse =
+        val classVersionRequest =
             httpClient.get(versionUrl) {
                 headers {
                     header("Accept", "application/json")
@@ -46,8 +55,12 @@ class KommuneService(private val httpClient: HttpClient) {
                     // Caches i HttpClient i inntil én uke
                     cacheControl(CacheControl.MaxAge(60 * 60 * 24 * 7))
                 }
-            }.body<ClassicationVersionResponse>()
-        return classicationVersionResponse.classificationItems.map { Kommune(it.code, it.name) }
+            }
+        if (!classVersionRequest.status.isSuccess()) {
+            log.error { "Fikk ${request.status.value} fra $versionUrl" }
+            error("Kunne ikke hente versjon på kommuneklassifisering")
+        }
+        return classVersionRequest.body<ClassicationVersionResponse>().classificationItems.map { Kommune(it.code, it.name) }
     }
 }
 

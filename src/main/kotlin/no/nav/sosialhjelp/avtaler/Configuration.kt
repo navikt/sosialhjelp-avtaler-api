@@ -89,7 +89,7 @@ object Configuration {
                 "pdl.audience" to "dev-fss:pdl:pdl-api",
                 "gcp.bucketName" to "digisos-nks-avtaler-dev",
                 "ereg.url" to "https://ereg-services.dev-fss-pub.nais.io",
-                "gotenberg.url" to "http://konvertering-til-pdf",
+                "gotenberg.url" to "http://sosialhjelp-konvertering-til-pdf",
             ),
         )
 

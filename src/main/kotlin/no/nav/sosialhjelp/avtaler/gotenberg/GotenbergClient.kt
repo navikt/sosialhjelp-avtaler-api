@@ -22,6 +22,7 @@ class GotenbergClient(
         filename: String,
         bytes: ByteArray,
     ): ByteArray? {
+        log.info { "Konverterer $filename til pdf på url $gotenbergUrl" }
         val response =
             httpClient.submitFormWithBinaryData(
                 "$gotenbergUrl$LIBRE_OFFICE_ROUTE",
@@ -40,10 +41,11 @@ class GotenbergClient(
 
         val traceHeader = response.headers["gotenberg-trace"] ?: "[N/A]"
         if (!response.status.isSuccess()) {
-            val body = response.bodyAsText()
             log.error {
-                "Gotenberg conversion failed with status ${response.status.value} and trace $traceHeader. Response: $body"
+                "Gotenberg conversion failed with status ${response.status.value} and trace $traceHeader."
             }
+            val bodyAsText = response.bodyAsText()
+            log.error { "Gotenberg response body: $bodyAsText" }
             return null
         }
 

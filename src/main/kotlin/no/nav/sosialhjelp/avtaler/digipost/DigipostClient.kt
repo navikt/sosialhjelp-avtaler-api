@@ -18,6 +18,7 @@ import no.digipost.signature.client.direct.ExitUrls
 import no.digipost.signature.client.direct.StatusReference
 import no.digipost.signature.client.security.KeyStoreConfig
 import no.nav.sosialhjelp.avtaler.Configuration
+import no.nav.sosialhjelp.avtaler.avtaler.Avtale
 import no.nav.sosialhjelp.avtaler.exceptions.VirsomhetsertifikatException
 import no.nav.sosialhjelp.avtaler.secretmanager.DigisosKeyStoreCredentials
 import no.nav.sosialhjelp.avtaler.secretmanager.SecretManager
@@ -25,7 +26,6 @@ import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.net.URI
 import java.util.Collections
-import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
@@ -36,7 +36,9 @@ data class DigipostResponse(val redirectUrl: URI, val signerUrl: URI, val refere
 interface DigipostClient {
     fun sendTilSignering(
         fnr: String,
-        avtale: DigipostAvtale,
+        avtale: Avtale,
+        dokument: ByteArray,
+        navn: String,
     ): DigipostResponse
 
     fun sjekkSigneringsstatus(
@@ -114,27 +116,21 @@ class DigipostClientImpl(
 
     override fun sendTilSignering(
         fnr: String,
-        avtale: DigipostAvtale,
+        avtale: Avtale,
+        dokument: ByteArray,
+        navn: String,
     ): DigipostResponse {
         val exitUrls =
             ExitUrls.of(
-                URI.create(onCompletionUrl + avtale.orgnr),
-                URI.create(onRejectionUrl + avtale.orgnr),
-                URI.create(onErrorUrl + avtale.orgnr),
+                URI.create(onCompletionUrl + avtale.uuid),
+                URI.create(onRejectionUrl + avtale.uuid),
+                URI.create(onErrorUrl + avtale.uuid),
             )
 
-        val avtalePdf: ByteArray
-        try {
-            avtalePdf = getAvtalePdf()
-        } catch (e: NullPointerException) {
-            log.error("Kunne ikke laste inn avtale.pdf")
-            throw e
-        }
-
-        val avtaleTittel = "Avtale om påkobling til innsynsflate NKS"
+        val avtaleTittel = avtale.navn
         val documents: List<DirectDocument> =
             listOf(
-                DirectDocument.builder(avtaleTittel, avtalePdf).type(DocumentType.PDF).build(),
+                DirectDocument.builder(avtaleTittel, dokument).type(DocumentType.PDF).build(),
             )
 
         val signers: List<DirectSigner> =
@@ -147,7 +143,7 @@ class DigipostClientImpl(
         val job =
             DirectJob
                 .builder(avtaleTittel, documents, signers, exitUrls)
-                .withReference(UUID.randomUUID().toString())
+                .withReference(avtale.uuid)
                 .build()
 
         val directJobResponse = client.create(job)
@@ -182,16 +178,14 @@ class DigipostClientImpl(
 
         return if (directJobStatusResponse.isPAdESAvailable) client.getPAdES(directJobStatusResponse.getpAdESUrl()) else null
     }
-
-    private fun getAvtalePdf(): ByteArray {
-        return this::class.java.getResource("/avtaler/Avtale.pdf")!!.openStream().readAllBytes()
-    }
 }
 
 class DigipostClientLocal : DigipostClient {
     override fun sendTilSignering(
         fnr: String,
-        avtale: DigipostAvtale,
+        avtale: Avtale,
+        dokument: ByteArray,
+        navn: String,
     ): DigipostResponse {
         return DigipostResponse(URI.create("http://localhost:8080"), URI.create("http://localhost:8080"), "1234")
     }

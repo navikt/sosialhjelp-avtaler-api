@@ -159,7 +159,7 @@ private fun Application.setupJobs() {
             val resultat =
                 documentJobService.lastNedOgLagreAvtale(
                     digipostJobbData,
-                    avtaleService.checkAvtaleBelongsToUser(digipostJobbData.uuid) ?: return@forEach,
+                    avtaleService.hentAvtale(digipostJobbData.uuid) ?: return@forEach,
                 )
             resultat.fold({
                 log.info("Fikk lagret avtale med uuid ${digipostJobbData.uuid} i batch-jobb")

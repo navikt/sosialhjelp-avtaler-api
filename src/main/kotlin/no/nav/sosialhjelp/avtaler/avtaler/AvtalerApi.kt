@@ -18,11 +18,12 @@ import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.extractFnr
+import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
 import no.nav.sosialhjelp.avtaler.pdl.PersonNavnService
 import org.koin.ktor.ext.inject
 import java.util.UUID
 
-data class AvtaleRequest(val orgnr: String)
+data class AvtaleRequest(val uuid: UUID)
 
 data class SigneringsstatusRequest(val uuid: UUID, val token: String)
 
@@ -54,7 +55,18 @@ fun Route.avtaleApi() {
                     call.response.status(HttpStatusCode.NotFound)
                     return@get
                 }
-                call.respond(HttpStatusCode.OK, avtale)
+                call.respond(
+                    HttpStatusCode.OK,
+                    avtale.let {
+                        AvtaleResponse(
+                            uuid = it.uuid,
+                            avtaleversjon = it.avtaleversjon,
+                            opprettet = it.opprettet,
+                            navn = it.navn,
+                            navnInnsender = it.navn_innsender,
+                        )
+                    },
+                )
             }
 
             get("/avtale") {
@@ -90,6 +102,18 @@ fun Route.avtaleApi() {
                 )
                 call.respondBytes(avtaleDokument, ContentType.Application.Pdf)
             }
+            post("/signer") {
+                val uuid = call.uuid()
+                val fnr = call.extractFnr()
+                val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")
+
+                val signeringsurl = avtaleService.signerAvtale(fnr, uuid, token)
+                if (signeringsurl == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@post
+                }
+                call.respond(HttpStatusCode.Created, signeringsurl)
+            }
         }
 
         get("/signert-avtale/{uuid}") {
@@ -104,18 +128,7 @@ fun Route.avtaleApi() {
             signertAvtaleDokument.use { call.respond(HttpStatusCode.OK, it) }
         }
 
-        post("/signer") {
-            val avtaleRequest = call.receive<AvtaleRequest>()
-            val fnr = call.extractFnr()
-            val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")
-            val navnInnsender = personNavnService.getFulltNavn(fnr, token)
-
-            val signeringsurl = avtaleService.signerAvtale(fnr, avtaleRequest, navnInnsender)
-            call.respond(HttpStatusCode.Created, signeringsurl)
-        }
-
         post("/signeringsstatus") {
-            // lagre singeringsstatus i database
             val signeringsstatusRequest = call.receive<SigneringsstatusRequest>()
             val fnr = call.extractFnr()
             val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")

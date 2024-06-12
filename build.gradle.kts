@@ -52,7 +52,7 @@ dependencies {
     implementation(libs.token.client.core)
 
     implementation(libs.signature.api.client.java)
-    implementation(libs.bundles.jaxb)
+    implementation(libs.jaxb.api)
 
     implementation(platform(libs.libraries.bom))
     implementation(libs.google.cloud.secretmanager)

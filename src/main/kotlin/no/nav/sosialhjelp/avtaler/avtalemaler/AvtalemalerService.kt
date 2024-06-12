@@ -5,6 +5,7 @@ import no.nav.sosialhjelp.avtaler.avtaler.Avtale
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
+import no.nav.sosialhjelp.avtaler.gotenberg.GotenbergClient
 import no.nav.sosialhjelp.avtaler.kommune.Kommune
 import no.nav.sosialhjelp.avtaler.kommune.KommuneService
 import java.io.ByteArrayOutputStream
@@ -18,6 +19,7 @@ class AvtalemalerService(
     private val kommuneService: KommuneService,
     private val avtaleService: AvtaleService,
     private val injectionService: InjectionService,
+    private val gotenbergClient: GotenbergClient,
 ) {
     suspend fun lagreAvtalemal(avtale: Avtalemal): Avtalemal {
         return transaction(databaseContext) { ctx ->
@@ -73,6 +75,7 @@ class AvtalemalerService(
                 }
             ByteArrayOutputStream().use {
                 injectionService.injectReplacements(replacements, avtalemal.mal.inputStream(), it)
+                val converted = gotenbergClient.convertToPdf("${avtalemal.navn}_${kommune.navn}.pdf", it.toByteArray())
                 avtaleService.lagreAvtale(
                     Avtale(
                         uuid = UUID.randomUUID(),
@@ -84,7 +87,7 @@ class AvtalemalerService(
                         navn_innsender = null,
                         avtalemal_uuid = avtalemal.uuid,
                     ),
-                    it.toByteArray(),
+                    converted,
                 )
             }
         }

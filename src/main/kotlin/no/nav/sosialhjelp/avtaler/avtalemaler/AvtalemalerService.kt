@@ -50,7 +50,7 @@ class AvtalemalerService(
         val alleredePublisert = avtaleService.hentAvtalemalToOrgnrMap()[uuid]
         val alleKommuner = kommuneService.getAlleKommuner()
         val kommunerToPublish =
-            kommuner?.mapNotNull { kommune ->
+            kommuner?.takeUnless { it.isEmpty() }?.mapNotNull { kommune ->
                 alleKommuner.find { it.orgnr == kommune } ?: if (!Configuration.prod) {
                     Kommune(kommune, "Ukjent")
                 } else {

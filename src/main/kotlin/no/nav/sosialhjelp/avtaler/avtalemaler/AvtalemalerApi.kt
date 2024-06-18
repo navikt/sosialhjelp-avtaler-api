@@ -120,7 +120,7 @@ fun Route.avtalemalerApi() {
             post("/publiser") {
                 val uuid = call.uuid()
                 val kommuner = call.receiveNullable<List<String>>()
-                log.info { "Publiserer avtalemal $uuid til kommuner $kommuner"}
+                log.info { "Publiserer avtalemal $uuid til kommuner $kommuner" }
                 avtalemalerService.publiser(uuid, kommuner)
                 call.respond(HttpStatusCode.OK)
             }

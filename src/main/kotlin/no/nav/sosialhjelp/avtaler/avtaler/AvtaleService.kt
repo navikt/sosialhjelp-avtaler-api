@@ -179,7 +179,7 @@ class AvtaleService(
 
         log.info("Avtale for orgnr ${avtale.orgnr} er signert")
 
-        documentJobService.lastNedOgLagreAvtale(digipostJobbData, signertAvtale)
+        documentJobService.lastNedOgLagreAvtale(digipostJobbData.copy(statusQueryToken = statusQueryToken), signertAvtale)
         return AvtaleResponse(
             uuid = signertAvtale.uuid,
             avtaleversjon = signertAvtale.avtaleversjon,

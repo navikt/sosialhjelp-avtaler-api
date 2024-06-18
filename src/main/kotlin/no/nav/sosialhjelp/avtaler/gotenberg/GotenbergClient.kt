@@ -22,7 +22,7 @@ class GotenbergClient(
         filename: String,
         bytes: ByteArray,
     ): ByteArray? {
-        log.info { "Konverterer $filename til pdf på url $gotenbergUrl" }
+        log.info { "Konverterer $filename til pdf" }
         val response =
             httpClient.submitFormWithBinaryData(
                 "$gotenbergUrl$LIBRE_OFFICE_ROUTE",

@@ -1,5 +1,11 @@
 package no.nav.sosialhjelp.avtaler.avtalemaler
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.joinAll
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.newFixedThreadPoolContext
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
@@ -14,6 +20,8 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
+val pdfConvertContext = newFixedThreadPoolContext(10, "pdfConvert")
+
 class AvtalemalerService(
     private val databaseContext: DatabaseContext,
     private val kommuneService: KommuneService,
@@ -21,22 +29,20 @@ class AvtalemalerService(
     private val injectionService: InjectionService,
     private val gotenbergClient: GotenbergClient,
 ) {
-    suspend fun lagreAvtalemal(avtale: Avtalemal): Avtalemal {
-        return transaction(databaseContext) { ctx ->
+    suspend fun lagreAvtalemal(avtale: Avtalemal): Avtalemal =
+        transaction(databaseContext) { ctx ->
             ctx.avtalemalerStore.lagreAvtalemal(avtale)
         }
-    }
 
     suspend fun slettAvtalemal(uuid: UUID) =
         transaction(databaseContext) { ctx ->
             ctx.avtalemalerStore.slettAvtalemal(uuid)
         }
 
-    suspend fun hentAvtalemaler(): List<Avtalemal> {
-        return transaction(databaseContext) { ctx ->
+    suspend fun hentAvtalemaler(): List<Avtalemal> =
+        transaction(databaseContext) { ctx ->
             ctx.avtalemalerStore.hentAvtalemaler()
         }
-    }
 
     suspend fun hentAvtalemal(uuid: UUID): Avtalemal? =
         transaction(databaseContext) { ctx ->
@@ -64,33 +70,55 @@ class AvtalemalerService(
             } ?: return null
         val now = LocalDateTime.now()
         val nowString = now.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"))
-        kommunerToPublish.filter { it.orgnr !in (alleredePublisert ?: emptyList()) }.forEach { kommune ->
-            val replacements =
-                avtalemal.replacementMap.mapValues {
-                    when (it.value) {
-                        Replacement.KOMMUNENAVN -> kommune.navn
-                        Replacement.KOMMUNEORGNR -> kommune.orgnr
-                        Replacement.DATO -> nowString
+        val scope = CoroutineScope(Dispatchers.IO.limitedParallelism(10))
+        val pdfScope = CoroutineScope(pdfConvertContext)
+        val injected =
+            kommunerToPublish
+                .filter {
+                    it.orgnr !in (alleredePublisert ?: emptyList())
+                }.associateWith { kommune ->
+                    scope.async {
+                        val replacements =
+                            avtalemal.replacementMap.mapValues {
+                                when (it.value) {
+                                    Replacement.KOMMUNENAVN -> kommune.navn
+                                    Replacement.KOMMUNEORGNR -> kommune.orgnr
+                                    Replacement.DATO -> nowString
+                                }
+                            }
+                        ByteArrayOutputStream().use {
+                            injectionService.injectReplacements(replacements, avtalemal.mal.inputStream(), it)
+                            it.toByteArray()
+                        }
                     }
                 }
-            ByteArrayOutputStream().use {
-                injectionService.injectReplacements(replacements, avtalemal.mal.inputStream(), it)
-                val converted = gotenbergClient.convertToPdf("${avtalemal.navn}_${kommune.navn}.pdf", it.toByteArray())
-                avtaleService.lagreAvtale(
-                    Avtale(
-                        uuid = UUID.randomUUID(),
-                        orgnr = kommune.orgnr,
-                        navn = "${avtalemal.navn}_${kommune.navn}",
-                        opprettet = now,
-                        avtaleversjon = "1.0",
-                        erSignert = false,
-                        navn_innsender = null,
-                        avtalemal_uuid = avtalemal.uuid,
-                    ),
-                    converted,
-                )
+
+        val converted =
+            injected.mapValues { (_, byteArray) ->
+                pdfScope.async {
+                    gotenbergClient.convertToPdf("${avtalemal.navn}.pdf", byteArray.await())
+                }
             }
-        }
+
+        converted
+            .mapValues { (kommune, byteArray) ->
+                scope.launch {
+                    avtaleService.lagreAvtale(
+                        Avtale(
+                            uuid = UUID.randomUUID(),
+                            orgnr = kommune.orgnr,
+                            navn = "${avtalemal.navn}_${kommune.navn}",
+                            opprettet = now,
+                            avtaleversjon = "1.0",
+                            erSignert = false,
+                            navn_innsender = null,
+                            avtalemal_uuid = avtalemal.uuid,
+                        ),
+                        byteArray.await(),
+                    )
+                }
+            }.values
+            .joinAll()
 
         val updated =
             avtalemal.copy(publisert = OffsetDateTime.now()).apply {

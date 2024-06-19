@@ -21,7 +21,21 @@ interface AvtalemalerStore : Store {
     fun lagreAvtalemal(avtale: Avtalemal): Avtalemal
 
     fun slettAvtalemal(uuid: UUID)
+
+    fun lagrePubliseringsjobb(publisering: Publisering): Publisering
+
+    fun hentPubliseringer(avtalemalUuid: UUID): List<Publisering>
+
+    fun hentFeiledePubliseringer(maxRetries: Int): List<Publisering>
 }
+
+data class Publisering(
+    val uuid: UUID,
+    val orgnr: String,
+    val avtalemalUuid: UUID,
+    val retryCount: Int = 0,
+    val avtaleUuid: UUID? = null,
+)
 
 enum class Replacement {
     KOMMUNENAVN,
@@ -38,15 +52,12 @@ data class Avtalemal(
     lateinit var navn: String
 
     fun isInitialized() = this::mal.isInitialized && this::navn.isInitialized
-
-    fun copy() =
-        Avtalemal(uuid, publisert, replacementMap).let {
-            it.mal = mal
-            it.navn = navn
-        }
 }
 
-class AvtalemalerStorePostgres(sessionFactory: () -> Session) : AvtalemalerStore, TransactionalStore(sessionFactory) {
+class AvtalemalerStorePostgres(
+    sessionFactory: () -> Session,
+) : TransactionalStore(sessionFactory),
+    AvtalemalerStore {
     override fun hentAvtalemaler(): List<Avtalemal> =
         session {
             val sql =
@@ -73,20 +84,21 @@ class AvtalemalerStorePostgres(sessionFactory: () -> Session) : AvtalemalerStore
                 VALUES (:uuid, :navn, :mal, :publisert, :replacement_map::jsonb)
                 ON CONFLICT ON CONSTRAINT avtalemal_pkey DO UPDATE SET navn = :navn, mal = :mal, publisert = :publisert, replacement_map = :replacement_map::jsonb
                 """.trimIndent()
-            session.update(
-                sql,
-                mapOf(
-                    "uuid" to avtale.uuid,
-                    "navn" to avtale.navn,
-                    "mal" to avtale.mal,
-                    "publisert" to avtale.publisert,
-                    "replacement_map" to
-                        PGobject().apply {
-                            type = "jsonb"
-                            value = ObjectMapper().writeValueAsString(avtale.replacementMap.mapValues { it.value.name })
-                        },
-                ),
-            ).validate()
+            session
+                .update(
+                    sql,
+                    mapOf(
+                        "uuid" to avtale.uuid,
+                        "navn" to avtale.navn,
+                        "mal" to avtale.mal,
+                        "publisert" to avtale.publisert,
+                        "replacement_map" to
+                            PGobject().apply {
+                                type = "jsonb"
+                                value = ObjectMapper().writeValueAsString(avtale.replacementMap.mapValues { it.value.name })
+                            },
+                    ),
+                ).validate()
             avtale
         }
 
@@ -98,15 +110,75 @@ class AvtalemalerStorePostgres(sessionFactory: () -> Session) : AvtalemalerStore
                 """.trimIndent()
             it.update(sql, mapOf("uuid" to uuid)).validate()
         }
+
+    override fun lagrePubliseringsjobb(publisering: Publisering) =
+        session { session ->
+            val sql =
+                """
+                insert into publisering (uuid, orgnr, avtalemal_uuid, avtale_uuid, retry_count)
+                values (:uuid, :orgnr, :avtalemal_uuid, :avtale_uuid, :retry_count)
+                on conflict on constraint publisering_pkey do update set orgnr = :orgnr, avtalemal_uuid = :avtalemal_uuid, avtale_uuid = :avtale_uuid, retry_count = :retry_count
+                """.trimIndent()
+
+            session
+                .update(
+                    sql,
+                    mapOf(
+                        "uuid" to publisering.uuid,
+                        "orgnr" to publisering.orgnr,
+                        "retry_count" to publisering.retryCount,
+                        "avtalemal_uuid" to publisering.avtalemalUuid,
+                        "avtale_uuid" to publisering.avtaleUuid,
+                    ),
+                ).validate()
+            publisering
+        }
+
+    override fun hentPubliseringer(avtalemalUuid: UUID): List<Publisering> =
+        session { session ->
+            val sql =
+                """
+                select * from publisering where avtalemal_uuid = :avtalemal_uuid
+                """.trimIndent()
+
+            session.queryList(sql, mapOf("avtalemal_uuid" to avtalemalUuid)) {
+                Publisering(
+                    it.uuid("uuid"),
+                    it.string("orgnr"),
+                    it.uuid("avtalemal_uuid"),
+                    it.int("retry_count"),
+                    it.uuidOrNull("avtale_uuid"),
+                )
+            }
+        }
+
+    override fun hentFeiledePubliseringer(maxRetries: Int): List<Publisering> =
+        session { session ->
+            val sql =
+                """
+                select * from publisering where avtale_uuid is null and retry_count < :max_retries
+                """.trimIndent()
+
+            session.queryList(sql, mapOf("max_retries" to maxRetries)) {
+                Publisering(
+                    it.uuid("uuid"),
+                    it.string("orgnr"),
+                    it.uuid("avtalemal_uuid"),
+                    it.int("retry_count"),
+                    it.uuidOrNull("avtale_uuid"),
+                )
+            }
+        }
 }
 
 private fun mapper(row: Row): Avtalemal =
     Avtalemal(
         row.uuid("uuid"),
         row.offsetDateTimeOrNull("publisert"),
-        ObjectMapper().readValue<Map<String, String>>(
-            row.string("replacement_map"),
-        ).mapValues { Replacement.valueOf(it.value) },
+        ObjectMapper()
+            .readValue<Map<String, String>>(
+                row.string("replacement_map"),
+            ).mapValues { Replacement.valueOf(it.value) },
     ).apply {
         navn = row.string("navn")
         mal = row.bytes("mal")

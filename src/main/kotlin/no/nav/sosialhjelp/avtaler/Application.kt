@@ -3,7 +3,9 @@ package no.nav.sosialhjelp.avtaler
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod
+import io.ktor.http.ContentType
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
@@ -44,6 +46,8 @@ import no.nav.sosialhjelp.avtaler.digipost.DigipostClientLocal
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.documentjob.DocumentJobService
 import no.nav.sosialhjelp.avtaler.ereg.EregClient
+import no.nav.sosialhjelp.avtaler.ereg.EregClientImpl
+import no.nav.sosialhjelp.avtaler.ereg.EregClientLocal
 import no.nav.sosialhjelp.avtaler.gcpbucket.GcpBucket
 import no.nav.sosialhjelp.avtaler.gotenberg.GotenbergClient
 import no.nav.sosialhjelp.avtaler.internal.internalRoutes
@@ -62,7 +66,8 @@ import kotlin.time.Duration.Companion.minutes
 private val log = KotlinLogging.logger {}
 
 fun main(args: Array<String>) {
-    io.ktor.server.cio.EngineMain.main(args)
+    io.ktor.server.cio.EngineMain
+        .main(args)
 }
 
 fun Application.module() {
@@ -88,6 +93,7 @@ private fun Application.setupKoin() {
                     single<DigipostClient> { DigipostClientLocal() }
                     single<Oauth2Client> { Oauth2ClientLocal() }
                     single<AltinnClient> { AltinnClientLocal() }
+                    single<EregClient> { EregClientLocal(get()) }
                 }
             } else {
                 module {
@@ -100,6 +106,7 @@ private fun Application.setupKoin() {
                     }
                     single<Oauth2Client> { Oauth2ClientImpl(get(), get(), Configuration.tokenXProperties) }
                     single<AltinnClient> { AltinnClientImpl(Configuration.altinnProperties, get()) }
+                    single<EregClient> { EregClientImpl(Configuration.eregProperties) }
                 }
             }
         val avtaleModule =
@@ -109,7 +116,8 @@ private fun Application.setupKoin() {
                 }
                 single { defaultHttpClient() }
                 single {
-                    ClientAuthenticationProperties.builder()
+                    ClientAuthenticationProperties
+                        .builder()
                         .clientId(Configuration.tokenXProperties.clientId)
                         .clientJwk(Configuration.tokenXProperties.privateJwk)
                         .clientAuthMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
@@ -117,7 +125,6 @@ private fun Application.setupKoin() {
                 }
 
                 single { GcpBucket(Configuration.gcpProperties.bucketName) }
-                single { EregClient(Configuration.eregProperties) }
                 single { PdlClient(Configuration.pdlProperties, get()) }
                 single { GotenbergClient(get(), Configuration.gotenbergProperties.url) }
 
@@ -135,6 +142,33 @@ private fun Application.setupKoin() {
 }
 
 private fun Application.setupJobs() {
+    setupOppryddingsjobb()
+    setupPubliseringRetry()
+}
+
+private fun Application.setupPubliseringRetry() {
+    val avtalemalerService by inject<AvtalemalerService>()
+    val scope = CoroutineScope(Dispatchers.IO)
+    val flow =
+        flow {
+            while (true) {
+                delay(10.minutes)
+                log.info("Sender retry-signal for publisering")
+                emit(Unit)
+            }
+        }
+
+    flow
+        .onEach {
+            val feilede = avtalemalerService.hentFeiledePubliseringer()
+            if (feilede.isNotEmpty()) {
+                avtalemalerService.initiatePublisering(feilede)
+            }
+        }.catch { log.error("Fikk feil i signalmottak", it) }
+        .launchIn(scope)
+}
+
+private fun Application.setupOppryddingsjobb() {
     if (Configuration.profile == Configuration.Profile.LOCAL) {
         return
     }
@@ -151,30 +185,33 @@ private fun Application.setupJobs() {
             }
         }
 
-    flow.onEach {
-        log.info("Tar imot oppryddingsignal")
-        val avtalerUtenDokument = avtaleService.hentAvtalerUtenSignertDokument()
-        log.info("Fant ${avtalerUtenDokument.size} avtaler uten nedlastet dokument")
-        avtalerUtenDokument.forEach { digipostJobbData ->
-            val resultat =
-                documentJobService.lastNedOgLagreAvtale(
-                    digipostJobbData,
-                    avtaleService.hentAvtale(digipostJobbData.uuid) ?: return@forEach,
-                )
-            resultat.fold({
-                log.info("Fikk lagret avtale med uuid ${digipostJobbData.uuid} i batch-jobb")
-            }, {
-                log.error("Fikk ikke lagret dokument i databasen", it)
-            })
-        }
-    }.catch { log.error("Fikk feil i signalmottak", it) }.launchIn(scope)
+    flow
+        .onEach {
+            log.info("Tar imot oppryddingsignal")
+            val avtalerUtenDokument = avtaleService.hentAvtalerUtenSignertDokument()
+            log.info("Fant ${avtalerUtenDokument.size} avtaler uten nedlastet dokument")
+            avtalerUtenDokument.forEach { digipostJobbData ->
+                val resultat =
+                    documentJobService.lastNedOgLagreAvtale(
+                        digipostJobbData,
+                        avtaleService.hentAvtale(digipostJobbData.uuid) ?: return@forEach,
+                    )
+                resultat.fold({
+                    log.info("Fikk lagret avtale med uuid ${digipostJobbData.uuid} i batch-jobb")
+                }, {
+                    log.error("Fikk ikke lagret dokument i databasen", it)
+                })
+            }
+        }.catch { log.error("Fikk feil i signalmottak", it) }
+        .launchIn(scope)
 }
 
-fun Application.configure() {
+private fun Application.configure() {
     TimeZone.setDefault(TimeZone.getTimeZone("Europe/Oslo"))
     install(ContentNegotiation) {
-        jackson {
+        jackson(contentType = ContentType.Any) {
             registerModule(JavaTimeModule())
+            registerKotlinModule()
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         }

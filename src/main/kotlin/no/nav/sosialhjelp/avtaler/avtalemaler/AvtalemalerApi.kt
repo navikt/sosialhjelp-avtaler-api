@@ -31,7 +31,10 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
 
-data class AvtalemalMetadata(val name: String, val replacementMap: Map<String, String> = emptyMap())
+data class AvtalemalMetadata(
+    val name: String,
+    val replacementMap: Map<String, String> = emptyMap(),
+)
 
 private val objectMapper = ObjectMapper().registerKotlinModule()
 
@@ -111,18 +114,27 @@ fun Route.avtalemalerApi() {
                 }
                 call.response.header(
                     HttpHeaders.ContentDisposition,
-                    ContentDisposition.Attachment.withParameter(ContentDisposition.Parameters.FileName, "${avtale.navn}.docx")
+                    ContentDisposition.Attachment
+                        .withParameter(ContentDisposition.Parameters.FileName, "${avtale.navn}.docx")
                         .toString(),
                 )
                 call.respondBytes(avtale.mal, ContentType.Application.Docx)
             }
 
-            post("/publiser") {
-                val uuid = call.uuid()
-                val kommuner = call.receiveNullable<List<String>>()
-                log.info { "Publiserer avtalemal $uuid til kommuner $kommuner" }
-                avtalemalerService.publiser(uuid, kommuner)
-                call.respond(HttpStatusCode.OK)
+            route("/publiser") {
+                post {
+                    val uuid = call.uuid()
+                    val kommuner = call.receiveNullable<List<String>>()
+                    log.info { "Publiserer avtalemal $uuid til kommuner $kommuner" }
+                    avtalemalerService.publiser(uuid, kommuner)
+                    call.respond(HttpStatusCode.Created)
+                }
+
+                get("/status") {
+                    val uuid = call.uuid()
+                    val publiseringer = avtalemalerService.hentPubliseringer(uuid)
+                    call.respond(HttpStatusCode.OK, publiseringer)
+                }
             }
 
             get("/preview") {
@@ -156,7 +168,8 @@ fun Route.avtalemalerApi() {
 
                 call.response.header(
                     HttpHeaders.ContentDisposition,
-                    ContentDisposition.Attachment.withParameter(ContentDisposition.Parameters.FileName, "${avtalemal.navn}_preview.pdf")
+                    ContentDisposition.Attachment
+                        .withParameter(ContentDisposition.Parameters.FileName, "${avtalemal.navn}_preview.pdf")
                         .toString(),
                 )
                 call.respondBytes(converted, ContentType.Application.Pdf, HttpStatusCode.OK)

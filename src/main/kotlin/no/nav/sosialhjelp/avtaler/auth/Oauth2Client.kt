@@ -16,14 +16,28 @@ import java.net.URI
 
 private val log = KotlinLogging.logger { }
 
-class Oauth2Client(
+interface Oauth2Client {
+    suspend fun exchangeToken(
+        token: String,
+        audience: String,
+    ): OAuth2AccessTokenResponse
+}
+
+class Oauth2ClientLocal : Oauth2Client {
+    override suspend fun exchangeToken(
+        token: String,
+        audience: String,
+    ): OAuth2AccessTokenResponse = OAuth2AccessTokenResponse("abc", 1, 1, emptyMap())
+}
+
+class Oauth2ClientImpl(
     private val httpClient: HttpClient,
     private val clientAuthProperties: ClientAuthenticationProperties,
     tokenXProperties: Configuration.TokenXProperties,
-) {
+) : Oauth2Client {
     private val tokenXTokenEndpointUrl = tokenXProperties.tokenXTokenEndpoint
 
-    suspend fun exchangeToken(
+    override suspend fun exchangeToken(
         token: String,
         audience: String,
     ): OAuth2AccessTokenResponse {

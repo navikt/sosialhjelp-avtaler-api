@@ -42,6 +42,7 @@ object Configuration {
                 "pdl.url" to "",
                 "pdl.audience" to "",
                 "ereg.url" to "",
+                "gotenberg.url" to "",
             ),
         )
 
@@ -64,13 +65,14 @@ object Configuration {
                 "POSTGRES_PORT" to "",
                 "gcp.bucketName" to "digisos-avtaler",
                 "ereg.url" to "https://ereg-services.dev-fss-pub.nais.io",
+                "gotenberg.url" to "http://gotenberg:3000",
             ),
         )
 
     private val devProperties =
         ConfigurationMap(
             mapOf(
-                "application.baseUrl" to "https://digisos.intern.dev.nav.no/sosialhjelp/avtaler",
+                "application.baseUrl" to "https://digisos.ansatt.dev.nav.no/sosialhjelp/avtaler",
                 "application.profile" to "DEV",
                 "application.cluster" to "DEV-GCP",
                 "altinn.altinnUrl" to "https://altinn-rettigheter-proxy.intern.dev.nav.no/altinn-rettigheter-proxy",
@@ -79,14 +81,15 @@ object Configuration {
                 "altinn.altinnRettigheterAudience" to "dev-gcp:arbeidsgiver:altinn-rettigheter-proxy",
                 "virksomhetssertifikat.projectId" to "virksomhetssertifikat-dev",
                 "virksomhetssertifikat.secretId" to "test-virksomhetssertifikat-felles-keystore-jceks_2018-2021",
-                "virksomhetssertifikat.versionId" to "3",
+                "virksomhetssertifikat.versionId" to "4",
                 "virksomhetssertifikat.passwordProjectId" to "virksomhetssertifikat-dev",
                 "virksomhetssertifikat.passwordSecretId" to "test-keystore-credentials-json",
-                "virksomhetssertifikat.passwordSecretVersion" to "2",
+                "virksomhetssertifikat.passwordSecretVersion" to "3",
                 "pdl.url" to "https://pdl-api.dev-fss-pub.nais.io/graphql",
                 "pdl.audience" to "dev-fss:pdl:pdl-api",
                 "gcp.bucketName" to "digisos-nks-avtaler-dev",
                 "ereg.url" to "https://ereg-services.dev-fss-pub.nais.io",
+                "gotenberg.url" to "http://sosialhjelp-konvertering-til-pdf",
             ),
         )
 
@@ -110,6 +113,7 @@ object Configuration {
                 "pdl.audience" to "prod-fss:pdl:pdl-api",
                 "gcp.bucketName" to "digisos-nks-avtaler",
                 "ereg.url" to "https://ereg-services.prod-fss-pub.nais.io",
+                "gotenberg.url" to "https://konvertering-til-pdf.prod-fss-pub.nais.io",
             ),
         )
 
@@ -137,6 +141,7 @@ object Configuration {
     val slackProperties = SlackProperties()
     val gcpProperties = GcpProperties()
     val azureProperties = AzureProperties()
+    val gotenbergProperties = GotenbergProperties()
 
     operator fun get(key: String): String = config[Key(key, stringType)]
 
@@ -217,9 +222,7 @@ object Configuration {
         val passwordSecretVersionId: String = this["virksomhetssertifikat.passwordSecretVersion"],
     )
 
-    data class EregProperties(
-        val baseUrl: String = this["ereg.url"],
-    )
+    data class EregProperties(val baseUrl: String = this["ereg.url"])
 
     data class SlackProperties(
         // The Slack-webhook is extracted from the environment variable SLACK_HOOK (envFrom: digisos-slack-hook)
@@ -227,7 +230,7 @@ object Configuration {
         val environment: String = profile.toString(),
     )
 
-    data class GcpProperties(
-        val bucketName: String = this["gcp.bucketName"],
-    )
+    data class GcpProperties(val bucketName: String = this["gcp.bucketName"])
+
+    data class GotenbergProperties(val url: String = this["gotenberg.url"])
 }

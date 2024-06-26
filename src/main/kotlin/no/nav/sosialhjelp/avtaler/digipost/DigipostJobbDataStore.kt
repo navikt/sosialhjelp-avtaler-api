@@ -27,13 +27,13 @@ class DigipostJobbDataStorePostgres(sessionFactory: () -> Session) : DigipostJob
             @Language("PostgreSQL")
             val sql =
                 """
-                INSERT INTO digipost_jobb_data (orgnr,
+                INSERT INTO digipost_jobb_data (uuid,
                                                 direct_job_reference,
                                                 status_url,
                                                 status_query_token,
                                                 signert_dokument)
-                VALUES (:orgnr, :direct_job_reference, :status_url, :status_query_token, :signert_dokument)
-                ON CONFLICT (orgnr) 
+                VALUES (:uuid, :direct_job_reference, :status_url, :status_query_token, :signert_dokument)
+                ON CONFLICT (uuid) 
                 DO UPDATE SET direct_job_reference = :direct_job_reference, status_url = :status_url, status_query_token = :status_query_token, signert_dokument = :signert_dokument
                 """.trimIndent()
 
@@ -74,7 +74,7 @@ class DigipostJobbDataStorePostgres(sessionFactory: () -> Session) : DigipostJob
             it.update(
                 sql,
                 mapOf(
-                    "orgnr" to digipostJobbData.uuid,
+                    "uuid" to digipostJobbData.uuid,
                     "status_query_token" to digipostJobbData.statusQueryToken,
                     "signert_dokument" to digipostJobbData.signertDokument,
                 ),

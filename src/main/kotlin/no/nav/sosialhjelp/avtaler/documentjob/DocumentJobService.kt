@@ -2,14 +2,16 @@ package no.nav.sosialhjelp.avtaler.documentjob
 
 import com.google.common.net.MediaType
 import mu.KotlinLogging
+import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
-import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.digipost.DigipostJobbData
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.ereg.EregClient
 import no.nav.sosialhjelp.avtaler.gcpbucket.GcpBucket
+import no.nav.sosialhjelp.avtaler.slack.Slack
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.time.format.DateTimeFormatter
 
 private val log = KotlinLogging.logger { }
 
@@ -34,8 +36,9 @@ class DocumentJobService(
         fileIS.use {
             it.transferTo(outputStream)
         }
-        val dbInputStream = ByteArrayInputStream(outputStream.toByteArray())
-        val bucketInputStream = ByteArrayInputStream(outputStream.toByteArray())
+        val byteArray = outputStream.toByteArray()
+        val dbInputStream = ByteArrayInputStream(byteArray)
+        val bucketInputStream = ByteArrayInputStream(byteArray)
 
         dbInputStream.use {
             digipostService.oppdaterDigipostJobbData(
@@ -46,7 +49,12 @@ class DocumentJobService(
         }
 
         val kommunenavn = eregClient.hentEnhetNavn(avtale.orgnr)
-        val blobNavn = AvtaleService.lagFilnavn(kommunenavn, avtale.opprettet)
+
+        val blobNavn = "${avtale.navn} - $kommunenavn - ${
+            avtale.opprettet.format(
+                DateTimeFormatter.ofPattern("dd.MM.yyyy"),
+            )
+        }"
         val metadata =
             mapOf(
                 "navnInnsender" to (avtale.navn_innsender ?: error("Har ikke navn på innsender")),
@@ -56,5 +64,8 @@ class DocumentJobService(
             gcpBucket.lagreBlob(blobNavn, MediaType.PDF, metadata, bucketInputStream.readAllBytes())
         }
         log.info("Lagret signert avtale i bucket for orgnr ${avtale.orgnr}, uuid ${avtale.uuid}")
+        if (Configuration.dev || Configuration.prod) {
+            Slack.post("Ny avtale (${avtale.navn}) signert for orgnr=${avtale.orgnr}.")
+        }
     }
 }

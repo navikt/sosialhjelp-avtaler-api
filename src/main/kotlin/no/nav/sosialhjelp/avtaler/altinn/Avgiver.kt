@@ -22,20 +22,5 @@ data class Avgiver(
         ;
 
         override fun toString(): String = "[$kode,$versjon]"
-
-        companion object {
-            val FILTER: String =
-                values().joinToString(" or ") {
-                    "ServiceCode eq '${it.kode}'"
-                }
-
-            fun fra(
-                kode: String,
-                versjon: Int,
-            ): Tjeneste? =
-                values().firstOrNull {
-                    it.kode == kode && it.versjon == versjon
-                }
-        }
     }
 }

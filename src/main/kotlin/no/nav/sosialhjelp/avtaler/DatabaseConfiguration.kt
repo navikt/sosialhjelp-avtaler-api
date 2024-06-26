@@ -17,7 +17,6 @@ class DatabaseConfiguration(private val props: Configuration.DatabaseProperties)
         if (!waitForDB(10.minutes)) {
             throw RuntimeException("Databasen ble ikke tilgjengelig innenfor tidsfristen")
         }
-
         val dataSource =
             HikariDataSource().apply {
                 username = props.databaseUser

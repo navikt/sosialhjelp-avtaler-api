@@ -1,6 +1,7 @@
 package no.nav.sosialhjelp.avtaler.digipost
 
 import no.digipost.signature.client.direct.DirectJobStatus
+import no.nav.sosialhjelp.avtaler.avtaler.Avtale
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
 import java.io.InputStream
@@ -19,26 +20,22 @@ data class DigipostAvtale(
 class DigipostService(private val digipostClient: DigipostClient, private val databaseContext: DatabaseContext) {
     fun sendTilSignering(
         fnr: String,
-        avtale: DigipostAvtale,
-    ): DigipostResponse {
-        return digipostClient.sendTilSignering(fnr, avtale)
-    }
+        avtale: Avtale,
+        dokument: ByteArray,
+        navn: String,
+    ): DigipostResponse = digipostClient.sendTilSignering(fnr, avtale, dokument, navn)
 
     fun erSigneringsstatusCompleted(
         jobbReference: String,
         statusUrl: URI,
         statusQueryToken: String,
-    ): Boolean {
-        return digipostClient.sjekkSigneringsstatus(jobbReference, statusUrl, statusQueryToken) == DirectJobStatus.COMPLETED_SUCCESSFULLY
-    }
+    ): Boolean = digipostClient.sjekkSigneringsstatus(jobbReference, statusUrl, statusQueryToken) == DirectJobStatus.COMPLETED_SUCCESSFULLY
 
     fun hentSignertDokument(
         statusQueryToken: String,
         directJobReference: String,
         statusUrl: URI,
-    ): InputStream? {
-        return digipostClient.hentSignertAvtale(statusQueryToken, directJobReference, statusUrl)
-    }
+    ): InputStream? = digipostClient.hentSignertAvtale(statusQueryToken, directJobReference, statusUrl)
 
     suspend fun oppdaterDigipostJobbData(
         digipostJobbData: DigipostJobbData,

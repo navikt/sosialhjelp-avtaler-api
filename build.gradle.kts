@@ -52,7 +52,7 @@ dependencies {
     implementation(libs.token.client.core)
 
     implementation(libs.signature.api.client.java)
-    implementation(libs.jaxb.impl)
+    implementation(libs.jaxb.api)
 
     implementation(platform(libs.libraries.bom))
     implementation(libs.google.cloud.secretmanager)
@@ -60,7 +60,7 @@ dependencies {
     implementation(libs.google.cloud.storage)
 
     implementation(libs.ktor.client.mock)
-    implementation(libs.apache.poi)
+    implementation(libs.bundles.apache.poi)
 
     testImplementation(libs.bundles.test)
 }

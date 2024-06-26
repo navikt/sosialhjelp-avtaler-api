@@ -3,6 +3,7 @@ package no.nav.sosialhjelp.avtaler
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import com.nimbusds.oauth2.sdk.auth.ClientAuthenticationMethod
 import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
@@ -25,20 +26,31 @@ import mu.KotlinLogging
 import no.nav.security.token.support.client.core.ClientAuthenticationProperties
 import no.nav.sosialhjelp.avtaler.HttpClientConfig.httpClient
 import no.nav.sosialhjelp.avtaler.altinn.AltinnClient
+import no.nav.sosialhjelp.avtaler.altinn.AltinnClientImpl
+import no.nav.sosialhjelp.avtaler.altinn.AltinnClientLocal
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.auth.Oauth2Client
+import no.nav.sosialhjelp.avtaler.auth.Oauth2ClientImpl
+import no.nav.sosialhjelp.avtaler.auth.Oauth2ClientLocal
 import no.nav.sosialhjelp.avtaler.avtalemaler.AvtalemalerService
+import no.nav.sosialhjelp.avtaler.avtalemaler.InjectionService
 import no.nav.sosialhjelp.avtaler.avtalemaler.avtalemalerApi
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.avtaler.avtaleApi
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.DefaultDatabaseContext
 import no.nav.sosialhjelp.avtaler.digipost.DigipostClient
+import no.nav.sosialhjelp.avtaler.digipost.DigipostClientImpl
+import no.nav.sosialhjelp.avtaler.digipost.DigipostClientLocal
 import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.documentjob.DocumentJobService
 import no.nav.sosialhjelp.avtaler.ereg.EregClient
+import no.nav.sosialhjelp.avtaler.ereg.EregClientImpl
+import no.nav.sosialhjelp.avtaler.ereg.EregClientLocal
 import no.nav.sosialhjelp.avtaler.gcpbucket.GcpBucket
+import no.nav.sosialhjelp.avtaler.gotenberg.GotenbergClient
 import no.nav.sosialhjelp.avtaler.internal.internalRoutes
+import no.nav.sosialhjelp.avtaler.kommune.KommuneService
 import no.nav.sosialhjelp.avtaler.kommune.kommuneApi
 import no.nav.sosialhjelp.avtaler.pdl.PdlClient
 import no.nav.sosialhjelp.avtaler.pdl.PersonNavnService
@@ -53,7 +65,8 @@ import kotlin.time.Duration.Companion.minutes
 private val log = KotlinLogging.logger {}
 
 fun main(args: Array<String>) {
-    io.ktor.server.cio.EngineMain.main(args)
+    io.ktor.server.cio.EngineMain
+        .main(args)
 }
 
 fun Application.module() {
@@ -73,6 +86,28 @@ fun Application.module() {
 private fun Application.setupKoin() {
     install(Koin) {
         slf4jLogger()
+        val externalServices =
+            if (Configuration.local) {
+                module {
+                    single<DigipostClient> { DigipostClientLocal() }
+                    single<Oauth2Client> { Oauth2ClientLocal() }
+                    single<AltinnClient> { AltinnClientLocal() }
+                    single<EregClient> { EregClientLocal(get()) }
+                }
+            } else {
+                module {
+                    single<DigipostClient> {
+                        DigipostClientImpl(
+                            Configuration.digipostProperties,
+                            Configuration.virksomhetssertifikatProperties,
+                            Configuration.profile,
+                        )
+                    }
+                    single<Oauth2Client> { Oauth2ClientImpl(get(), get(), Configuration.tokenXProperties) }
+                    single<AltinnClient> { AltinnClientImpl(Configuration.altinnProperties, get()) }
+                    single<EregClient> { EregClientImpl(Configuration.eregProperties) }
+                }
+            }
         val avtaleModule =
             module {
                 single<DatabaseContext>(createdAtStart = true) {
@@ -80,35 +115,62 @@ private fun Application.setupKoin() {
                 }
                 single { defaultHttpClient() }
                 single {
-                    ClientAuthenticationProperties.builder()
+                    ClientAuthenticationProperties
+                        .builder()
                         .clientId(Configuration.tokenXProperties.clientId)
                         .clientJwk(Configuration.tokenXProperties.privateJwk)
                         .clientAuthMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
                         .build()
                 }
-                single { Oauth2Client(get(), get(), Configuration.tokenXProperties) }
-                single { AltinnService(AltinnClient(Configuration.altinnProperties, get())) }
-                single {
-                    DigipostClient(
-                        Configuration.digipostProperties,
-                        Configuration.virksomhetssertifikatProperties,
-                        Configuration.profile,
-                    )
-                }
+
                 single { GcpBucket(Configuration.gcpProperties.bucketName) }
-                single { EregClient(Configuration.eregProperties) }
                 single { PdlClient(Configuration.pdlProperties, get()) }
+                single { GotenbergClient(get(), Configuration.gotenbergProperties.url) }
+
+                singleOf(::AltinnService)
+                singleOf(::KommuneService)
+                singleOf(::InjectionService)
                 singleOf(::DigipostService)
                 singleOf(::DocumentJobService)
                 singleOf(::PersonNavnService)
                 singleOf(::AvtaleService)
                 singleOf(::AvtalemalerService)
             }
-        modules(avtaleModule)
+        modules(externalServices, avtaleModule)
     }
 }
 
 private fun Application.setupJobs() {
+    setupOppryddingsjobb()
+    setupPubliseringRetry()
+}
+
+private fun Application.setupPubliseringRetry() {
+    val avtalemalerService by inject<AvtalemalerService>()
+    val scope = CoroutineScope(Dispatchers.IO)
+    val flow =
+        flow {
+            while (true) {
+                delay(10.minutes)
+                log.info("Sender retry-signal for publisering")
+                emit(Unit)
+            }
+        }
+
+    flow
+        .onEach {
+            val feilede = avtalemalerService.hentFeiledePubliseringer()
+            if (feilede.isNotEmpty()) {
+                avtalemalerService.initiatePublisering(feilede)
+            }
+        }.catch { log.error("Fikk feil i signalmottak", it) }
+        .launchIn(scope)
+}
+
+private fun Application.setupOppryddingsjobb() {
+    if (Configuration.profile == Configuration.Profile.LOCAL) {
+        return
+    }
     val avtaleService by inject<AvtaleService>()
     val documentJobService by inject<DocumentJobService>()
     log.info("Setter opp oppryddingsjobb")
@@ -122,37 +184,40 @@ private fun Application.setupJobs() {
             }
         }
 
-    flow.onEach {
-        log.info("Tar imot oppryddingsignal")
-        val avtalerUtenDokument = avtaleService.hentAvtalerUtenSignertDokument()
-        log.info("Fant ${avtalerUtenDokument.size} avtaler uten nedlastet dokument")
-        avtalerUtenDokument.forEach { digipostJobbData ->
-            val resultat =
-                documentJobService.lastNedOgLagreAvtale(
-                    digipostJobbData,
-                    avtaleService.hentAvtale(digipostJobbData.uuid) ?: return@forEach,
-                )
-            resultat.fold({
-                log.info("Fikk lagret avtale med uuid ${digipostJobbData.uuid} i batch-jobb")
-            }, {
-                log.error("Fikk ikke lagret dokument i databasen", it)
-            })
-        }
-    }.catch { log.error("Fikk feil i signalmottak", it) }.launchIn(scope)
+    flow
+        .onEach {
+            log.info("Tar imot oppryddingsignal")
+            val avtalerUtenDokument = avtaleService.hentAvtalerUtenSignertDokument()
+            log.info("Fant ${avtalerUtenDokument.size} avtaler uten nedlastet dokument")
+            avtalerUtenDokument.forEach { digipostJobbData ->
+                val resultat =
+                    documentJobService.lastNedOgLagreAvtale(
+                        digipostJobbData,
+                        avtaleService.hentAvtale(digipostJobbData.uuid) ?: return@forEach,
+                    )
+                resultat.fold({
+                    log.info("Fikk lagret avtale med uuid ${digipostJobbData.uuid} i batch-jobb")
+                }, {
+                    log.error("Fikk ikke lagret dokument i databasen", it)
+                })
+            }
+        }.catch { log.error("Fikk feil i signalmottak", it) }
+        .launchIn(scope)
 }
 
-fun Application.configure() {
+private fun Application.configure() {
     TimeZone.setDefault(TimeZone.getTimeZone("Europe/Oslo"))
     install(ContentNegotiation) {
         jackson {
             registerModule(JavaTimeModule())
+            registerKotlinModule()
             disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
             disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
         }
     }
     install(IgnoreTrailingSlash)
     install(CallLogging) {
-        this.filter {
+        filter {
             !it.request.path().contains("/internal")
         }
     }
@@ -167,9 +232,9 @@ fun Application.setupRoutes() {
             route("/api") {
                 authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
                     avtaleApi()
-                    kommuneApi()
                 }
                 authenticate(if (Configuration.local) "local" else AZURE_AUTH) {
+                    kommuneApi()
                     avtalemalerApi()
                 }
             }

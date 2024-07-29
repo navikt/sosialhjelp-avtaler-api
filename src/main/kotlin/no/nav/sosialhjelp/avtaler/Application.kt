@@ -230,11 +230,11 @@ fun Application.setupRoutes() {
         route("/sosialhjelp/avtaler-api") {
             internalRoutes()
             route("/api") {
+                kommuneApi()
                 authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
                     avtaleApi()
                 }
                 authenticate(if (Configuration.local) "local" else AZURE_AUTH) {
-                    kommuneApi()
                     avtalemalerApi()
                 }
             }

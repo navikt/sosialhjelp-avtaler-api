@@ -13,17 +13,30 @@ import java.time.LocalDate
 
 const val URL = "https://data.ssb.no/api/klass/v1/classifications/582"
 
-data class ClassificationResponse(val versions: List<ClassificationVersion>)
+data class ClassificationResponse(
+    val versions: List<ClassificationVersion>,
+)
 
-data class ClassificationVersion(val validFrom: LocalDate, val validTo: LocalDate? = null, val name: String, val _links: Link)
+data class ClassificationVersion(
+    val validFrom: LocalDate,
+    val validTo: LocalDate? = null,
+    val name: String,
+    val _links: Link,
+)
 
-data class Link(val self: Self)
+data class Link(
+    val self: Self,
+)
 
-data class Self(val href: String)
+data class Self(
+    val href: String,
+)
 
 private val log = KotlinLogging.logger {}
 
-class KommuneService(private val httpClient: HttpClient) {
+class KommuneService(
+    private val httpClient: HttpClient,
+) {
     suspend fun getAlleKommuner(): List<Kommune> {
         val request =
             httpClient.get(URL) {
@@ -64,8 +77,16 @@ class KommuneService(private val httpClient: HttpClient) {
     }
 }
 
-data class ClassicationVersionResponse(val classificationItems: List<ClassificationItem>)
+data class ClassicationVersionResponse(
+    val classificationItems: List<ClassificationItem>,
+)
 
-data class ClassificationItem(val code: String, val name: String)
+data class ClassificationItem(
+    val code: String,
+    val name: String,
+)
 
-data class Kommune(val orgnr: String, val navn: String)
+data class Kommune(
+    val orgnr: String,
+    val navn: String,
+)

@@ -46,17 +46,16 @@ class AvtaleService(
                     navn = avgiver.navn,
                     avtaler =
                         avtalerByOrgnr[avgiver.orgnr]?.map {
-                            AvtaleResponse(it.uuid, it.navn, it.navn_innsender, it.avtaleversjon, it.opprettet, it.erSignert)
+                            AvtaleResponse(it.uuid, it.orgnr, it.navn, it.navn_innsender, it.avtaleversjon, it.opprettet, it.erSignert)
                         } ?: emptyList(),
                 )
             }
     }
 
-    suspend fun hentAvtalerUtenSignertDokument(): List<DigipostJobbData> {
-        return transaction(databaseContext) { ctx ->
+    suspend fun hentAvtalerUtenSignertDokument(): List<DigipostJobbData> =
+        transaction(databaseContext) { ctx ->
             ctx.digipostJobbDataStore.hentAlleUtenLagretDokument()
         }
-    }
 
     suspend fun hentAvtaleDokument(
         fnr: String,
@@ -110,7 +109,8 @@ class AvtaleService(
         tjeneste: Avgiver.Tjeneste,
         token: String?,
     ): List<Avgiver> =
-        altinnService.hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
+        altinnService
+            .hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
             .filter { avgiver ->
                 avgiver.erKommune().also { log.info("Hentet enhet med orgnr: ${avgiver.orgnr}") }
             }.also { sikkerLog.info("Filtrert avgivere for fnr: $fnr, tjeneste: $tjeneste, avgivere: $this") }
@@ -187,6 +187,7 @@ class AvtaleService(
             navn = signertAvtale.navn,
             navnInnsender = signertAvtale.navn_innsender,
             erSignert = true,
+            orgnr = signertAvtale.orgnr,
         )
     }
 
@@ -238,11 +239,10 @@ class AvtaleService(
         )
     }
 
-    suspend fun hentAvtalemalToOrgnrMap(): Map<UUID, List<String>> {
-        return transaction(databaseContext) { ctx ->
+    suspend fun hentAvtalemalToOrgnrMap(): Map<UUID, List<String>> =
+        transaction(databaseContext) { ctx ->
             ctx.avtaleStore.hentAlle()
         }
-    }
 
     suspend fun hentAvtale(uuid: UUID): Avtale? =
         transaction(databaseContext) { ctx ->

@@ -10,6 +10,7 @@ data class AvtaleResponse(
     val avtaleversjon: String? = null,
     val opprettet: LocalDateTime? = null,
     val erSignert: Boolean = false,
+    val avtaleUrl: String? = "/api/avtale/$uuid/avtale",
 )
 
 data class KommuneResponse(

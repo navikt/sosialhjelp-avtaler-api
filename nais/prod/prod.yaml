@@ -58,6 +58,8 @@ spec:
         - host: secretmanager.googleapis.com
         - host: hooks.slack.com
         - host: ereg-services.dev-fss-pub.nais.io
+        - host: konvertering-til-pdf.prod-fss-pub.nais.io
+        - host: data.ssb.no
       rules:
         - application: altinn-rettigheter-proxy
           namespace: arbeidsgiver

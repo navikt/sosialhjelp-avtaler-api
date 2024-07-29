@@ -59,11 +59,13 @@ spec:
         - host: hooks.slack.com
         - host: digisos.intern.dev.nav.no
         - host: ereg-services.dev-fss-pub.nais.io
+        - host: data.ssb.no
       rules:
         - application: sosialhjelp-mock-alt-api-mock
         - application: curl-digipost-app
         - application: altinn-rettigheter-proxy
           namespace: arbeidsgiver
+        - application: sosialhjelp-konvertering-til-pdf
   resources:
     limits:
       cpu: 400m

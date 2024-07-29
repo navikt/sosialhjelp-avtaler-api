@@ -8,6 +8,7 @@ import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.engine.cio.CIO
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.cache.HttpCache
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.request.accept
@@ -39,9 +40,12 @@ fun engineFactory(block: () -> HttpClientEngine): HttpClientEngine =
 
 fun defaultHttpClient(): HttpClient {
     return HttpClient(CIO) {
+        install(HttpCache)
         install(ContentNegotiation) {
             jackson {
+                registerModule(JavaTimeModule())
                 disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
+                disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             }
         }
     }

@@ -5,6 +5,7 @@ import java.util.UUID
 
 data class AvtaleResponse(
     val uuid: UUID,
+    val orgnr: String,
     val navn: String,
     val navnInnsender: String? = null,
     val avtaleversjon: String? = null,

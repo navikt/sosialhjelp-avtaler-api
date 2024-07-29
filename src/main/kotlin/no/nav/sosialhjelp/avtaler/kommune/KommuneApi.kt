@@ -6,12 +6,14 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import mu.KotlinLogging
+import no.nav.sosialhjelp.avtaler.ereg.EregClient
 import org.koin.ktor.ext.inject
 
 private val log = KotlinLogging.logger { }
 
 fun Route.kommuneApi() {
     val kommuneService by inject<KommuneService>()
+    val eregService by inject<EregClient>()
 
     route("/kommuner") {
         get {
@@ -19,5 +21,16 @@ fun Route.kommuneApi() {
             val kommuner = kommuneService.getAlleKommuner()
             call.respond(kommuner)
         }
+
+        get("/{orgnr}") {
+            val orgnr = call.parameters["orgnr"] ?: error("Mangler orgnr")
+            log.info("Henter kommune med orgnr $orgnr")
+            val kommunenavn = eregService.hentEnhetNavn(orgnr)
+            call.respond(KommunenavnResponse(kommunenavn))
+        }
     }
 }
+
+data class KommunenavnResponse(
+    val kommunenavn: String,
+)

@@ -22,7 +22,10 @@ import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
 import org.koin.ktor.ext.inject
 import java.util.UUID
 
-data class SigneringsstatusRequest(val uuid: UUID, val token: String)
+data class SigneringsstatusRequest(
+    val uuid: UUID,
+    val token: String,
+)
 
 fun Route.avtaleApi() {
     val avtaleService by inject<AvtaleService>()
@@ -60,6 +63,7 @@ fun Route.avtaleApi() {
                             opprettet = it.opprettet,
                             navn = it.navn,
                             navnInnsender = it.navn_innsender,
+                            orgnr = it.orgnr,
                         )
                     },
                 )
@@ -93,7 +97,8 @@ fun Route.avtaleApi() {
 
                 call.response.header(
                     HttpHeaders.ContentDisposition,
-                    ContentDisposition.Attachment.withParameter(ContentDisposition.Parameters.FileName, "${avtale.navn}.pdf")
+                    ContentDisposition.Attachment
+                        .withParameter(ContentDisposition.Parameters.FileName, "${avtale.navn}.pdf")
                         .toString(),
                 )
                 call.respondBytes(avtaleDokument, ContentType.Application.Pdf)

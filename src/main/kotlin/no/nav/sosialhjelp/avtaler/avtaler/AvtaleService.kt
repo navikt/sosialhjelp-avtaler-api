@@ -219,7 +219,14 @@ class AvtaleService(
         )
     }
 
-    suspend fun hentSignertAvtaleDokumentFraDatabaseEllerDigipost(uuid: UUID): InputStream? {
+    suspend fun hentSignertAvtaleDokumentFraDatabaseEllerDigipost(
+        fnr: String,
+        tjeneste: Avgiver.Tjeneste,
+        token: String?,
+        uuid: UUID,
+    ): InputStream? {
+        hentAvtale(uuid)?.also { it.checkAvtaleBelongsToUser(fnr, tjeneste, token) } ?: error("Fant ikke avtale med uuid $uuid")
+
         val digipostJobbData =
             digipostService.hentDigipostJobb(uuid)
 

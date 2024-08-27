@@ -17,6 +17,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
+import no.nav.sosialhjelp.avtaler.avtalemaler.AvtalemalerService
 import no.nav.sosialhjelp.avtaler.extractFnr
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
 import org.koin.ktor.ext.inject
@@ -29,6 +30,7 @@ data class SigneringsstatusRequest(
 
 fun Route.avtaleApi() {
     val avtaleService by inject<AvtaleService>()
+    val avtalemalerService by inject<AvtalemalerService>()
 
     route("/avtale") {
         get {
@@ -54,6 +56,7 @@ fun Route.avtaleApi() {
                     call.response.status(HttpStatusCode.NotFound)
                     return@get
                 }
+                val avtalemal = avtale.avtalemal_uuid?.let { avtalemalerService.hentAvtalemal(it) }
                 call.respond(
                     HttpStatusCode.OK,
                     avtale.let {
@@ -64,6 +67,8 @@ fun Route.avtaleApi() {
                             navn = it.navn,
                             navnInnsender = it.navn_innsender,
                             orgnr = it.orgnr,
+                            ingress = avtalemal?.ingress,
+                            kvitteringstekst = avtalemal?.kvitteringstekst,
                         )
                     },
                 )
@@ -79,8 +84,7 @@ fun Route.avtaleApi() {
                         this.context.getAccessToken(),
                     )
                 if (avtale == null) {
-                    call.respond(HttpStatusCode.NotFound)
-                    return@get
+                    return@get call.respond(HttpStatusCode.NotFound)
                 }
                 val avtaleDokument =
                     avtaleService.hentAvtaleDokument(
@@ -91,8 +95,7 @@ fun Route.avtaleApi() {
                     )
 
                 if (avtaleDokument == null) {
-                    call.response.status(HttpStatusCode.NotFound)
-                    return@get
+                    return@get call.response.status(HttpStatusCode.NotFound)
                 }
 
                 call.response.header(
@@ -143,8 +146,7 @@ fun Route.avtaleApi() {
                 )
 
             if (avtaleResponse == null) {
-                call.response.status(HttpStatusCode.NotFound)
-                return@post
+                return@post call.response.status(HttpStatusCode.NotFound)
             }
             call.respond(HttpStatusCode.OK, avtaleResponse)
         }

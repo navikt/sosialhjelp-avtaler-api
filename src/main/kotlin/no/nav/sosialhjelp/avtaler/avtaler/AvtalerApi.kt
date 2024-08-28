@@ -68,6 +68,8 @@ fun Route.avtaleApi() {
                             navnInnsender = it.navn_innsender,
                             orgnr = it.orgnr,
                             ingress = avtalemal?.ingress,
+                            ingressNynorsk = avtalemal?.ingressNynorsk,
+                            kvitteringstekstNynorsk = avtalemal?.kvitteringstekstNynorsk,
                             kvitteringstekst = avtalemal?.kvitteringstekst,
                         )
                     },
@@ -152,14 +154,26 @@ fun Route.avtaleApi() {
                     fnr = fnr,
                     token = token,
                 )
-            val avtalemal = avtaleResponse?.uuid?.let { avtalemalerService.hentAvtalemal(it) }
+            val avtalemal = avtaleResponse?.avtalemal_uuid?.let { avtalemalerService.hentAvtalemal(it) }
 
             if (avtaleResponse == null) {
                 return@post call.response.status(HttpStatusCode.NotFound)
             }
             call.respond(
                 HttpStatusCode.OK,
-                avtaleResponse.copy(ingress = avtalemal?.ingress, kvitteringstekst = avtalemal?.kvitteringstekst),
+                AvtaleResponse(
+                    avtaleResponse.uuid,
+                    avtaleResponse.orgnr,
+                    avtaleResponse.navn,
+                    avtaleResponse.navn_innsender,
+                    avtaleResponse.avtaleversjon,
+                    avtaleResponse.opprettet,
+                    avtaleResponse.erSignert,
+                    ingress = avtalemal?.ingress,
+                    kvitteringstekst = avtalemal?.kvitteringstekst,
+                    ingressNynorsk = avtalemal?.ingressNynorsk,
+                    kvitteringstekstNynorsk = avtalemal?.kvitteringstekstNynorsk,
+                ),
             )
         }
     }

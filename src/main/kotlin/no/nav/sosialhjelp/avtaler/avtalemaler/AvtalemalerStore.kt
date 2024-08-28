@@ -47,7 +47,9 @@ data class Avtalemal(
     val uuid: UUID,
     val publisert: OffsetDateTime? = null,
     var ingress: String? = null,
+    var ingressNynorsk: String? = null,
     var kvitteringstekst: String? = null,
+    var kvitteringstekstNynorsk: String? = null,
     var replacementMap: Map<String, Replacement> = emptyMap(),
 ) {
     lateinit var mal: ByteArray
@@ -64,7 +66,7 @@ class AvtalemalerStorePostgres(
         session {
             val sql =
                 """
-                SELECT uuid, navn, mal, publisert, replacement_map, ingress, kvitteringstekst from avtalemal
+                SELECT uuid, navn, mal, publisert, replacement_map, ingress, kvitteringstekst, ingress_nynorsk, kvitteringstekst_nynorsk from avtalemal
                 """.trimIndent()
             it.queryList(sql, emptyList(), ::mapper)
         }
@@ -73,7 +75,7 @@ class AvtalemalerStorePostgres(
         session { session ->
             val sql =
                 """
-                SELECT uuid, navn, mal, publisert, replacement_map, ingress, kvitteringstekst from avtalemal where uuid = :uuid
+                SELECT uuid, navn, mal, publisert, replacement_map, ingress, kvitteringstekst, ingress_nynorsk, kvitteringstekst_nynorsk from avtalemal where uuid = :uuid
                 """.trimIndent()
             session.query(sql, mapOf("uuid" to uuid), ::mapper)
         }
@@ -82,9 +84,9 @@ class AvtalemalerStorePostgres(
         session { session ->
             val sql =
                 """
-                INSERT INTO avtalemal (uuid, navn, mal, publisert, replacement_map, ingress, kvitteringstekst)
-                VALUES (:uuid, :navn, :mal, :publisert, :replacement_map::jsonb, :ingress, :kvitteringstekst)
-                ON CONFLICT ON CONSTRAINT avtalemal_pkey DO UPDATE SET navn = :navn, mal = :mal, publisert = :publisert, replacement_map = :replacement_map::jsonb, ingress = :ingress, kvitteringstekst = :kvitteringstekst
+                INSERT INTO avtalemal (uuid, navn, mal, publisert, replacement_map, ingress, kvitteringstekst, ingress_nynorsk, kvitteringstekst_nynorsk)
+                VALUES (:uuid, :navn, :mal, :publisert, :replacement_map::jsonb, :ingress, :kvitteringstekst, :ingress_nynorsk, :kvitteringstekst_nynorsk)
+                ON CONFLICT ON CONSTRAINT avtalemal_pkey DO UPDATE SET navn = :navn, mal = :mal, publisert = :publisert, replacement_map = :replacement_map::jsonb, ingress = :ingress, kvitteringstekst = :kvitteringstekst, ingress_nynorsk = :ingress_nynorsk, kvitteringstekst_nynorsk = :kvitteringstekst_nynorsk
                 """.trimIndent()
             session
                 .update(
@@ -100,7 +102,9 @@ class AvtalemalerStorePostgres(
                                 value = ObjectMapper().writeValueAsString(avtale.replacementMap.mapValues { it.value.name })
                             },
                         "ingress" to avtale.ingress,
+                        "ingress_nynorsk" to avtale.ingressNynorsk,
                         "kvitteringstekst" to avtale.kvitteringstekst,
+                        "kvitteringstekstNynorsk" to avtale.kvitteringstekstNynorsk,
                     ),
                 ).validate()
             avtale
@@ -180,7 +184,9 @@ private fun mapper(row: Row): Avtalemal =
         row.uuid("uuid"),
         row.offsetDateTimeOrNull("publisert"),
         row.stringOrNull("ingress"),
+        row.stringOrNull("ingress_nynorsk"),
         row.stringOrNull("kvitteringstekst"),
+        row.stringOrNull("kvitteringstekst_nynorsk"),
         ObjectMapper()
             .readValue<Map<String, String>>(
                 row.string("replacement_map"),

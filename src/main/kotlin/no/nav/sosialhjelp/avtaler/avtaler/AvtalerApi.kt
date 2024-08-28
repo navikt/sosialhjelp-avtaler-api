@@ -68,6 +68,8 @@ fun Route.avtaleApi() {
                             navnInnsender = it.navn_innsender,
                             orgnr = it.orgnr,
                             ingress = avtalemal?.ingress,
+                            ingressNynorsk = avtalemal?.ingressNynorsk,
+                            kvitteringstekstNynorsk = avtalemal?.kvitteringstekstNynorsk,
                             kvitteringstekst = avtalemal?.kvitteringstekst,
                         )
                     },
@@ -159,7 +161,12 @@ fun Route.avtaleApi() {
             }
             call.respond(
                 HttpStatusCode.OK,
-                avtaleResponse.copy(ingress = avtalemal?.ingress, kvitteringstekst = avtalemal?.kvitteringstekst),
+                avtaleResponse.copy(
+                    ingress = avtalemal?.ingress,
+                    kvitteringstekst = avtalemal?.kvitteringstekst,
+                    ingressNynorsk = avtalemal?.ingressNynorsk,
+                    kvitteringstekstNynorsk = avtalemal?.kvitteringstekstNynorsk,
+                ),
             )
         }
     }

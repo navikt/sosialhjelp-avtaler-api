@@ -34,6 +34,10 @@ import java.util.UUID
 data class AvtalemalMetadata(
     val name: String,
     val replacementMap: Map<String, String> = emptyMap(),
+    val ingress: String? = null,
+    val kvitteringstekst: String? = null,
+    val ingressNynorsk: String? = null,
+    val kvitteringstekstNynorsk: String? = null,
 )
 
 private val objectMapper = ObjectMapper().registerKotlinModule()
@@ -81,6 +85,10 @@ fun Route.avtalemalerApi() {
                             val metadata = objectMapper.readValue<AvtalemalMetadata>(part.value)
                             avtale.navn = metadata.name
                             avtale.replacementMap = metadata.replacementMap.mapValues { Replacement.valueOf(it.value) }
+                            avtale.ingress = metadata.ingress
+                            avtale.ingressNynorsk = metadata.ingressNynorsk
+                            avtale.kvitteringstekst = metadata.kvitteringstekst
+                            avtale.kvitteringstekstNynorsk = metadata.kvitteringstekstNynorsk
                         }
                     }
 

@@ -30,7 +30,10 @@ spec:
     application:
       enabled: true
       tenant: nav.no
-      allowAllUsers: true
+      allowAllUsers: false
+      claims:
+        groups:
+          - id: "9137b6c8-2023-4de9-87e0-0105f01c1e5d"
   gcp:
     sqlInstances:
       - type: POSTGRES_14

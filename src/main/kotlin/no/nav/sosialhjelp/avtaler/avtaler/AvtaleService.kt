@@ -160,7 +160,7 @@ class AvtaleService(
         fnr: String,
         token: String,
         statusQueryToken: String,
-    ): AvtaleResponse? {
+    ): Avtale? {
         val digipostJobbData = digipostService.hentDigipostJobb(uuid)
         if (digipostJobbData == null) {
             log.error("Kunne ikke hente signeringsstatus for uuid $uuid")
@@ -180,15 +180,7 @@ class AvtaleService(
         log.info("Avtale for orgnr ${avtale.orgnr} er signert")
 
         documentJobService.lastNedOgLagreAvtale(digipostJobbData.copy(statusQueryToken = statusQueryToken), signertAvtale)
-        return AvtaleResponse(
-            uuid = signertAvtale.uuid,
-            avtaleversjon = signertAvtale.avtaleversjon,
-            opprettet = signertAvtale.opprettet,
-            navn = signertAvtale.navn,
-            navnInnsender = signertAvtale.navn_innsender,
-            erSignert = true,
-            orgnr = signertAvtale.orgnr,
-        )
+        return signertAvtale.copy(erSignert = true)
     }
 
     private fun erAvtaleSignert(
@@ -219,7 +211,14 @@ class AvtaleService(
         )
     }
 
-    suspend fun hentSignertAvtaleDokumentFraDatabaseEllerDigipost(uuid: UUID): InputStream? {
+    suspend fun hentSignertAvtaleDokumentFraDatabaseEllerDigipost(
+        fnr: String,
+        tjeneste: Avgiver.Tjeneste,
+        token: String?,
+        uuid: UUID,
+    ): InputStream? {
+        hentAvtale(uuid)?.also { it.checkAvtaleBelongsToUser(fnr, tjeneste, token) } ?: error("Fant ikke avtale med uuid $uuid")
+
         val digipostJobbData =
             digipostService.hentDigipostJobb(uuid)
 

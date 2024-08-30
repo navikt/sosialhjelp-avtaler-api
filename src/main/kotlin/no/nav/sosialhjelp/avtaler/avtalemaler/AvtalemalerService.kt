@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.newFixedThreadPoolContext
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
@@ -21,8 +20,6 @@ import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
-
-val pdfConvertContext = newFixedThreadPoolContext(10, "pdfConvert")
 
 class AvtalemalerService(
     private val databaseContext: DatabaseContext,
@@ -150,7 +147,7 @@ class AvtalemalerService(
                 Avtale(
                     uuid = UUID.randomUUID(),
                     orgnr = publisering.orgnr,
-                    navn = "${avtalemal.navn}_$kommuneNavn",
+                    navn = avtalemal.navn,
                     opprettet = now,
                     avtaleversjon = "1.0",
                     erSignert = false,

@@ -17,6 +17,7 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
+import no.nav.sosialhjelp.avtaler.avtalemaler.AvtalemalerService
 import no.nav.sosialhjelp.avtaler.extractFnr
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
 import org.koin.ktor.ext.inject
@@ -29,6 +30,7 @@ data class SigneringsstatusRequest(
 
 fun Route.avtaleApi() {
     val avtaleService by inject<AvtaleService>()
+    val avtalemalerService by inject<AvtalemalerService>()
 
     route("/avtale") {
         get {
@@ -54,6 +56,7 @@ fun Route.avtaleApi() {
                     call.response.status(HttpStatusCode.NotFound)
                     return@get
                 }
+                val avtalemal = avtale.avtalemal_uuid?.let { avtalemalerService.hentAvtalemal(it) }
                 call.respond(
                     HttpStatusCode.OK,
                     avtale.let {
@@ -64,6 +67,10 @@ fun Route.avtaleApi() {
                             navn = it.navn,
                             navnInnsender = it.navn_innsender,
                             orgnr = it.orgnr,
+                            ingress = avtalemal?.ingress,
+                            ingressNynorsk = avtalemal?.ingressNynorsk,
+                            kvitteringstekstNynorsk = avtalemal?.kvitteringstekstNynorsk,
+                            kvitteringstekst = avtalemal?.kvitteringstekst,
                         )
                     },
                 )
@@ -79,8 +86,7 @@ fun Route.avtaleApi() {
                         this.context.getAccessToken(),
                     )
                 if (avtale == null) {
-                    call.respond(HttpStatusCode.NotFound)
-                    return@get
+                    return@get call.respond(HttpStatusCode.NotFound)
                 }
                 val avtaleDokument =
                     avtaleService.hentAvtaleDokument(
@@ -91,8 +97,7 @@ fun Route.avtaleApi() {
                     )
 
                 if (avtaleDokument == null) {
-                    call.response.status(HttpStatusCode.NotFound)
-                    return@get
+                    return@get call.response.status(HttpStatusCode.NotFound)
                 }
 
                 call.response.header(
@@ -103,6 +108,27 @@ fun Route.avtaleApi() {
                 )
                 call.respondBytes(avtaleDokument, ContentType.Application.Pdf)
             }
+
+            get("/signert-avtale") {
+                val uuid = call.uuid()
+                val fnr = call.extractFnr()
+                val token = this.context.getAccessToken() ?: error("Kunne ikke hente access token")
+                val signertAvtaleDokument =
+                    avtaleService.hentSignertAvtaleDokumentFraDatabaseEllerDigipost(
+                        fnr,
+                        Avgiver.Tjeneste.AVTALESIGNERING,
+                        token,
+                        uuid,
+                    )
+
+                if (signertAvtaleDokument == null) {
+                    call.response.status(HttpStatusCode.NotFound)
+                    return@get
+                }
+
+                signertAvtaleDokument.use { call.respond(HttpStatusCode.OK, it) }
+            }
+
             post("/signer") {
                 val uuid = call.uuid()
                 val fnr = call.extractFnr()
@@ -117,23 +143,10 @@ fun Route.avtaleApi() {
             }
         }
 
-        get("/signert-avtale/{uuid}") {
-            val uuid = call.uuid()
-            val signertAvtaleDokument = avtaleService.hentSignertAvtaleDokumentFraDatabaseEllerDigipost(uuid)
-
-            if (signertAvtaleDokument == null) {
-                call.response.status(HttpStatusCode.NotFound)
-                return@get
-            }
-
-            signertAvtaleDokument.use { call.respond(HttpStatusCode.OK, it) }
-        }
-
         post("/signeringsstatus") {
             val signeringsstatusRequest = call.receive<SigneringsstatusRequest>()
             val fnr = call.extractFnr()
             val token = this.context.getAccessToken() ?: throw RuntimeException("Kunne ikke hente access token")
-
             val avtaleResponse =
                 avtaleService.sjekkAvtaleStatusOgLagreSignertDokument(
                     statusQueryToken = signeringsstatusRequest.token,
@@ -141,12 +154,27 @@ fun Route.avtaleApi() {
                     fnr = fnr,
                     token = token,
                 )
+            val avtalemal = avtaleResponse?.avtalemal_uuid?.let { avtalemalerService.hentAvtalemal(it) }
 
             if (avtaleResponse == null) {
-                call.response.status(HttpStatusCode.NotFound)
-                return@post
+                return@post call.response.status(HttpStatusCode.NotFound)
             }
-            call.respond(HttpStatusCode.OK, avtaleResponse)
+            call.respond(
+                HttpStatusCode.OK,
+                AvtaleResponse(
+                    avtaleResponse.uuid,
+                    avtaleResponse.orgnr,
+                    avtaleResponse.navn,
+                    avtaleResponse.navn_innsender,
+                    avtaleResponse.avtaleversjon,
+                    avtaleResponse.opprettet,
+                    avtaleResponse.erSignert,
+                    ingress = avtalemal?.ingress,
+                    kvitteringstekst = avtalemal?.kvitteringstekst,
+                    ingressNynorsk = avtalemal?.ingressNynorsk,
+                    kvitteringstekstNynorsk = avtalemal?.kvitteringstekstNynorsk,
+                ),
+            )
         }
     }
 }

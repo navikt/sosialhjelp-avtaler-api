@@ -48,7 +48,8 @@ fun Application.installAuthentication(httpClient: HttpClient) {
             .build()
 
     val abcProviderTokenAzure =
-        JwkProviderBuilder(URI.create(azureConfig.metadata.jwksUri).toURL()).cached(1000, 24, TimeUnit.HOURS)
+        JwkProviderBuilder(URI.create(azureConfig.metadata.jwksUri).toURL())
+            .cached(1000, 24, TimeUnit.HOURS)
             // if not cached, only allow max 100 different keys per minute to be fetched from external provider
             .rateLimited(100, 1, TimeUnit.MINUTES)
             .build()
@@ -94,11 +95,9 @@ fun isValidAzureToken(
     clientId: String,
 ): Boolean {
     if (payload.issuer != jwtIssuer) {
-//        logger.warn("Something is wrong here with issuer")
         return false
     }
     if (!payload.audience.contains(clientId)) {
-//        logger.warn("Something is wrong here with audience")
         return false
     }
     return true
@@ -114,9 +113,13 @@ private data class AuthenticationConfiguration(
     )
 }
 
-internal data class UserPrincipal(val fnr: String) : Principal
+internal data class UserPrincipal(
+    val fnr: String,
+) : Principal
 
-internal data class AzureUserPrincipal(val email: String) : Principal
+internal data class AzureUserPrincipal(
+    val email: String,
+) : Principal
 
 fun ApplicationCall.extractFnr(): String {
     val fnrFromClaims = this.principal<UserPrincipal>()?.fnr

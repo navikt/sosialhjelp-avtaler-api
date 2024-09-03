@@ -6,6 +6,7 @@ import mu.KotlinLogging
 import no.digipost.signature.client.ClientConfiguration
 import no.digipost.signature.client.ServiceEnvironment
 import no.digipost.signature.client.core.DocumentType
+import no.digipost.signature.client.core.IdentifierInSignedDocuments
 import no.digipost.signature.client.core.ResponseInputStream
 import no.digipost.signature.client.core.Sender
 import no.digipost.signature.client.direct.DirectClient
@@ -31,7 +32,11 @@ import kotlin.time.toJavaDuration
 
 private val log = KotlinLogging.logger {}
 
-data class DigipostResponse(val redirectUrl: URI, val signerUrl: URI, val reference: String)
+data class DigipostResponse(
+    val redirectUrl: URI,
+    val signerUrl: URI,
+    val reference: String,
+)
 
 interface DigipostClient {
     fun sendTilSignering(
@@ -71,22 +76,24 @@ class DigipostClientImpl(
     private val virksomhetVersionId = virksomhetProps.versionId
     private val keyStoreConfig: KeyStoreConfig = configure(accessSecretVersion)
     private val clientConfiguration =
-        ClientConfiguration.builder(keyStoreConfig)
+        ClientConfiguration
+            .builder(keyStoreConfig)
             .serviceEnvironment(if (profile == Configuration.Profile.PROD) ServiceEnvironment.PRODUCTION else ServiceEnvironment.DIFITEST)
             .defaultSender(Sender(props.navOrgnr))
             .timeoutsForDocumentDownloads {
                 it.allTimeouts(30.seconds.toJavaDuration())
-            }
-            .build()
+            }.build()
     private val client = DirectClient(clientConfiguration)
 
     private fun configure(accessSecretVersion: SecretManager): KeyStoreConfig {
         val certificatePassword =
-            accessSecretVersion.accessSecretVersion(
-                virksomhetPasswordProjectId,
-                virksomhetPasswordSecretId,
-                virksomhetPasswordVersionId,
-            )?.data?.toStringUtf8()
+            accessSecretVersion
+                .accessSecretVersion(
+                    virksomhetPasswordProjectId,
+                    virksomhetPasswordSecretId,
+                    virksomhetPasswordVersionId,
+                )?.data
+                ?.toStringUtf8()
         val objectMapper = ObjectMapper().registerKotlinModule()
         val keystoreCredentials: DigisosKeyStoreCredentials =
             objectMapper.readValue(
@@ -144,6 +151,7 @@ class DigipostClientImpl(
             DirectJob
                 .builder(avtaleTittel, documents, signers, exitUrls)
                 .withReference(avtale.uuid)
+                .withIdentifierInSignedDocuments(IdentifierInSignedDocuments.NAME)
                 .build()
 
         val directJobResponse = client.create(job)
@@ -162,7 +170,8 @@ class DigipostClientImpl(
         val directJobResponse = DirectJobResponse(1, directJobReference, statusUrl, null)
         val directJobStatusResponse =
             client.getStatus(
-                StatusReference.of(directJobResponse)
+                StatusReference
+                    .of(directJobResponse)
                     .withStatusQueryToken(statusQueryToken),
             )
         return directJobStatusResponse.status
@@ -186,23 +195,17 @@ class DigipostClientLocal : DigipostClient {
         avtale: Avtale,
         dokument: ByteArray,
         navn: String,
-    ): DigipostResponse {
-        return DigipostResponse(URI.create("http://localhost:8080"), URI.create("http://localhost:8080"), "1234")
-    }
+    ): DigipostResponse = DigipostResponse(URI.create("http://localhost:8080"), URI.create("http://localhost:8080"), "1234")
 
     override fun sjekkSigneringsstatus(
         directJobReference: String,
         statusUrl: URI,
         statusQueryToken: String,
-    ): DirectJobStatus {
-        return DirectJobStatus.COMPLETED_SUCCESSFULLY
-    }
+    ): DirectJobStatus = DirectJobStatus.COMPLETED_SUCCESSFULLY
 
     override fun hentSignertAvtale(
         statusQueryToken: String,
         jobReference: String,
         statusUrl: URI,
-    ): ResponseInputStream? {
-        return ResponseInputStream(InputStream.nullInputStream(), 1L)
-    }
+    ): ResponseInputStream? = ResponseInputStream(InputStream.nullInputStream(), 1L)
 }

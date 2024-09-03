@@ -149,7 +149,7 @@ class DigipostClientImpl(
 
         val job =
             DirectJob
-                .builder(avtaleTittel, documents, signers, exitUrls)
+                .builder("Avtalesignering_${avtale.orgnr}_${avtale.uuid}", documents, signers, exitUrls)
                 .withReference(avtale.uuid)
                 .withIdentifierInSignedDocuments(IdentifierInSignedDocuments.NAME)
                 .build()

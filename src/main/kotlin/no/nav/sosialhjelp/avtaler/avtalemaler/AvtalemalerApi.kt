@@ -174,12 +174,6 @@ fun Route.avtalemalerApi() {
                     return@get
                 }
 
-                call.response.header(
-                    HttpHeaders.ContentDisposition,
-                    ContentDisposition.Attachment
-                        .withParameter(ContentDisposition.Parameters.FileName, "${avtalemal.navn}_preview.pdf")
-                        .toString(),
-                )
                 call.respondBytes(converted, ContentType.Application.Pdf, HttpStatusCode.OK)
             }
         }

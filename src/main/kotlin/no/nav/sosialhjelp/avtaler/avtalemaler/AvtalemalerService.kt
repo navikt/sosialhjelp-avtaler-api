@@ -86,15 +86,20 @@ class AvtalemalerService(
 
         initiatePublisering(publiseringer)
 
+        val now = OffsetDateTime.now()
         val updated =
-            avtalemal.copy(publisert = OffsetDateTime.now()).apply {
-                mal = avtalemal.mal
-                navn = avtalemal.navn
-            }
+            avtalemal
+                .copy(publisert = now)
+                .apply {
+                    mal = avtalemal.mal
+                    navn = avtalemal.navn
+                }.also {
+                    transaction(databaseContext) { ctx ->
+                        ctx.avtalemalerStore.updatePublisert(it.uuid, now)
+                    }
+                }
 
-        return transaction(databaseContext) { ctx ->
-            ctx.avtalemalerStore.lagreAvtalemal(updated)
-        }
+        return updated
     }
 
     suspend fun hentFeiledePubliseringer(): List<Publisering> =

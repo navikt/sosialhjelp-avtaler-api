@@ -20,6 +20,11 @@ interface AvtalemalerStore : Store {
 
     fun lagreAvtalemal(avtale: Avtalemal): Avtalemal
 
+    fun updatePublisert(
+        uuid: UUID,
+        publisert: OffsetDateTime,
+    )
+
     fun slettAvtalemal(uuid: UUID)
 
     fun lagrePubliseringsjobb(publisering: Publisering): Publisering
@@ -113,6 +118,21 @@ class AvtalemalerStorePostgres(
                 ).validate()
             avtale
         }
+
+    override fun updatePublisert(
+        uuid: UUID,
+        publisert: OffsetDateTime,
+    ) = session { session ->
+        val sql = "update avtalemal set publisert = :publisert where uuid = :uuid"
+        session
+            .update(
+                sql,
+                mapOf(
+                    "uuid" to uuid,
+                    "publisert" to publisert,
+                ),
+            ).validate()
+    }
 
     override fun slettAvtalemal(uuid: UUID) =
         session {

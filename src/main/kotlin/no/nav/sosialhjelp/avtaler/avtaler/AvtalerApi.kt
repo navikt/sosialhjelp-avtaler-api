@@ -76,6 +76,33 @@ fun Route.avtaleApi() {
                 )
             }
 
+            get("/eksempel") {
+                val uuid = call.uuid()
+                val avtale =
+                    avtaleService.hentAvtale(
+                        call.extractFnr(),
+                        uuid,
+                        Avgiver.Tjeneste.AVTALESIGNERING,
+                        this.context.getAccessToken(),
+                    )
+                if (avtale == null) {
+                    return@get call.respond(HttpStatusCode.NotFound)
+                }
+                val eksempelDokument = avtalemalerService.hentEksempel(uuid)
+
+                if (eksempelDokument == null) {
+                    return@get call.response.status(HttpStatusCode.NotFound)
+                }
+
+                call.response.header(
+                    HttpHeaders.ContentDisposition,
+                    ContentDisposition.Attachment
+                        .withParameter(ContentDisposition.Parameters.FileName, "Eksempel på ${avtale.navn}.pdf")
+                        .toString(),
+                )
+                call.respondBytes(eksempelDokument, ContentType.Application.Pdf)
+            }
+
             get("/avtale") {
                 val uuid = call.uuid()
                 val avtale =

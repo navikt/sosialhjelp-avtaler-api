@@ -12,6 +12,7 @@ import io.ktor.http.content.forEachPart
 import io.ktor.http.content.streamProvider
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
+import io.ktor.server.request.header
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.request.receiveNullable
 import io.ktor.server.response.header
@@ -49,6 +50,7 @@ data class AvtalemalDto(
     val publishedTo: List<String> = emptyList(),
     val dokumentUrl: String = "/sosialhjelp/avtaler-api/api/avtalemal/$uuid/dokument",
     val previewUrl: String = "/sosialhjelp/avtaler-api/api/avtalemal/$uuid/preview",
+    val exampleUrl: String = "/sosialhjelp/avtaler-api/api/avtalemal/$uuid/eksempel",
     val replacementMap: Map<String, String> = emptyMap(),
 )
 
@@ -74,6 +76,9 @@ fun Route.avtalemalerApi() {
                         when (part.name) {
                             "file" -> {
                                 avtale.mal = part.streamProvider().readAllBytes()
+                            }
+                            "examplePdf" -> {
+                                avtale.examplePdf = part.streamProvider().readAllBytes()
                             }
 
                             else -> "Ukjent filnavn: ${part.name}"
@@ -143,6 +148,21 @@ fun Route.avtalemalerApi() {
                     val publiseringer = avtalemalerService.hentPubliseringer(uuid)
                     call.respond(HttpStatusCode.OK, publiseringer)
                 }
+            }
+
+            get("/eksempel") {
+                val uuid = call.uuid()
+                val avtalemal = avtalemalerService.hentAvtalemal(uuid)
+                if (avtalemal == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@get
+                }
+                val eksempelDokument = avtalemalerService.hentEksempel(uuid)
+                if (eksempelDokument == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@get
+                }
+                call.respondBytes(eksempelDokument, ContentType.Application.Pdf)
             }
 
             get("/preview") {

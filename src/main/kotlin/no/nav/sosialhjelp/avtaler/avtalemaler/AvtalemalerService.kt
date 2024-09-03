@@ -160,4 +160,9 @@ class AvtalemalerService(
             ctx.avtalemalerStore.lagrePubliseringsjobb(publisering.copy(avtaleUuid = avtale.uuid))
         }
     }
+
+    suspend fun hentEksempel(uuid: UUID): ByteArray? =
+        transaction(databaseContext) { ctx ->
+            ctx.avtalemalerStore.hentEksempel(uuid)
+        }
 }

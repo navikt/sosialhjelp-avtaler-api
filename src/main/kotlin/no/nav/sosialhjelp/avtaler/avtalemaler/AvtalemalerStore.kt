@@ -27,6 +27,8 @@ interface AvtalemalerStore : Store {
     fun hentPubliseringer(avtalemalUuid: UUID): List<Publisering>
 
     fun hentFeiledePubliseringer(maxRetries: Int): List<Publisering>
+
+    fun hentEksempel(uuid: UUID): ByteArray?
 }
 
 data class Publisering(
@@ -52,6 +54,7 @@ data class Avtalemal(
     var kvitteringstekstNynorsk: String? = null,
     var replacementMap: Map<String, Replacement> = emptyMap(),
 ) {
+    lateinit var examplePdf: ByteArray
     lateinit var mal: ByteArray
     lateinit var navn: String
 
@@ -84,9 +87,9 @@ class AvtalemalerStorePostgres(
         session { session ->
             val sql =
                 """
-                INSERT INTO avtalemal (uuid, navn, mal, publisert, replacement_map, ingress, kvitteringstekst, ingress_nynorsk, kvitteringstekst_nynorsk)
-                VALUES (:uuid, :navn, :mal, :publisert, :replacement_map::jsonb, :ingress, :kvitteringstekst, :ingress_nynorsk, :kvitteringstekst_nynorsk)
-                ON CONFLICT ON CONSTRAINT avtalemal_pkey DO UPDATE SET navn = :navn, mal = :mal, publisert = :publisert, replacement_map = :replacement_map::jsonb, ingress = :ingress, kvitteringstekst = :kvitteringstekst, ingress_nynorsk = :ingress_nynorsk, kvitteringstekst_nynorsk = :kvitteringstekst_nynorsk
+                INSERT INTO avtalemal (uuid, navn, mal, publisert, replacement_map, ingress, kvitteringstekst, ingress_nynorsk, kvitteringstekst_nynorsk, example_pdf)
+                VALUES (:uuid, :navn, :mal, :publisert, :replacement_map::jsonb, :ingress, :kvitteringstekst, :ingress_nynorsk, :kvitteringstekst_nynorsk, :example_pdf)
+                ON CONFLICT ON CONSTRAINT avtalemal_pkey DO UPDATE SET navn = :navn, mal = :mal, publisert = :publisert, replacement_map = :replacement_map::jsonb, ingress = :ingress, kvitteringstekst = :kvitteringstekst, ingress_nynorsk = :ingress_nynorsk, kvitteringstekst_nynorsk = :kvitteringstekst_nynorsk, example_pdf = :example_pdf
                 """.trimIndent()
             session
                 .update(
@@ -105,6 +108,7 @@ class AvtalemalerStorePostgres(
                         "ingress_nynorsk" to avtale.ingressNynorsk,
                         "kvitteringstekst" to avtale.kvitteringstekst,
                         "kvitteringstekstNynorsk" to avtale.kvitteringstekstNynorsk,
+                        "example_pdf" to avtale.examplePdf,
                     ),
                 ).validate()
             avtale
@@ -175,6 +179,17 @@ class AvtalemalerStorePostgres(
                     it.int("retry_count"),
                     it.uuidOrNull("avtale_uuid"),
                 )
+            }
+        }
+
+    override fun hentEksempel(uuid: UUID): ByteArray? =
+        session { session ->
+            val sql =
+                """
+                select example_pdf from avtalemal where uuid = :uuid                    
+                """.trimIndent()
+            session.query(sql, mapOf("uuid" to uuid)) {
+                it.bytes("example_pdf")
             }
         }
 }

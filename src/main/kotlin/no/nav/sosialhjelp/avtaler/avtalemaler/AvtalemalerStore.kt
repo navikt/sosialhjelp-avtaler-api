@@ -112,7 +112,7 @@ class AvtalemalerStorePostgres(
                         "ingress" to avtale.ingress,
                         "ingress_nynorsk" to avtale.ingressNynorsk,
                         "kvitteringstekst" to avtale.kvitteringstekst,
-                        "kvitteringstekstNynorsk" to avtale.kvitteringstekstNynorsk,
+                        "kvitteringstekst_nynorsk" to avtale.kvitteringstekstNynorsk,
                         "example_pdf" to avtale.examplePdf,
                     ),
                 ).validate()

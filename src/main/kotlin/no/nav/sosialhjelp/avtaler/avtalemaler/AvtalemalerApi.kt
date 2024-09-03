@@ -12,7 +12,6 @@ import io.ktor.http.content.forEachPart
 import io.ktor.http.content.streamProvider
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.application.call
-import io.ktor.server.request.header
 import io.ktor.server.request.receiveMultipart
 import io.ktor.server.request.receiveNullable
 import io.ktor.server.response.header
@@ -52,6 +51,10 @@ data class AvtalemalDto(
     val previewUrl: String = "/sosialhjelp/avtaler-api/api/avtalemal/$uuid/preview",
     val exampleUrl: String = "/sosialhjelp/avtaler-api/api/avtalemal/$uuid/eksempel",
     val replacementMap: Map<String, String> = emptyMap(),
+    val ingress: String? = null,
+    val kvitteringstekst: String? = null,
+    val ingressNynorsk: String? = null,
+    val kvitteringstekstNynorsk: String? = null,
 )
 
 fun Route.avtalemalerApi() {
@@ -215,4 +218,8 @@ fun Avtalemal.toDto(publishedOrgnrs: List<String>?) =
                 it.value.name
             },
         publishedTo = publishedOrgnrs ?: emptyList(),
+        ingress = ingress,
+        kvitteringstekst = kvitteringstekst,
+        ingressNynorsk = ingressNynorsk,
+        kvitteringstekstNynorsk = kvitteringstekstNynorsk,
     )

@@ -85,10 +85,10 @@ fun Route.avtaleApi() {
                         Avgiver.Tjeneste.AVTALESIGNERING,
                         this.context.getAccessToken(),
                     )
-                if (avtale == null) {
+                if (avtale?.avtalemal_uuid == null) {
                     return@get call.respond(HttpStatusCode.NotFound)
                 }
-                val eksempelDokument = avtalemalerService.hentEksempel(uuid)
+                val eksempelDokument = avtalemalerService.hentEksempel(avtale.avtalemal_uuid)
 
                 if (eksempelDokument == null) {
                     return@get call.response.status(HttpStatusCode.NotFound)

@@ -11,12 +11,11 @@ jobs:
     name: 'Deploy to prod-gcp'
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     permissions:
-      packages: write
       contents: write
-    uses: navikt/sosialhjelp-ci/.github/workflows/deploy_app.yml@v2
+      id-token: write
+    uses: navikt/sosialhjelp-ci/.github/workflows/deploy_app.yml@v3
     with:
       cluster-name: 'prod-gcp'
       resource-folder: 'prod'
       resource-name: 'prod'
-      build-always: true
     secrets: inherit

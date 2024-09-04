@@ -2,7 +2,7 @@ package no.nav.sosialhjelp.avtaler.avtalemaler
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
@@ -109,7 +109,8 @@ class AvtalemalerService(
 
     fun initiatePublisering(publiseringer: List<Publisering>) {
         val scope = CoroutineScope(Dispatchers.IO)
-        flowOf(*publiseringer.toTypedArray())
+        publiseringer
+            .asFlow()
             .onEach { publisering ->
                 runCatching { processPublisering(publisering) }.onFailure {
                     log.error(it) { "Feil ved publisering" }

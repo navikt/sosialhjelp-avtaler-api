@@ -52,7 +52,6 @@ spec:
       rules:
         - application: sosialhjelp-avtaler
         - application: sosialhjelp-avtaler-admin
-        - application: curl-digipost-app
     outbound:
       external:
         - host: data.brreg.no
@@ -66,7 +65,6 @@ spec:
       rules:
         - application: altinn-rettigheter-proxy
           namespace: arbeidsgiver
-        - application: curl-digipost-app
   resources:
     limits:
       memory: 2Gi

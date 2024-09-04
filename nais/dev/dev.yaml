@@ -52,7 +52,6 @@ spec:
       rules:
         - application: sosialhjelp-avtaler-dev
         - application: sosialhjelp-avtaler-admin
-        - application: curl-digipost-app
     outbound:
       external:
         - host: data.brreg.no
@@ -65,7 +64,6 @@ spec:
         - host: data.ssb.no
       rules:
         - application: sosialhjelp-mock-alt-api-mock
-        - application: curl-digipost-app
         - application: altinn-rettigheter-proxy
           namespace: arbeidsgiver
         - application: sosialhjelp-konvertering-til-pdf

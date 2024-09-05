@@ -6,9 +6,6 @@ import io.ktor.client.request.get
 import io.ktor.http.CacheControl
 import io.ktor.http.headers
 import io.ktor.server.response.cacheControl
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.jsonPrimitive
-import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.Configuration
 import java.net.InetAddress
 
@@ -16,7 +13,9 @@ interface LeaderElectionClient {
     suspend fun isLeader(): Boolean
 }
 
-private val log = KotlinLogging.logger { }
+data class LeaderElectionResponse(
+    val name: String,
+)
 
 class LeaderElectionClientImpl(
     private val httpClient: HttpClient,
@@ -29,11 +28,8 @@ class LeaderElectionClientImpl(
                     headers {
                         cacheControl(CacheControl.MaxAge(10))
                     }
-                }.body<JsonObject>()
-        val leader: String? = leaderJson["name"]?.jsonPrimitive?.content
-        if (leader == null) {
-            log.warn { "Fikk null fra leader election" }
-        }
+                }.body<LeaderElectionResponse>()
+        val leader: String = leaderJson.name
         val hostname: String = InetAddress.getLocalHost().hostName
 
         return hostname == leader

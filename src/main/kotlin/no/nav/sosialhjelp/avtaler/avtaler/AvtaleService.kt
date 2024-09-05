@@ -216,8 +216,9 @@ class AvtaleService(
         tjeneste: Avgiver.Tjeneste,
         token: String?,
         uuid: UUID,
-    ): InputStream? {
-        hentAvtale(uuid)?.also { it.checkAvtaleBelongsToUser(fnr, tjeneste, token) } ?: error("Fant ikke avtale med uuid $uuid")
+    ): Pair<String, InputStream?>? {
+        val avtale =
+            hentAvtale(uuid)?.also { it.checkAvtaleBelongsToUser(fnr, tjeneste, token) } ?: error("Fant ikke avtale med uuid $uuid")
 
         val digipostJobbData =
             digipostService.hentDigipostJobb(uuid)
@@ -229,13 +230,14 @@ class AvtaleService(
 
         if (digipostJobbData.signertDokument != null) {
             log.info { "Hentet signert avtale for uuid $uuid fra database" }
-            return digipostJobbData.signertDokument
+            return avtale.navn to digipostJobbData.signertDokument
         }
 
-        return hentSignertAvtaleDokumentFraDigipost(
-            digipostJobbData,
-            digipostJobbData.statusQueryToken,
-        )
+        return avtale.navn to
+            hentSignertAvtaleDokumentFraDigipost(
+                digipostJobbData,
+                digipostJobbData.statusQueryToken,
+            )
     }
 
     suspend fun hentAvtalemalToOrgnrMap(): Map<UUID, List<String>> =

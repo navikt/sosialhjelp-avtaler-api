@@ -12,6 +12,7 @@ import io.ktor.server.request.receive
 import io.ktor.server.response.header
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytes
+import io.ktor.server.response.respondOutputStream
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
@@ -140,7 +141,7 @@ fun Route.avtaleApi() {
                 val uuid = call.uuid()
                 val fnr = call.extractFnr()
                 val token = this.context.getAccessToken() ?: error("Kunne ikke hente access token")
-                val signertAvtaleDokument =
+                val (title, document) =
                     avtaleService.hentSignertAvtaleDokumentFraDatabaseEllerDigipost(
                         fnr,
                         Avgiver.Tjeneste.AVTALESIGNERING,
@@ -148,12 +149,25 @@ fun Route.avtaleApi() {
                         uuid,
                     )
 
-                if (signertAvtaleDokument == null) {
+                if (document == null) {
                     call.response.status(HttpStatusCode.NotFound)
                     return@get
                 }
 
-                signertAvtaleDokument.use { call.respond(HttpStatusCode.OK, it) }
+                call.response.header(
+                    HttpHeaders.ContentDisposition,
+                    ContentDisposition.Attachment
+                        .withParameter(ContentDisposition.Parameters.FileName, "$title.pdf")
+                        .toString(),
+                )
+
+                document.use { doc ->
+                    call.respondOutputStream(contentType = ContentType.Application.Pdf, status = HttpStatusCode.OK) {
+                        this.use { outputStream ->
+                            doc.copyTo(outputStream)
+                        }
+                    }
+                }
             }
 
             post("/signer") {

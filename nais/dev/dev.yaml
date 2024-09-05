@@ -23,7 +23,8 @@ spec:
     path: /sosialhjelp/avtaler-api/internal/prometheus
   replicas:
     min: 1
-    max: 1
+    max: 2
+  leaderElection: true
   tokenx:
     enabled: true
   azure:

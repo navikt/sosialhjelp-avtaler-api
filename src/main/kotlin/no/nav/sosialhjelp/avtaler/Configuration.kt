@@ -142,6 +142,7 @@ object Configuration {
     val gcpProperties = GcpProperties()
     val azureProperties = AzureProperties()
     val gotenbergProperties = GotenbergProperties()
+    val leaderElectionProperties = LeaderElectionProperties()
 
     operator fun get(key: String): String = config[Key(key, stringType)]
 
@@ -165,24 +166,6 @@ object Configuration {
         LOCAL,
         DEV,
         PROD,
-    }
-
-    enum class Cluster {
-        PROD_GCP,
-        DEV_GCP,
-        LOCAL,
-        ;
-
-        companion object {
-            fun fromNaisString(cluster: String): Cluster {
-                return when (cluster) {
-                    "PROD-GCP" -> PROD_GCP
-                    "DEV-GCP" -> PROD_GCP
-                    "LOCAL" -> PROD_GCP
-                    else -> error("Ukjent cluster-navn")
-                }
-            }
-        }
     }
 
     data class AltinnProperties(
@@ -222,7 +205,9 @@ object Configuration {
         val passwordSecretVersionId: String = this["virksomhetssertifikat.passwordSecretVersion"],
     )
 
-    data class EregProperties(val baseUrl: String = this["ereg.url"])
+    data class EregProperties(
+        val baseUrl: String = this["ereg.url"],
+    )
 
     data class SlackProperties(
         // The Slack-webhook is extracted from the environment variable SLACK_HOOK (envFrom: digisos-slack-hook)
@@ -230,7 +215,15 @@ object Configuration {
         val environment: String = profile.toString(),
     )
 
-    data class GcpProperties(val bucketName: String = this["gcp.bucketName"])
+    data class GcpProperties(
+        val bucketName: String = this["gcp.bucketName"],
+    )
 
-    data class GotenbergProperties(val url: String = this["gotenberg.url"])
+    data class GotenbergProperties(
+        val url: String = this["gotenberg.url"],
+    )
+
+    data class LeaderElectionProperties(
+        val url: String = this["ELECTOR_GET_URL"],
+    )
 }

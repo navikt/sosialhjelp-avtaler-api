@@ -61,6 +61,7 @@ dependencies {
 
     implementation(libs.ktor.client.mock)
     implementation(libs.bundles.apache.poi)
+    implementation(libs.opentelemetry.instrumentation.annotations)
 
     testImplementation(libs.bundles.test)
 }

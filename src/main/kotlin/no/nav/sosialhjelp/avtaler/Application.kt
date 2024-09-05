@@ -15,6 +15,7 @@ import io.ktor.server.request.path
 import io.ktor.server.routing.IgnoreTrailingSlash
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import io.opentelemetry.instrumentation.annotations.WithSpan
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -150,6 +151,14 @@ private fun Application.setupJobs() {
     setupPubliseringRetry()
 }
 
+@WithSpan
+private suspend fun receivePublishSignal(avtalemalerService: AvtalemalerService) {
+    val feilede = avtalemalerService.hentFeiledePubliseringer()
+    if (feilede.isNotEmpty()) {
+        avtalemalerService.initiatePublisering(feilede)
+    }
+}
+
 private fun Application.setupPubliseringRetry() {
     val avtalemalerService by inject<AvtalemalerService>()
     val leaderElectionClient by inject<LeaderElectionClient>()
@@ -168,12 +177,31 @@ private fun Application.setupPubliseringRetry() {
 
     flow
         .onEach {
-            val feilede = avtalemalerService.hentFeiledePubliseringer()
-            if (feilede.isNotEmpty()) {
-                avtalemalerService.initiatePublisering(feilede)
-            }
+            receivePublishSignal(avtalemalerService)
         }.catch { log.error("Fikk feil i signalmottak", it) }
         .launchIn(scope)
+}
+
+@WithSpan
+private suspend fun receiveCleaningSignal(
+    avtaleService: AvtaleService,
+    documentJobService: DocumentJobService,
+) {
+    log.info("Tar imot oppryddingsignal")
+    val avtalerUtenDokument = avtaleService.hentAvtalerUtenSignertDokument()
+    log.info("Fant ${avtalerUtenDokument.size} avtaler uten nedlastet dokument")
+    avtalerUtenDokument.forEach { digipostJobbData ->
+        val resultat =
+            documentJobService.lastNedOgLagreAvtale(
+                digipostJobbData,
+                avtaleService.hentAvtale(digipostJobbData.uuid) ?: return@forEach,
+            )
+        resultat.fold({
+            log.info("Fikk lagret avtale med uuid ${digipostJobbData.uuid} i batch-jobb")
+        }, {
+            log.error("Fikk ikke lagret dokument i databasen", it)
+        })
+    }
 }
 
 private fun Application.setupOppryddingsjobb() {
@@ -198,21 +226,7 @@ private fun Application.setupOppryddingsjobb() {
 
     flow
         .onEach {
-            log.info("Tar imot oppryddingsignal")
-            val avtalerUtenDokument = avtaleService.hentAvtalerUtenSignertDokument()
-            log.info("Fant ${avtalerUtenDokument.size} avtaler uten nedlastet dokument")
-            avtalerUtenDokument.forEach { digipostJobbData ->
-                val resultat =
-                    documentJobService.lastNedOgLagreAvtale(
-                        digipostJobbData,
-                        avtaleService.hentAvtale(digipostJobbData.uuid) ?: return@forEach,
-                    )
-                resultat.fold({
-                    log.info("Fikk lagret avtale med uuid ${digipostJobbData.uuid} i batch-jobb")
-                }, {
-                    log.error("Fikk ikke lagret dokument i databasen", it)
-                })
-            }
+            receiveCleaningSignal(avtaleService, documentJobService)
         }.catch { log.error("Fikk feil i signalmottak", it) }
         .launchIn(scope)
 }

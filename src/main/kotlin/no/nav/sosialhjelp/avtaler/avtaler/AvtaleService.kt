@@ -38,7 +38,7 @@ class AvtaleService(
                 ctx.avtaleStore.hentAvtalerForOrganisasjoner(avgivereFiltrert.map { it.orgnr })
             }
 
-        val avtalerByOrgnr = avtaler.groupBy { it.orgnr }.mapValues { (_, avtaler) -> avtaler.sortedBy { it.navn } }
+        val avtalerByOrgnr = avtaler.groupBy { it.orgnr }.mapValues { (_, avtaler) -> avtaler.sortedBy { it.opprettet } }
         return avgivereFiltrert
             .map { avgiver ->
                 KommuneResponse(

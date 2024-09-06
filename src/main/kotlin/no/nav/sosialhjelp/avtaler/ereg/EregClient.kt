@@ -22,7 +22,8 @@ class EregClientImpl(
         client
             .get("$baseUrl/v2/organisasjon/$orgnr")
             .body<EnhetResponse>()
-            .navn.navnelinje1
+            .navn
+            ?.navnelinje1 ?: error("Fant ikke enhet med orgnr $orgnr")
 }
 
 class EregClientLocal(
@@ -34,7 +35,7 @@ class EregClientLocal(
 }
 
 data class EnhetResponse(
-    val navn: NavnResponse,
+    val navn: NavnResponse?,
 )
 
 data class NavnResponse(

@@ -179,23 +179,16 @@ class AvtalemalerService(
                 val orgnrUtenSignatur = ctx.avtalemalerStore.hentOrgnrUtenSignatur(uuid)
                 orgnrUtenSignatur to orgnrMedSignatur
             }
-        val uten2 =
-            uten.associateWith {
-                if (Configuration.profile === Configuration.Profile.LOCAL) {
-                    it
-                } else {
-                    eregClient.hentEnhetNavn(it)
-                }
+        val kommuner = kommuneService.getAlleKommuner()
+        val utenMap =
+            uten.associateWith { orgnr ->
+                kommuner.find { it.orgnr == orgnr }?.navn ?: "Ukjent kommune"
             }
-        val med2 =
-            med.associateWith {
-                if (Configuration.profile === Configuration.Profile.LOCAL) {
-                    it
-                } else {
-                    eregClient.hentEnhetNavn(it)
-                }
+        val medMap =
+            med.associateWith { orgnr ->
+                kommuner.find { it.orgnr == orgnr }?.navn ?: "Ukjent kommune"
             }
-        return AvtaleSummary(uten2, med2)
+        return AvtaleSummary(utenMap, medMap)
     }
 }
 

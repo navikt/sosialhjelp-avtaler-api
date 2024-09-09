@@ -1,5 +1,6 @@
 package no.nav.sosialhjelp.avtaler.avtaler
 
+import io.micrometer.prometheus.PrometheusMeterRegistry
 import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
@@ -25,6 +26,7 @@ class AvtaleService(
     private val documentJobService: DocumentJobService,
     private val databaseContext: DatabaseContext,
     private val personNavnService: PersonNavnService,
+    private val prometheusRegistry: PrometheusMeterRegistry,
 ) {
     suspend fun hentKommuner(
         fnr: String,
@@ -180,6 +182,7 @@ class AvtaleService(
         log.info("Avtale for orgnr ${avtale.orgnr} er signert")
 
         documentJobService.lastNedOgLagreAvtale(digipostJobbData.copy(statusQueryToken = statusQueryToken), signertAvtale)
+
         return signertAvtale.copy(erSignert = true)
     }
 

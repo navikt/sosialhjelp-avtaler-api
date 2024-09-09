@@ -15,6 +15,7 @@ import io.ktor.client.request.accept
 import io.ktor.client.request.headers
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
+import io.ktor.http.headers
 import io.ktor.serialization.jackson.jackson
 
 object HttpClientConfig {
@@ -38,8 +39,8 @@ fun engineFactory(block: () -> HttpClientEngine): HttpClientEngine =
         else -> CIO.create()
     }
 
-fun defaultHttpClient(): HttpClient {
-    return HttpClient(CIO) {
+fun defaultHttpClient(): HttpClient =
+    HttpClient(CIO) {
         install(HttpCache)
         install(ContentNegotiation) {
             jackson {
@@ -49,16 +50,14 @@ fun defaultHttpClient(): HttpClient {
             }
         }
     }
-}
 
-fun defaultHttpClientWithJsonHeaders(): HttpClient {
-    return defaultHttpClient()
+fun defaultHttpClientWithJsonHeaders(): HttpClient =
+    defaultHttpClient()
         .config {
             defaultRequest {
                 jsonHeaders()
             }
         }
-}
 
 fun DefaultRequest.DefaultRequestBuilder.jsonHeaders() {
     headers {

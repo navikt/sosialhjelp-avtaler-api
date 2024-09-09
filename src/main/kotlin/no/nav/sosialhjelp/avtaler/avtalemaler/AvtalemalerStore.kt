@@ -34,6 +34,10 @@ interface AvtalemalerStore : Store {
     fun hentFeiledePubliseringer(maxRetries: Int): List<Publisering>
 
     fun hentEksempel(uuid: UUID): ByteArray?
+
+    fun hentOrgnrUtenSignatur(uuid: UUID): List<String>
+
+    fun hentOrgnrMedSignatur(uuid: UUID): List<String>
 }
 
 data class Publisering(
@@ -210,6 +214,28 @@ class AvtalemalerStorePostgres(
                 """.trimIndent()
             session.query(sql, mapOf("uuid" to uuid)) {
                 it.bytes("example_pdf")
+            }
+        }
+
+    override fun hentOrgnrUtenSignatur(uuid: UUID): List<String> =
+        session { session ->
+            val sql =
+                """
+                select orgnr from avtale_v1 where avtalemal_uuid = :uuid and er_signert = false
+                """.trimIndent()
+            session.queryList(sql, mapOf("uuid" to uuid)) {
+                it.string("orgnr")
+            }
+        }
+
+    override fun hentOrgnrMedSignatur(uuid: UUID): List<String> =
+        session { session ->
+            val sql =
+                """
+                select orgnr from avtale_v1 where avtalemal_uuid = :uuid and er_signert = true
+                """.trimIndent()
+            session.queryList(sql, mapOf("uuid" to uuid)) {
+                it.string("orgnr")
             }
         }
 }

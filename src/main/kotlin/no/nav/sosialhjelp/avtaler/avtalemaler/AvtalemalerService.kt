@@ -188,7 +188,7 @@ class AvtalemalerService(
             med.associateWith { orgnr ->
                 kommuner.find { it.orgnr == orgnr }?.navn ?: "Ukjent kommune"
             }
-        return AvtaleSummary(utenMap, medMap)
+        return AvtaleSummary(medMap, utenMap)
     }
 }
 

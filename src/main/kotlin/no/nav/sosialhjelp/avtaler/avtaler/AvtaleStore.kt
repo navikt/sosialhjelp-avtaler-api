@@ -41,8 +41,10 @@ data class Avtale(
     val avtalemal_uuid: UUID? = null,
 )
 
-class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
-    TransactionalStore(sessionFactory) {
+class AvtaleStorePostgres(
+    sessionFactory: () -> Session,
+) : TransactionalStore(sessionFactory),
+    AvtaleStore {
     override fun hentAvtalerForOrganisasjon(orgnr: String): List<Avtale> =
         session {
             @Language("PostgreSQL")
@@ -132,19 +134,20 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
                                                                     navn = :navn,
                                                                     avtalemal_uuid = :avtalemal_uuid
                 """.trimIndent()
-            it.update(
-                sql,
-                mapOf(
-                    "uuid" to avtale.uuid,
-                    "orgnr" to avtale.orgnr,
-                    "avtaleversjon" to avtale.avtaleversjon,
-                    "navn_innsender" to avtale.navn_innsender,
-                    "er_signert" to avtale.erSignert,
-                    "opprettet" to avtale.opprettet,
-                    "navn" to avtale.navn,
-                    "avtalemal_uuid" to avtale.avtalemal_uuid,
-                ),
-            ).validate()
+            it
+                .update(
+                    sql,
+                    mapOf(
+                        "uuid" to avtale.uuid,
+                        "orgnr" to avtale.orgnr,
+                        "avtaleversjon" to avtale.avtaleversjon,
+                        "navn_innsender" to avtale.navn_innsender,
+                        "er_signert" to avtale.erSignert,
+                        "opprettet" to avtale.opprettet,
+                        "navn" to avtale.navn,
+                        "avtalemal_uuid" to avtale.avtalemal_uuid,
+                    ),
+                ).validate()
             avtale
         }
 
@@ -177,12 +180,14 @@ class AvtaleStorePostgres(sessionFactory: () -> Session) : AvtaleStore,
                 """
                 select orgnr, avtalemal_uuid from avtale_v1
                 """.trimIndent()
-            session.queryList(sql, emptyMap()) { row ->
-                val uuidOrNull = row.uuidOrNull("avtalemal_uuid")
-                uuidOrNull?.let { it to row.string("orgnr") }
-            }.groupBy { it.first }.mapValues { entry ->
-                entry.value.map { it.second }
-            }
+            session
+                .queryList(sql, emptyMap()) { row ->
+                    val uuidOrNull = row.uuidOrNull("avtalemal_uuid")
+                    uuidOrNull?.let { it to row.string("orgnr") }
+                }.groupBy { it.first }
+                .mapValues { entry ->
+                    entry.value.map { it.second }
+                }
         }
 
     private fun mapper(row: Row): Avtale =

@@ -36,6 +36,7 @@ data class Avtale(
     val avtaleversjon: String? = null,
     val navn_innsender: String? = null,
     val erSignert: Boolean,
+    val signert_tidspunkt: LocalDateTime? = null,
     val opprettet: LocalDateTime = LocalDateTime.now(),
     val navn: String,
     val avtalemal_uuid: UUID? = null,
@@ -116,23 +117,25 @@ class AvtaleStorePostgres(
             val sql =
                 """
                 INSERT INTO avtale_v1 (
-                                        uuid,
-                                        orgnr,
-                                       avtaleversjon,
-                                       navn_innsender,
-                                       er_signert,
-                                       opprettet,
-                                        navn,
-                                        avtalemal_uuid
-                                       )
-                VALUES (:uuid, :orgnr, :avtaleversjon, :navn_innsender, :er_signert, :opprettet, :navn, :avtalemal_uuid)
+                                    uuid,
+                                    orgnr,
+                                    avtaleversjon,
+                                    navn_innsender,
+                                    er_signert,
+                                    opprettet,
+                                    navn,
+                                    avtalemal_uuid,
+                                    signert_tidspunkt
+                                    )
+                VALUES (:uuid, :orgnr, :avtaleversjon, :navn_innsender, :er_signert, :opprettet, :navn, :avtalemal_uuid, :signert_tidspunkt)
                 ON CONFLICT on constraint avtale_v1_pkey do update set orgnr = :orgnr,
                                                                     avtaleversjon = :avtaleversjon,
                                                                     navn_innsender = :navn_innsender,
                                                                     er_signert = :er_signert,
                                                                     opprettet = :opprettet,
                                                                     navn = :navn,
-                                                                    avtalemal_uuid = :avtalemal_uuid
+                                                                    avtalemal_uuid = :avtalemal_uuid,
+                                                                    signert_tidspunkt = :signert_tidspunkt
                 """.trimIndent()
             it
                 .update(
@@ -146,6 +149,7 @@ class AvtaleStorePostgres(
                         "opprettet" to avtale.opprettet,
                         "navn" to avtale.navn,
                         "avtalemal_uuid" to avtale.avtalemal_uuid,
+                        "signert_tidspunkt" to avtale.signert_tidspunkt,
                     ),
                 ).validate()
             avtale

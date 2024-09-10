@@ -220,7 +220,7 @@ class AvtalemalerStorePostgres(
         session { session ->
             val sql =
                 """
-                select a.orgnr, a.er_signert, a.signert_tidspunkt from avtale_v1 a join digipost_jobb_data djd on a.uuid = djd.uuid where a.avtalemal_uuid = :uuid
+                select orgnr, er_signert, signert_tidspunkt from avtale_v1 where avtalemal_uuid = :uuid
                 """.trimIndent()
             session.queryList(sql, mapOf("uuid" to uuid)) {
                 Signeringsinfo(

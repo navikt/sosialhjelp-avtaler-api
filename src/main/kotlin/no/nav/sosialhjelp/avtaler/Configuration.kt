@@ -43,6 +43,7 @@ object Configuration {
                 "pdl.audience" to "",
                 "ereg.url" to "",
                 "gotenberg.url" to "",
+                "ELECTOR_GET_URL" to "",
             ),
         )
 

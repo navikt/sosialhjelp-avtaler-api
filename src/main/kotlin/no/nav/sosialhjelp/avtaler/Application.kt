@@ -110,7 +110,7 @@ private fun Application.setupKoin() {
                     }
                     single<Oauth2Client> { Oauth2ClientImpl(get(), get(), Configuration.tokenXProperties) }
                     single<AltinnClient> { AltinnClientImpl(Configuration.altinnProperties, get()) }
-                    single<EregClient> { EregClientImpl(Configuration.eregProperties) }
+                    single<EregClient> { EregClientImpl(get(), Configuration.eregProperties) }
                     single<LeaderElectionClient> { LeaderElectionClientImpl(get()) }
                 }
             }

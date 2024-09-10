@@ -121,6 +121,12 @@ fun Route.avtalemalerApi() {
                 call.respond(HttpStatusCode.OK)
             }
 
+            get("/stats") {
+                val uuid = call.uuid()
+                val summary = avtalemalerService.hentAvtaleSummary(uuid)
+                call.respond(HttpStatusCode.OK, summary)
+            }
+
             get("/dokument") {
                 val uuid = call.uuid()
                 val avtale = avtalemalerService.hentAvtalemal(uuid)

@@ -171,4 +171,28 @@ class AvtalemalerService(
         transaction(databaseContext) { ctx ->
             ctx.avtalemalerStore.hentEksempel(uuid)
         }
+
+    suspend fun hentAvtaleSummary(uuid: UUID): AvtaleSummary {
+        val (uten, med) =
+            transaction(databaseContext) { ctx ->
+                val orgnrMedSignatur = ctx.avtalemalerStore.hentOrgnrMedSignatur(uuid)
+                val orgnrUtenSignatur = ctx.avtalemalerStore.hentOrgnrUtenSignatur(uuid)
+                orgnrUtenSignatur to orgnrMedSignatur
+            }
+        val kommuner = kommuneService.getAlleKommuner()
+        val utenMap =
+            uten.associateWith { orgnr ->
+                kommuner.find { it.orgnr == orgnr }?.navn ?: "Ukjent kommune"
+            }
+        val medMap =
+            med.associateWith { orgnr ->
+                kommuner.find { it.orgnr == orgnr }?.navn ?: "Ukjent kommune"
+            }
+        return AvtaleSummary(medMap, utenMap)
+    }
 }
+
+data class AvtaleSummary(
+    val signedOrgnrs: Map<String, String>,
+    val unsignedOrgnrs: Map<String, String>,
+)

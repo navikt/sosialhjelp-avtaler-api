@@ -10,6 +10,7 @@ import no.nav.sosialhjelp.avtaler.store.query
 import no.nav.sosialhjelp.avtaler.store.queryList
 import no.nav.sosialhjelp.avtaler.store.update
 import org.postgresql.util.PGobject
+import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -35,9 +36,7 @@ interface AvtalemalerStore : Store {
 
     fun hentEksempel(uuid: UUID): ByteArray?
 
-    fun hentOrgnrUtenSignatur(uuid: UUID): List<String>
-
-    fun hentOrgnrMedSignatur(uuid: UUID): List<String>
+    fun hentSigneringsinfo(uuid: UUID): List<Signeringsinfo>
 }
 
 data class Publisering(
@@ -217,28 +216,27 @@ class AvtalemalerStorePostgres(
             }
         }
 
-    override fun hentOrgnrUtenSignatur(uuid: UUID): List<String> =
+    override fun hentSigneringsinfo(uuid: UUID): List<Signeringsinfo> =
         session { session ->
             val sql =
                 """
-                select orgnr from avtale_v1 where avtalemal_uuid = :uuid and er_signert = false
+                select a.orgnr, a.er_signert, a.signert_tidspunkt from avtale_v1 a join digipost_jobb_data djd on a.uuid = djd.uuid where a.avtalemal_uuid = :uuid
                 """.trimIndent()
             session.queryList(sql, mapOf("uuid" to uuid)) {
-                it.string("orgnr")
-            }
-        }
-
-    override fun hentOrgnrMedSignatur(uuid: UUID): List<String> =
-        session { session ->
-            val sql =
-                """
-                select orgnr from avtale_v1 where avtalemal_uuid = :uuid and er_signert = true
-                """.trimIndent()
-            session.queryList(sql, mapOf("uuid" to uuid)) {
-                it.string("orgnr")
+                Signeringsinfo(
+                    it.string("orgnr"),
+                    it.boolean("er_signert"),
+                    it.localDateTime("signert_tidspunkt"),
+                )
             }
         }
 }
+
+data class Signeringsinfo(
+    val orgnr: String,
+    val erSignert: Boolean,
+    val signertTidspunkt: LocalDateTime?,
+)
 
 private fun mapper(row: Row): Avtalemal =
     Avtalemal(

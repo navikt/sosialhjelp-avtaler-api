@@ -9,12 +9,15 @@ import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
+import io.ktor.server.metrics.micrometer.MicrometerMetrics
 import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.path
 import io.ktor.server.routing.IgnoreTrailingSlash
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import io.micrometer.prometheus.PrometheusConfig
+import io.micrometer.prometheus.PrometheusMeterRegistry
 import io.opentelemetry.instrumentation.annotations.WithSpan
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -79,11 +82,9 @@ fun Application.module() {
 
     log.info("sosialhjelp-avtaler-api starting up on $host:$port...")
 
-    configure()
-
     setupKoin()
+    configure()
     setupJobs()
-
     setupRoutes()
 }
 
@@ -132,6 +133,7 @@ private fun Application.setupKoin() {
                 single { GcpBucket(Configuration.gcpProperties.bucketName) }
                 single { PdlClient(Configuration.pdlProperties, get()) }
                 single { GotenbergClient(get(), Configuration.gotenbergProperties.url) }
+                single { PrometheusMeterRegistry(PrometheusConfig.DEFAULT) }
 
                 singleOf(::AltinnService)
                 singleOf(::KommuneService)
@@ -233,6 +235,10 @@ private fun Application.setupOppryddingsjobb() {
 
 private fun Application.configure() {
     TimeZone.setDefault(TimeZone.getTimeZone("Europe/Oslo"))
+    val appMicrometerRegistry by inject<PrometheusMeterRegistry>()
+    install(MicrometerMetrics) {
+        registry = appMicrometerRegistry
+    }
     install(ContentNegotiation) {
         jackson {
             registerModule(JavaTimeModule())
@@ -252,9 +258,10 @@ private fun Application.configure() {
 fun Application.setupRoutes() {
     installAuthentication(httpClient(engineFactory { StubEngine.tokenX() }))
 
+    val prometheusMeterRegistry by inject<PrometheusMeterRegistry>()
     routing {
         route("/sosialhjelp/avtaler-api") {
-            internalRoutes()
+            internalRoutes(prometheusMeterRegistry)
             route("/api") {
                 kommuneApi()
                 authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {

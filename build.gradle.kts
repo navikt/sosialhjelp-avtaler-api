@@ -62,6 +62,7 @@ dependencies {
     implementation(libs.ktor.client.mock)
     implementation(libs.bundles.apache.poi)
     implementation(libs.opentelemetry.instrumentation.annotations)
+    implementation(libs.micrometer.registry.prometheus)
 
     testImplementation(libs.bundles.test)
 }

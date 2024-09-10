@@ -226,7 +226,7 @@ class AvtalemalerStorePostgres(
                 Signeringsinfo(
                     it.string("orgnr"),
                     it.boolean("er_signert"),
-                    it.localDateTime("signert_tidspunkt"),
+                    it.localDateTimeOrNull("signert_tidspunkt"),
                 )
             }
         }

@@ -1,23 +1,17 @@
 package no.nav.sosialhjelp.avtaler.digipost
 
-import no.digipost.signature.client.direct.DirectJobStatus
+import no.digipost.signature.client.direct.DirectJobStatusResponse
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
 import no.nav.sosialhjelp.avtaler.db.transaction
 import java.io.InputStream
 import java.net.URI
-import java.time.LocalDateTime
 import java.util.UUID
 
-data class DigipostAvtale(
-    val orgnr: String,
-    val avtaleversjon: String? = null,
-    val navn_innsender: String,
-    val erSignert: Boolean,
-    val opprettet: LocalDateTime = LocalDateTime.now(),
-)
-
-class DigipostService(private val digipostClient: DigipostClient, private val databaseContext: DatabaseContext) {
+class DigipostService(
+    private val digipostClient: DigipostClient,
+    private val databaseContext: DatabaseContext,
+) {
     fun sendTilSignering(
         fnr: String,
         avtale: Avtale,
@@ -25,11 +19,11 @@ class DigipostService(private val digipostClient: DigipostClient, private val da
         navn: String,
     ): DigipostResponse = digipostClient.sendTilSignering(fnr, avtale, dokument, navn)
 
-    fun erSigneringsstatusCompleted(
+    fun getJobStatus(
         jobbReference: String,
         statusUrl: URI,
         statusQueryToken: String,
-    ): Boolean = digipostClient.sjekkSigneringsstatus(jobbReference, statusUrl, statusQueryToken) == DirectJobStatus.COMPLETED_SUCCESSFULLY
+    ): DirectJobStatusResponse = digipostClient.getDirectJobStatus(jobbReference, statusUrl, statusQueryToken)
 
     fun hentSignertDokument(
         statusQueryToken: String,

@@ -172,27 +172,29 @@ class AvtalemalerService(
             ctx.avtalemalerStore.hentEksempel(uuid)
         }
 
-    suspend fun hentAvtaleSummary(uuid: UUID): AvtaleSummary {
-        val (uten, med) =
+    suspend fun hentAvtaleSummary(uuid: UUID): List<AvtaleSummary> {
+        val signeringsinfo =
             transaction(databaseContext) { ctx ->
-                val orgnrMedSignatur = ctx.avtalemalerStore.hentOrgnrMedSignatur(uuid)
-                val orgnrUtenSignatur = ctx.avtalemalerStore.hentOrgnrUtenSignatur(uuid)
-                orgnrUtenSignatur to orgnrMedSignatur
+                ctx.avtalemalerStore.hentSigneringsinfo(uuid)
             }
         val kommuner = kommuneService.getAlleKommuner()
-        val utenMap =
-            uten.associateWith { orgnr ->
-                kommuner.find { it.orgnr == orgnr }?.navn ?: "Ukjent kommune"
+        val avtaleSummaries =
+            signeringsinfo.map { info ->
+                AvtaleSummary(
+                    info.orgnr,
+                    kommuner.find { it.orgnr == info.orgnr }?.navn ?: "Ukjent kommune",
+                    info.erSignert,
+                    info.signertTidspunkt,
+                )
             }
-        val medMap =
-            med.associateWith { orgnr ->
-                kommuner.find { it.orgnr == orgnr }?.navn ?: "Ukjent kommune"
-            }
-        return AvtaleSummary(medMap, utenMap)
+
+        return avtaleSummaries.sortedWith(Comparator.nullsLast(compareBy({ it.signedAt }, { it.name })))
     }
 }
 
 data class AvtaleSummary(
-    val signedOrgnrs: Map<String, String>,
-    val unsignedOrgnrs: Map<String, String>,
+    val orgnr: String,
+    val name: String,
+    val hasSigned: Boolean,
+    val signedAt: LocalDateTime?,
 )

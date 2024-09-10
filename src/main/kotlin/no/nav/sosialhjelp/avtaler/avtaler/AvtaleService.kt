@@ -2,6 +2,7 @@ package no.nav.sosialhjelp.avtaler.avtaler
 
 import io.micrometer.prometheus.PrometheusMeterRegistry
 import mu.KotlinLogging
+import no.digipost.signature.client.direct.DirectJobStatus
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService
 import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.db.DatabaseContext
@@ -15,6 +16,8 @@ import no.nav.sosialhjelp.avtaler.kommune.KommuneResponse
 import no.nav.sosialhjelp.avtaler.pdl.PersonNavnService
 import java.io.InputStream
 import java.net.URI
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.UUID
 
 private val log = KotlinLogging.logger { }
@@ -170,13 +173,28 @@ class AvtaleService(
         }
         digipostService.oppdaterDigipostJobbData(digipostJobbData, statusQueryToken = statusQueryToken)
         val avtale = hentAvtale(fnr, uuid, Avgiver.Tjeneste.AVTALESIGNERING, token) ?: error("Finnes ikke noen avtale med uuid $uuid")
+        val job =
+            digipostService.getJobStatus(
+                digipostJobbData.directJobReference,
+                digipostJobbData.statusUrl,
+                statusQueryToken,
+            )
         val signertAvtale =
-            if (!erAvtaleSignert(digipostJobbData, statusQueryToken)) {
+            if (job.status != DirectJobStatus.COMPLETED_SUCCESSFULLY) {
                 log.info("Avtale for orgnr ${avtale.orgnr} er ikke signert")
                 return null
             } else {
                 val navn = personNavnService.getFulltNavn(fnr, token)
-                lagreAvtale(avtale.copy(erSignert = true, navn_innsender = navn))
+                lagreAvtale(
+                    avtale.copy(
+                        erSignert = true,
+                        navn_innsender = navn,
+                        signert_tidspunkt =
+                            job.signatures[0]?.statusDateTime?.let {
+                                LocalDateTime.ofInstant(it, ZoneId.of("Europe/Oslo"))
+                            },
+                    ),
+                )
             }
 
         log.info("Avtale for orgnr ${avtale.orgnr} er signert")
@@ -190,11 +208,12 @@ class AvtaleService(
         digipostJobbData: DigipostJobbData,
         statusQueryToken: String,
     ): Boolean =
-        digipostService.erSigneringsstatusCompleted(
-            digipostJobbData.directJobReference,
-            digipostJobbData.statusUrl,
-            statusQueryToken,
-        )
+        digipostService
+            .getJobStatus(
+                digipostJobbData.directJobReference,
+                digipostJobbData.statusUrl,
+                statusQueryToken,
+            ).status == DirectJobStatus.COMPLETED_SUCCESSFULLY
 
     private fun hentSignertAvtaleDokumentFraDigipost(
         digipostJobbData: DigipostJobbData,

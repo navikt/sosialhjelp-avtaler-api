@@ -54,7 +54,7 @@ class DocumentJobService(
             avtale.opprettet.format(
                 DateTimeFormatter.ofPattern("dd.MM.yyyy"),
             )
-        }"
+        }.pdf"
         val metadata =
             mapOf(
                 "navnInnsender" to (avtale.navn_innsender ?: error("Har ikke navn på innsender")),

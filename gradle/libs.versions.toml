@@ -2,26 +2,26 @@
 konfig = "1.6.10.0"
 ktor = "2.3.7"
 kotlin = "1.9.22"
-kotlinSerializationPlugin = "1.6.2"
-kotest = "5.8.0"
+kotlinSerializationPlugin = "1.7.3"
+kotest = "5.9.1"
 ktlint = "1.0.1"
 logback = "1.5.3"
 logbackEncoder = "7.4"
-jackson = "2.17.0"
+jackson = "2.18.0"
 microutils = "3.0.5"
 tokenSupport = "3.2.0"
 kotliquery = "1.9.0"
-flywaydb = "10.13.0"
+flywaydb = "10.20.0"
 hikari = "5.1.0"
 postgresql = "42.7.1"
 digipostSignatureApiClient = "7.0.3"
 jaxbApi = "4.0.2"
-googleCloudLibraries = "26.35.0"
-googleCloudSecretManager = "2.40.0"
+googleCloudLibraries = "26.49.0"
+googleCloudSecretManager = "2.52.0"
 koin = "3.5.6"
-apache-poi = "5.2.5"
-opentelemetry = "2.3.0"
-prometheus = "1.10.2"
+apache-poi = "5.3.0"
+opentelemetry = "2.8.0"
+prometheus = "1.13.6"
 
 [libraries]
 konfig = { module = "com.natpryce:konfig", version.ref = "konfig" }
@@ -43,7 +43,7 @@ ktor-serialization-jackson-jvm = { module = "io.ktor:ktor-serialization-jackson-
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
 kotlin-logging = { module = "io.github.microutils:kotlin-logging", version.ref = "microutils" }
-log4j-core = { module = "org.apache.logging.log4j:log4j-core", version = "2.23.1" }
+log4j-core = { module = "org.apache.logging.log4j:log4j-core", version = "2.24.1" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
 flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flywaydb" }

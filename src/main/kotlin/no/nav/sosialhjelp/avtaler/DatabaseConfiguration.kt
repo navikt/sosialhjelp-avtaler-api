@@ -12,7 +12,9 @@ import kotlin.time.Duration.Companion.seconds
 
 private val log = KotlinLogging.logger { }
 
-class DatabaseConfiguration(private val props: Configuration.DatabaseProperties) {
+class DatabaseConfiguration(
+    private val props: Configuration.DatabaseProperties,
+) {
     fun dataSource(): DataSource {
         if (!waitForDB(10.minutes)) {
             throw RuntimeException("Databasen ble ikke tilgjengelig innenfor tidsfristen")
@@ -31,9 +33,12 @@ class DatabaseConfiguration(private val props: Configuration.DatabaseProperties)
             }
 
         val flyway =
-            Flyway.configure().dataSource(
-                dataSource,
-            ).validateMigrationNaming(true).load()
+            Flyway
+                .configure()
+                .dataSource(
+                    dataSource,
+                ).validateMigrationNaming(true)
+                .load()
         flyway.migrate()
 
         return dataSource

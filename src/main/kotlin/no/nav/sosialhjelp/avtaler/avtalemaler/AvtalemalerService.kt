@@ -2,11 +2,10 @@ package no.nav.sosialhjelp.avtaler.avtalemaler
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.newFixedThreadPoolContext
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
@@ -21,8 +20,6 @@ import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
-
-val pdfConvertContext = newFixedThreadPoolContext(10, "pdfConvert")
 
 class AvtalemalerService(
     private val databaseContext: DatabaseContext,
@@ -89,15 +86,20 @@ class AvtalemalerService(
 
         initiatePublisering(publiseringer)
 
+        val now = OffsetDateTime.now()
         val updated =
-            avtalemal.copy(publisert = OffsetDateTime.now()).apply {
-                mal = avtalemal.mal
-                navn = avtalemal.navn
-            }
+            avtalemal
+                .copy(publisert = now)
+                .apply {
+                    mal = avtalemal.mal
+                    navn = avtalemal.navn
+                }.also {
+                    transaction(databaseContext) { ctx ->
+                        ctx.avtalemalerStore.updatePublisert(it.uuid, now)
+                    }
+                }
 
-        return transaction(databaseContext) { ctx ->
-            ctx.avtalemalerStore.lagreAvtalemal(updated)
-        }
+        return updated
     }
 
     suspend fun hentFeiledePubliseringer(): List<Publisering> =
@@ -107,7 +109,8 @@ class AvtalemalerService(
 
     fun initiatePublisering(publiseringer: List<Publisering>) {
         val scope = CoroutineScope(Dispatchers.IO)
-        flowOf(*publiseringer.toTypedArray())
+        publiseringer
+            .asFlow()
             .onEach { publisering ->
                 runCatching { processPublisering(publisering) }.onFailure {
                     log.error(it) { "Feil ved publisering" }
@@ -150,7 +153,7 @@ class AvtalemalerService(
                 Avtale(
                     uuid = UUID.randomUUID(),
                     orgnr = publisering.orgnr,
-                    navn = "${avtalemal.navn}_$kommuneNavn",
+                    navn = avtalemal.navn,
                     opprettet = now,
                     avtaleversjon = "1.0",
                     erSignert = false,
@@ -163,4 +166,35 @@ class AvtalemalerService(
             ctx.avtalemalerStore.lagrePubliseringsjobb(publisering.copy(avtaleUuid = avtale.uuid))
         }
     }
+
+    suspend fun hentEksempel(uuid: UUID): ByteArray? =
+        transaction(databaseContext) { ctx ->
+            ctx.avtalemalerStore.hentEksempel(uuid)
+        }
+
+    suspend fun hentAvtaleSummary(uuid: UUID): List<AvtaleSummary> {
+        val signeringsinfo =
+            transaction(databaseContext) { ctx ->
+                ctx.avtalemalerStore.hentSigneringsinfo(uuid)
+            }
+        val kommuner = kommuneService.getAlleKommuner()
+        val avtaleSummaries =
+            signeringsinfo.map { info ->
+                AvtaleSummary(
+                    info.orgnr,
+                    kommuner.find { it.orgnr == info.orgnr }?.navn ?: "Ukjent kommune",
+                    info.erSignert,
+                    info.signertTidspunkt,
+                )
+            }
+
+        return avtaleSummaries.sortedWith(Comparator.nullsLast(compareBy({ it.signedAt }, { it.name })))
+    }
 }
+
+data class AvtaleSummary(
+    val orgnr: String,
+    val name: String,
+    val hasSigned: Boolean,
+    val signedAt: LocalDateTime?,
+)

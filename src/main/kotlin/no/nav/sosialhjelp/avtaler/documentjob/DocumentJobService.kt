@@ -51,14 +51,14 @@ class DocumentJobService(
         val kommunenavn = eregClient.hentEnhetNavn(avtale.orgnr)
 
         val blobNavn = "${avtale.navn} - $kommunenavn - ${
-            avtale.opprettet.format(
+            avtale.signert_tidspunkt?.format(
                 DateTimeFormatter.ofPattern("dd.MM.yyyy"),
-            )
-        }"
+            ) ?: "datoløs"
+        }.pdf"
         val metadata =
             mapOf(
                 "navnInnsender" to (avtale.navn_innsender ?: error("Har ikke navn på innsender")),
-                "signertTidspunkt" to avtale.opprettet.toString(),
+                "signertTidspunkt" to avtale.signert_tidspunkt.toString(),
             )
         bucketInputStream.use {
             gcpBucket.lagreBlob(blobNavn, MediaType.PDF, metadata, bucketInputStream.readAllBytes())

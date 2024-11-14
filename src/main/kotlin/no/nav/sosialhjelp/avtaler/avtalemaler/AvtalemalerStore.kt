@@ -10,6 +10,7 @@ import no.nav.sosialhjelp.avtaler.store.query
 import no.nav.sosialhjelp.avtaler.store.queryList
 import no.nav.sosialhjelp.avtaler.store.update
 import org.postgresql.util.PGobject
+import java.time.LocalDateTime
 import java.time.OffsetDateTime
 import java.util.UUID
 
@@ -20,6 +21,11 @@ interface AvtalemalerStore : Store {
 
     fun lagreAvtalemal(avtale: Avtalemal): Avtalemal
 
+    fun updatePublisert(
+        uuid: UUID,
+        publisert: OffsetDateTime,
+    )
+
     fun slettAvtalemal(uuid: UUID)
 
     fun lagrePubliseringsjobb(publisering: Publisering): Publisering
@@ -27,6 +33,10 @@ interface AvtalemalerStore : Store {
     fun hentPubliseringer(avtalemalUuid: UUID): List<Publisering>
 
     fun hentFeiledePubliseringer(maxRetries: Int): List<Publisering>
+
+    fun hentEksempel(uuid: UUID): ByteArray?
+
+    fun hentSigneringsinfo(uuid: UUID): List<Signeringsinfo>
 }
 
 data class Publisering(
@@ -46,8 +56,13 @@ enum class Replacement {
 data class Avtalemal(
     val uuid: UUID,
     val publisert: OffsetDateTime? = null,
+    var ingress: String? = null,
+    var ingressNynorsk: String? = null,
+    var kvitteringstekst: String? = null,
+    var kvitteringstekstNynorsk: String? = null,
     var replacementMap: Map<String, Replacement> = emptyMap(),
 ) {
+    lateinit var examplePdf: ByteArray
     lateinit var mal: ByteArray
     lateinit var navn: String
 
@@ -62,7 +77,7 @@ class AvtalemalerStorePostgres(
         session {
             val sql =
                 """
-                SELECT uuid, navn, mal, publisert, replacement_map from avtalemal
+                SELECT uuid, navn, mal, publisert, replacement_map, ingress, kvitteringstekst, ingress_nynorsk, kvitteringstekst_nynorsk from avtalemal
                 """.trimIndent()
             it.queryList(sql, emptyList(), ::mapper)
         }
@@ -71,7 +86,7 @@ class AvtalemalerStorePostgres(
         session { session ->
             val sql =
                 """
-                SELECT uuid, navn, mal, publisert, replacement_map from avtalemal where uuid = :uuid
+                SELECT uuid, navn, mal, publisert, replacement_map, ingress, kvitteringstekst, ingress_nynorsk, kvitteringstekst_nynorsk from avtalemal where uuid = :uuid
                 """.trimIndent()
             session.query(sql, mapOf("uuid" to uuid), ::mapper)
         }
@@ -80,9 +95,9 @@ class AvtalemalerStorePostgres(
         session { session ->
             val sql =
                 """
-                INSERT INTO avtalemal (uuid, navn, mal, publisert, replacement_map)
-                VALUES (:uuid, :navn, :mal, :publisert, :replacement_map::jsonb)
-                ON CONFLICT ON CONSTRAINT avtalemal_pkey DO UPDATE SET navn = :navn, mal = :mal, publisert = :publisert, replacement_map = :replacement_map::jsonb
+                INSERT INTO avtalemal (uuid, navn, mal, publisert, replacement_map, ingress, kvitteringstekst, ingress_nynorsk, kvitteringstekst_nynorsk, example_pdf)
+                VALUES (:uuid, :navn, :mal, :publisert, :replacement_map::jsonb, :ingress, :kvitteringstekst, :ingress_nynorsk, :kvitteringstekst_nynorsk, :example_pdf)
+                ON CONFLICT ON CONSTRAINT avtalemal_pkey DO UPDATE SET navn = :navn, mal = :mal, publisert = :publisert, replacement_map = :replacement_map::jsonb, ingress = :ingress, kvitteringstekst = :kvitteringstekst, ingress_nynorsk = :ingress_nynorsk, kvitteringstekst_nynorsk = :kvitteringstekst_nynorsk, example_pdf = :example_pdf
                 """.trimIndent()
             session
                 .update(
@@ -97,10 +112,30 @@ class AvtalemalerStorePostgres(
                                 type = "jsonb"
                                 value = ObjectMapper().writeValueAsString(avtale.replacementMap.mapValues { it.value.name })
                             },
+                        "ingress" to avtale.ingress,
+                        "ingress_nynorsk" to avtale.ingressNynorsk,
+                        "kvitteringstekst" to avtale.kvitteringstekst,
+                        "kvitteringstekst_nynorsk" to avtale.kvitteringstekstNynorsk,
+                        "example_pdf" to avtale.examplePdf,
                     ),
                 ).validate()
             avtale
         }
+
+    override fun updatePublisert(
+        uuid: UUID,
+        publisert: OffsetDateTime,
+    ) = session { session ->
+        val sql = "update avtalemal set publisert = :publisert where uuid = :uuid"
+        session
+            .update(
+                sql,
+                mapOf(
+                    "uuid" to uuid,
+                    "publisert" to publisert,
+                ),
+            ).validate()
+    }
 
     override fun slettAvtalemal(uuid: UUID) =
         session {
@@ -169,12 +204,48 @@ class AvtalemalerStorePostgres(
                 )
             }
         }
+
+    override fun hentEksempel(uuid: UUID): ByteArray? =
+        session { session ->
+            val sql =
+                """
+                select example_pdf from avtalemal where uuid = :uuid                    
+                """.trimIndent()
+            session.query(sql, mapOf("uuid" to uuid)) {
+                it.bytes("example_pdf")
+            }
+        }
+
+    override fun hentSigneringsinfo(uuid: UUID): List<Signeringsinfo> =
+        session { session ->
+            val sql =
+                """
+                select orgnr, er_signert, signert_tidspunkt from avtale_v1 where avtalemal_uuid = :uuid
+                """.trimIndent()
+            session.queryList(sql, mapOf("uuid" to uuid)) {
+                Signeringsinfo(
+                    it.string("orgnr"),
+                    it.boolean("er_signert"),
+                    it.localDateTimeOrNull("signert_tidspunkt"),
+                )
+            }
+        }
 }
+
+data class Signeringsinfo(
+    val orgnr: String,
+    val erSignert: Boolean,
+    val signertTidspunkt: LocalDateTime?,
+)
 
 private fun mapper(row: Row): Avtalemal =
     Avtalemal(
         row.uuid("uuid"),
         row.offsetDateTimeOrNull("publisert"),
+        row.stringOrNull("ingress"),
+        row.stringOrNull("ingress_nynorsk"),
+        row.stringOrNull("kvitteringstekst"),
+        row.stringOrNull("kvitteringstekst_nynorsk"),
         ObjectMapper()
             .readValue<Map<String, String>>(
                 row.string("replacement_map"),

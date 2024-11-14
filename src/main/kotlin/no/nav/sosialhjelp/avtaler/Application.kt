@@ -9,12 +9,16 @@ import io.ktor.serialization.jackson.jackson
 import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
+import io.ktor.server.metrics.micrometer.MicrometerMetrics
 import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.path
 import io.ktor.server.routing.IgnoreTrailingSlash
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
+import io.micrometer.prometheus.PrometheusConfig
+import io.micrometer.prometheus.PrometheusMeterRegistry
+import io.opentelemetry.instrumentation.annotations.WithSpan
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -52,6 +56,9 @@ import no.nav.sosialhjelp.avtaler.gotenberg.GotenbergClient
 import no.nav.sosialhjelp.avtaler.internal.internalRoutes
 import no.nav.sosialhjelp.avtaler.kommune.KommuneService
 import no.nav.sosialhjelp.avtaler.kommune.kommuneApi
+import no.nav.sosialhjelp.avtaler.leaderelection.LeaderElectionClient
+import no.nav.sosialhjelp.avtaler.leaderelection.LeaderElectionClientImpl
+import no.nav.sosialhjelp.avtaler.leaderelection.LeaderElectionClientLocal
 import no.nav.sosialhjelp.avtaler.pdl.PdlClient
 import no.nav.sosialhjelp.avtaler.pdl.PersonNavnService
 import org.koin.core.module.dsl.singleOf
@@ -75,11 +82,9 @@ fun Application.module() {
 
     log.info("sosialhjelp-avtaler-api starting up on $host:$port...")
 
-    configure()
-
     setupKoin()
+    configure()
     setupJobs()
-
     setupRoutes()
 }
 
@@ -93,6 +98,7 @@ private fun Application.setupKoin() {
                     single<Oauth2Client> { Oauth2ClientLocal() }
                     single<AltinnClient> { AltinnClientLocal() }
                     single<EregClient> { EregClientLocal(get()) }
+                    single<LeaderElectionClient> { LeaderElectionClientLocal() }
                 }
             } else {
                 module {
@@ -105,7 +111,8 @@ private fun Application.setupKoin() {
                     }
                     single<Oauth2Client> { Oauth2ClientImpl(get(), get(), Configuration.tokenXProperties) }
                     single<AltinnClient> { AltinnClientImpl(Configuration.altinnProperties, get()) }
-                    single<EregClient> { EregClientImpl(Configuration.eregProperties) }
+                    single<EregClient> { EregClientImpl(get(), Configuration.eregProperties) }
+                    single<LeaderElectionClient> { LeaderElectionClientImpl(get()) }
                 }
             }
         val avtaleModule =
@@ -126,6 +133,7 @@ private fun Application.setupKoin() {
                 single { GcpBucket(Configuration.gcpProperties.bucketName) }
                 single { PdlClient(Configuration.pdlProperties, get()) }
                 single { GotenbergClient(get(), Configuration.gotenbergProperties.url) }
+                single { PrometheusMeterRegistry(PrometheusConfig.DEFAULT) }
 
                 singleOf(::AltinnService)
                 singleOf(::KommuneService)
@@ -145,26 +153,57 @@ private fun Application.setupJobs() {
     setupPubliseringRetry()
 }
 
+@WithSpan
+private suspend fun receivePublishSignal(avtalemalerService: AvtalemalerService) {
+    val feilede = avtalemalerService.hentFeiledePubliseringer()
+    if (feilede.isNotEmpty()) {
+        avtalemalerService.initiatePublisering(feilede)
+    }
+}
+
 private fun Application.setupPubliseringRetry() {
     val avtalemalerService by inject<AvtalemalerService>()
+    val leaderElectionClient by inject<LeaderElectionClient>()
     val scope = CoroutineScope(Dispatchers.IO)
     val flow =
         flow {
             while (true) {
                 delay(10.minutes)
-                log.info("Sender retry-signal for publisering")
-                emit(Unit)
+                if (leaderElectionClient.isLeader()) {
+                    log.info("Sender retry-signal for publisering")
+                    emit(Unit)
+                }
+                delay(10.minutes)
             }
         }
 
     flow
         .onEach {
-            val feilede = avtalemalerService.hentFeiledePubliseringer()
-            if (feilede.isNotEmpty()) {
-                avtalemalerService.initiatePublisering(feilede)
-            }
+            receivePublishSignal(avtalemalerService)
         }.catch { log.error("Fikk feil i signalmottak", it) }
         .launchIn(scope)
+}
+
+@WithSpan
+private suspend fun receiveCleaningSignal(
+    avtaleService: AvtaleService,
+    documentJobService: DocumentJobService,
+) {
+    log.info("Tar imot oppryddingsignal")
+    val avtalerUtenDokument = avtaleService.hentAvtalerUtenSignertDokument()
+    log.info("Fant ${avtalerUtenDokument.size} avtaler uten nedlastet dokument")
+    avtalerUtenDokument.forEach { digipostJobbData ->
+        val resultat =
+            documentJobService.lastNedOgLagreAvtale(
+                digipostJobbData,
+                avtaleService.hentAvtale(digipostJobbData.uuid) ?: return@forEach,
+            )
+        resultat.fold({
+            log.info("Fikk lagret avtale med uuid ${digipostJobbData.uuid} i batch-jobb")
+        }, {
+            log.error("Fikk ikke lagret dokument i databasen", it)
+        })
+    }
 }
 
 private fun Application.setupOppryddingsjobb() {
@@ -173,40 +212,33 @@ private fun Application.setupOppryddingsjobb() {
     }
     val avtaleService by inject<AvtaleService>()
     val documentJobService by inject<DocumentJobService>()
+    val leaderElectionClient by inject<LeaderElectionClient>()
     log.info("Setter opp oppryddingsjobb")
     val scope = CoroutineScope(Dispatchers.IO)
     val flow =
         flow {
             while (true) {
                 delay(10.minutes)
-                log.info("Sender oppryddingsignal")
-                emit(Unit)
+                if (leaderElectionClient.isLeader()) {
+                    log.info("Sender oppryddingsignal")
+                    emit(Unit)
+                }
             }
         }
 
     flow
         .onEach {
-            log.info("Tar imot oppryddingsignal")
-            val avtalerUtenDokument = avtaleService.hentAvtalerUtenSignertDokument()
-            log.info("Fant ${avtalerUtenDokument.size} avtaler uten nedlastet dokument")
-            avtalerUtenDokument.forEach { digipostJobbData ->
-                val resultat =
-                    documentJobService.lastNedOgLagreAvtale(
-                        digipostJobbData,
-                        avtaleService.hentAvtale(digipostJobbData.uuid) ?: return@forEach,
-                    )
-                resultat.fold({
-                    log.info("Fikk lagret avtale med uuid ${digipostJobbData.uuid} i batch-jobb")
-                }, {
-                    log.error("Fikk ikke lagret dokument i databasen", it)
-                })
-            }
+            receiveCleaningSignal(avtaleService, documentJobService)
         }.catch { log.error("Fikk feil i signalmottak", it) }
         .launchIn(scope)
 }
 
 private fun Application.configure() {
     TimeZone.setDefault(TimeZone.getTimeZone("Europe/Oslo"))
+    val appMicrometerRegistry by inject<PrometheusMeterRegistry>()
+    install(MicrometerMetrics) {
+        registry = appMicrometerRegistry
+    }
     install(ContentNegotiation) {
         jackson {
             registerModule(JavaTimeModule())
@@ -226,9 +258,10 @@ private fun Application.configure() {
 fun Application.setupRoutes() {
     installAuthentication(httpClient(engineFactory { StubEngine.tokenX() }))
 
+    val prometheusMeterRegistry by inject<PrometheusMeterRegistry>()
     routing {
         route("/sosialhjelp/avtaler-api") {
-            internalRoutes()
+            internalRoutes(prometheusMeterRegistry)
             route("/api") {
                 kommuneApi()
                 authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {

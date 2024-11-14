@@ -34,6 +34,10 @@ import java.util.UUID
 data class AvtalemalMetadata(
     val name: String,
     val replacementMap: Map<String, String> = emptyMap(),
+    val ingress: String? = null,
+    val kvitteringstekst: String? = null,
+    val ingressNynorsk: String? = null,
+    val kvitteringstekstNynorsk: String? = null,
 )
 
 private val objectMapper = ObjectMapper().registerKotlinModule()
@@ -45,7 +49,12 @@ data class AvtalemalDto(
     val publishedTo: List<String> = emptyList(),
     val dokumentUrl: String = "/sosialhjelp/avtaler-api/api/avtalemal/$uuid/dokument",
     val previewUrl: String = "/sosialhjelp/avtaler-api/api/avtalemal/$uuid/preview",
+    val exampleUrl: String = "/sosialhjelp/avtaler-api/api/avtalemal/$uuid/eksempel",
     val replacementMap: Map<String, String> = emptyMap(),
+    val ingress: String? = null,
+    val kvitteringstekst: String? = null,
+    val ingressNynorsk: String? = null,
+    val kvitteringstekstNynorsk: String? = null,
 )
 
 fun Route.avtalemalerApi() {
@@ -71,6 +80,9 @@ fun Route.avtalemalerApi() {
                             "file" -> {
                                 avtale.mal = part.streamProvider().readAllBytes()
                             }
+                            "examplePdf" -> {
+                                avtale.examplePdf = part.streamProvider().readAllBytes()
+                            }
 
                             else -> "Ukjent filnavn: ${part.name}"
                         }
@@ -81,6 +93,10 @@ fun Route.avtalemalerApi() {
                             val metadata = objectMapper.readValue<AvtalemalMetadata>(part.value)
                             avtale.navn = metadata.name
                             avtale.replacementMap = metadata.replacementMap.mapValues { Replacement.valueOf(it.value) }
+                            avtale.ingress = metadata.ingress
+                            avtale.ingressNynorsk = metadata.ingressNynorsk
+                            avtale.kvitteringstekst = metadata.kvitteringstekst
+                            avtale.kvitteringstekstNynorsk = metadata.kvitteringstekstNynorsk
                         }
                     }
 
@@ -103,6 +119,12 @@ fun Route.avtalemalerApi() {
                 val uuid = call.uuid()
                 avtalemalerService.slettAvtalemal(uuid)
                 call.respond(HttpStatusCode.OK)
+            }
+
+            get("/stats") {
+                val uuid = call.uuid()
+                val summary = avtalemalerService.hentAvtaleSummary(uuid)
+                call.respond(HttpStatusCode.OK, summary)
             }
 
             get("/dokument") {
@@ -137,6 +159,21 @@ fun Route.avtalemalerApi() {
                 }
             }
 
+            get("/eksempel") {
+                val uuid = call.uuid()
+                val avtalemal = avtalemalerService.hentAvtalemal(uuid)
+                if (avtalemal == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@get
+                }
+                val eksempelDokument = avtalemalerService.hentEksempel(uuid)
+                if (eksempelDokument == null) {
+                    call.respond(HttpStatusCode.NotFound)
+                    return@get
+                }
+                call.respondBytes(eksempelDokument, ContentType.Application.Pdf)
+            }
+
             get("/preview") {
                 val uuid = call.uuid()
                 val avtalemal = avtalemalerService.hentAvtalemal(uuid)
@@ -166,12 +203,6 @@ fun Route.avtalemalerApi() {
                     return@get
                 }
 
-                call.response.header(
-                    HttpHeaders.ContentDisposition,
-                    ContentDisposition.Attachment
-                        .withParameter(ContentDisposition.Parameters.FileName, "${avtalemal.navn}_preview.pdf")
-                        .toString(),
-                )
                 call.respondBytes(converted, ContentType.Application.Pdf, HttpStatusCode.OK)
             }
         }
@@ -193,4 +224,8 @@ fun Avtalemal.toDto(publishedOrgnrs: List<String>?) =
                 it.value.name
             },
         publishedTo = publishedOrgnrs ?: emptyList(),
+        ingress = ingress,
+        kvitteringstekst = kvitteringstekst,
+        ingressNynorsk = ingressNynorsk,
+        kvitteringstekstNynorsk = kvitteringstekstNynorsk,
     )

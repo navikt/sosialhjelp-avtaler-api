@@ -12,6 +12,10 @@ data class AvtaleResponse(
     val opprettet: LocalDateTime? = null,
     val erSignert: Boolean = false,
     val avtaleUrl: String? = "/api/avtale/$uuid/avtale",
+    val ingress: String? = null,
+    val ingressNynorsk: String? = null,
+    val kvitteringstekst: String? = null,
+    val kvitteringstekstNynorsk: String? = null,
 )
 
 data class KommuneResponse(

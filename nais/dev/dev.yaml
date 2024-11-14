@@ -23,14 +23,18 @@ spec:
     path: /sosialhjelp/avtaler-api/internal/prometheus
   replicas:
     min: 1
-    max: 1
+    max: 2
+  leaderElection: true
   tokenx:
     enabled: true
   azure:
     application:
       enabled: true
       tenant: nav.no
-      allowAllUsers: true
+      allowAllUsers: false
+      claims:
+        groups:
+          - id: "9137b6c8-2023-4de9-87e0-0105f01c1e5d"
   gcp:
     sqlInstances:
       - type: POSTGRES_14
@@ -49,7 +53,6 @@ spec:
       rules:
         - application: sosialhjelp-avtaler-dev
         - application: sosialhjelp-avtaler-admin
-        - application: curl-digipost-app
     outbound:
       external:
         - host: data.brreg.no
@@ -61,8 +64,6 @@ spec:
         - host: ereg-services.dev-fss-pub.nais.io
         - host: data.ssb.no
       rules:
-        - application: sosialhjelp-mock-alt-api-mock
-        - application: curl-digipost-app
         - application: altinn-rettigheter-proxy
           namespace: arbeidsgiver
         - application: sosialhjelp-konvertering-til-pdf
@@ -73,6 +74,10 @@ spec:
     requests:
       cpu: 15m
       memory: 512Mi
+  observability:
+    autoInstrumentation:
+      enabled: true
+      runtime: java
   secureLogs:
     enabled: true
   envFrom:

@@ -1,11 +1,11 @@
 [versions]
 konfig = "1.6.10.0"
-ktor = "2.3.7"
-kotlin = "2.0.0"
+ktor = "2.3.12"
+kotlin = "2.0.21"
 kotlinSerializationPlugin = "1.6.2"
 kotest = "5.8.0"
 ktlint = "1.0.1"
-logback = "1.5.3"
+logback = "1.5.12"
 logbackEncoder = "7.4"
 jackson = "2.17.0"
 microutils = "3.0.5"
@@ -13,8 +13,8 @@ tokenSupport = "3.2.0"
 kotliquery = "1.9.0"
 flywaydb = "10.13.0"
 hikari = "5.1.0"
-postgresql = "42.7.1"
-digipostSignatureApiClient = "7.0.3"
+postgresql = "42.7.4"
+digipostSignatureApiClient = "7.0.4"
 jaxbApi = "4.0.2"
 googleCloudLibraries = "26.35.0"
 googleCloudSecretManager = "2.40.0"
@@ -129,4 +129,4 @@ apache-poi = [
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "12.1.0" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "12.1.1" }

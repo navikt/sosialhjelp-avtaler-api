@@ -1,7 +1,7 @@
 [versions]
 konfig = "1.6.10.0"
 ktor = "2.3.7"
-kotlin = "1.9.22"
+kotlin = "2.0.0"
 kotlinSerializationPlugin = "1.6.2"
 kotest = "5.8.0"
 ktlint = "1.0.1"

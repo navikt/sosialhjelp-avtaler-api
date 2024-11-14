@@ -1,6 +1,6 @@
 package no.nav.sosialhjelp.avtaler.avtaler
 
-import io.micrometer.prometheus.PrometheusMeterRegistry
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import mu.KotlinLogging
 import no.digipost.signature.client.direct.DirectJobStatus
 import no.nav.sosialhjelp.avtaler.altinn.AltinnService

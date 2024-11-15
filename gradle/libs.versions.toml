@@ -21,7 +21,7 @@ googleCloudSecretManager = "2.53.0"
 koin = "4.0.0"
 apache-poi = "5.3.0"
 opentelemetry = "2.10.0"
-prometheus = "1.14.0"
+prometheus = "1.14.1"
 
 [libraries]
 konfig = { module = "com.natpryce:konfig", version.ref = "konfig" }

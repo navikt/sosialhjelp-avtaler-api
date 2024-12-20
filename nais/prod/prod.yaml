@@ -47,7 +47,6 @@ spec:
         cascadingDelete: false
     buckets:
       - name: digisos-nks-avtaler
-        cascadingDelete: true
   accessPolicy:
     inbound:
       rules:

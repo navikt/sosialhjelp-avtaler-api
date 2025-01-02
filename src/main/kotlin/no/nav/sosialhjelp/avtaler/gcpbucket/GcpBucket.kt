@@ -6,9 +6,16 @@ import com.google.cloud.storage.StorageOptions
 import com.google.common.net.MediaType
 import org.threeten.bp.Duration
 
-class GcpBucket(private val bucketName: String) {
+class GcpBucket(
+    private val bucketName: String,
+) {
     private val retrySetting = RetrySettings.newBuilder().setTotalTimeout(Duration.ofMillis(3000)).build()
-    private val storage = StorageOptions.newBuilder().setRetrySettings(retrySetting).build().service
+    private val storage =
+        StorageOptions
+            .newBuilder()
+            .setRetrySettings(retrySetting)
+            .build()
+            .service
 
     fun lagreBlob(
         blobName: String,
@@ -18,7 +25,8 @@ class GcpBucket(private val bucketName: String) {
     ) {
         val contentTypeVerdi = contentType.toString()
         val blobInfo =
-            BlobInfo.newBuilder(bucketName, blobName)
+            BlobInfo
+                .newBuilder(bucketName, blobName)
                 .setContentType(contentTypeVerdi)
                 .setMetadata(metadata + mapOf("content-type" to contentTypeVerdi))
                 .build()

@@ -17,6 +17,7 @@ import io.ktor.server.request.receiveNullable
 import io.ktor.server.response.header
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytes
+import io.ktor.server.response.respondOutputStream
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
@@ -26,10 +27,14 @@ import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
 import no.nav.sosialhjelp.avtaler.gotenberg.GotenbergClient
 import org.koin.ktor.ext.inject
 import java.io.ByteArrayOutputStream
+import java.io.InputStream
+import java.io.OutputStream
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 data class AvtalemalMetadata(
     val name: String,
@@ -80,6 +85,7 @@ fun Route.avtalemalerApi() {
                             "file" -> {
                                 avtale.mal = part.streamProvider().readAllBytes()
                             }
+
                             "examplePdf" -> {
                                 avtale.examplePdf = part.streamProvider().readAllBytes()
                             }
@@ -205,12 +211,64 @@ fun Route.avtalemalerApi() {
 
                 call.respondBytes(converted, ContentType.Application.Pdf, HttpStatusCode.OK)
             }
+
+            route("/avtale") {
+                get("/signerte-avtaler") {
+                    val uuid = call.uuid()
+                    val signerteAvtaler = avtaleService.hentAvtaleUuidsForMal(uuid)
+                    val avtalerMap =
+                        signerteAvtaler
+                            .mapNotNull {
+                                avtaleService.hentSignertAvtaleFraDatabase(it)
+                            }.toMap()
+                    call.response.header(
+                        HttpHeaders.ContentDisposition,
+                        ContentDisposition.Attachment
+                            .withParameter(ContentDisposition.Parameters.FileName, "signerte-avtaler.zip")
+                            .toString(),
+                    )
+                    call.respondOutputStream(contentType = ContentType.Application.Zip, status = HttpStatusCode.OK) {
+                        this.use {
+                            zipTheDip(avtalerMap, it)
+                        }
+                    }
+                }
+                route("/{avtaleUuid}") {
+                    get("/signert-avtale") {
+                        val uuid = call.avtaleUuid()
+                        val (title, document) =
+                            avtaleService.hentSignertAvtaleFraDatabase(
+                                uuid,
+                            ) ?: return@get call.response.status(HttpStatusCode.NotFound)
+
+                        call.response.header(
+                            HttpHeaders.ContentDisposition,
+                            ContentDisposition.Attachment
+                                .withParameter(ContentDisposition.Parameters.FileName, "$title.pdf")
+                                .toString(),
+                        )
+
+                        document.use { doc ->
+                            call.respondOutputStream(contentType = ContentType.Application.Pdf, status = HttpStatusCode.OK) {
+                                this.use { outputStream ->
+                                    doc.copyTo(outputStream)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 private fun ApplicationCall.uuid(): UUID =
     requireNotNull(parameters["uuid"]?.let { UUID.fromString(it) }) {
+        "Mangler uuid i URL"
+    }
+
+private fun ApplicationCall.avtaleUuid(): UUID =
+    requireNotNull(parameters["avtaleUuid"]?.let { UUID.fromString(it) }) {
         "Mangler uuid i URL"
     }
 
@@ -229,3 +287,17 @@ fun Avtalemal.toDto(publishedOrgnrs: List<String>?) =
         ingressNynorsk = ingressNynorsk,
         kvitteringstekstNynorsk = kvitteringstekstNynorsk,
     )
+
+private fun zipTheDip(
+    streams: Map<String, InputStream>,
+    outputStream: OutputStream,
+) = ZipOutputStream(outputStream).use { zipOut ->
+    streams.forEach { (fileName, file) ->
+        file.use { fis ->
+            val zipEntry = ZipEntry(fileName)
+            zipOut.putNextEntry(zipEntry)
+            fis.copyTo(zipOut)
+            zipOut.closeEntry()
+        }
+    }
+}

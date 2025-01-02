@@ -233,6 +233,11 @@ class AvtaleService(
         )
     }
 
+    suspend fun hentSignertAvtaleFraDatabase(uuid: UUID): Pair<String, InputStream>? {
+        val avtale = hentAvtale(uuid) ?: return null
+        return digipostService.hentDigipostJobb(uuid)?.signertDokument?.let { avtale.navn to it }
+    }
+
     suspend fun hentSignertAvtaleDokumentFraDatabaseEllerDigipost(
         fnr: String,
         tjeneste: Avgiver.Tjeneste,
@@ -270,6 +275,11 @@ class AvtaleService(
     suspend fun hentAvtale(uuid: UUID): Avtale? =
         transaction(databaseContext) { ctx ->
             ctx.avtaleStore.hentAvtale(uuid)
+        }
+
+    suspend fun hentAvtaleUuidsForMal(uuid: UUID): List<UUID> =
+        transaction(databaseContext) { ctx ->
+            ctx.avtaleStore.hentAlleUuidsForMal(uuid)
         }
 
     suspend fun lagreAvtale(

@@ -8,8 +8,8 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.route
 import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.AZURE_AUTH
-import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.TOKEN_X_AUTH
+import no.nav.sosialhjelp.avtaler.authOrLocal
 import no.nav.sosialhjelp.avtaler.ereg.EregClient
 import org.koin.ktor.ext.inject
 
@@ -20,7 +20,7 @@ fun Route.kommuneApi() {
     val eregService by inject<EregClient>()
 
     route("/kommuner") {
-        authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH, if (Configuration.local) "local" else AZURE_AUTH) {
+        authenticate(configurations = authOrLocal(TOKEN_X_AUTH, AZURE_AUTH)) {
             get {
                 log.info("Henter alle kommuner")
                 val kommuner = kommuneService.getAlleKommuner()

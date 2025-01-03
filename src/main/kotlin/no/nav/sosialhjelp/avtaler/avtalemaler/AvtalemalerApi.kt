@@ -17,19 +17,26 @@ import io.ktor.server.request.receiveNullable
 import io.ktor.server.response.header
 import io.ktor.server.response.respond
 import io.ktor.server.response.respondBytes
+import io.ktor.server.response.respondOutputStream
 import io.ktor.server.routing.Route
 import io.ktor.server.routing.delete
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
+import no.nav.sosialhjelp.avtaler.ereg.EregClient
 import no.nav.sosialhjelp.avtaler.gotenberg.GotenbergClient
+import no.nav.sosialhjelp.avtaler.utils.format
 import org.koin.ktor.ext.inject
 import java.io.ByteArrayOutputStream
+import java.io.InputStream
+import java.io.OutputStream
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
+import java.util.zip.ZipEntry
+import java.util.zip.ZipOutputStream
 
 data class AvtalemalMetadata(
     val name: String,
@@ -62,6 +69,7 @@ fun Route.avtalemalerApi() {
     val injectionService by inject<InjectionService>()
     val gotenbergClient by inject<GotenbergClient>()
     val avtaleService by inject<AvtaleService>()
+    val eregClient by inject<EregClient>()
 
     route("/avtalemal") {
         get {
@@ -80,6 +88,7 @@ fun Route.avtalemalerApi() {
                             "file" -> {
                                 avtale.mal = part.streamProvider().readAllBytes()
                             }
+
                             "examplePdf" -> {
                                 avtale.examplePdf = part.streamProvider().readAllBytes()
                             }
@@ -205,12 +214,72 @@ fun Route.avtalemalerApi() {
 
                 call.respondBytes(converted, ContentType.Application.Pdf, HttpStatusCode.OK)
             }
+
+            route("/avtale") {
+                get("/signerte-avtaler") {
+                    val uuid = call.uuid()
+                    val signerteAvtaler = avtaleService.hentAvtalerForMal(uuid)
+                    val avtalerMap =
+                        signerteAvtaler
+                            .mapNotNull { avtale ->
+                                val document = avtaleService.hentSignertAvtaleFraDatabase(avtale.uuid) ?: return@mapNotNull null
+                                val kommunenavn = eregClient.hentEnhetNavn(avtale.orgnr).findBokmaalName()
+                                val signertTidspunkt = avtale.signert_tidspunkt.format()
+                                val title = "${avtale.navn} - $kommunenavn - $signertTidspunkt"
+                                title to document
+                            }.toMap()
+                    call.response.header(
+                        HttpHeaders.ContentDisposition,
+                        ContentDisposition.Attachment
+                            .withParameter(ContentDisposition.Parameters.FileName, "signerte-avtaler.zip")
+                            .toString(),
+                    )
+                    call.respondOutputStream(contentType = ContentType.Application.Zip, status = HttpStatusCode.OK) {
+                        this.use {
+                            createZip(avtalerMap, it)
+                        }
+                    }
+                }
+                route("/{avtaleUuid}") {
+                    get("/signert-avtale") {
+                        val uuid = call.avtaleUuid()
+                        val avtale = avtaleService.hentAvtale(uuid) ?: return@get call.response.status(HttpStatusCode.NotFound)
+                        val document =
+                            avtaleService.hentSignertAvtaleFraDatabase(
+                                uuid,
+                            ) ?: return@get call.response.status(HttpStatusCode.NotFound)
+
+                        val kommunenavn = eregClient.hentEnhetNavn(avtale.orgnr).findBokmaalName()
+                        val signertTidspunkt = avtale.signert_tidspunkt.format()
+                        val title = "${avtale.navn} - $kommunenavn - $signertTidspunkt"
+                        call.response.header(
+                            HttpHeaders.ContentDisposition,
+                            ContentDisposition.Attachment
+                                .withParameter(ContentDisposition.Parameters.FileName, "$title.pdf")
+                                .toString(),
+                        )
+
+                        document.use { doc ->
+                            call.respondOutputStream(contentType = ContentType.Application.Pdf, status = HttpStatusCode.OK) {
+                                this.use { outputStream ->
+                                    doc.copyTo(outputStream)
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
 
 private fun ApplicationCall.uuid(): UUID =
     requireNotNull(parameters["uuid"]?.let { UUID.fromString(it) }) {
+        "Mangler uuid i URL"
+    }
+
+private fun ApplicationCall.avtaleUuid(): UUID =
+    requireNotNull(parameters["avtaleUuid"]?.let { UUID.fromString(it) }) {
         "Mangler uuid i URL"
     }
 
@@ -229,3 +298,22 @@ fun Avtalemal.toDto(publishedOrgnrs: List<String>?) =
         ingressNynorsk = ingressNynorsk,
         kvitteringstekstNynorsk = kvitteringstekstNynorsk,
     )
+
+private fun createZip(
+    streams: Map<String, InputStream>,
+    outputStream: OutputStream,
+) = ZipOutputStream(outputStream).use { zipOut ->
+    streams.forEach { (fileName, file) ->
+        file.use { fis ->
+            val zipEntry = ZipEntry("$fileName.pdf")
+            zipOut.putNextEntry(zipEntry)
+            fis.copyTo(zipOut)
+            zipOut.closeEntry()
+        }
+    }
+}
+
+private fun String.findBokmaalName(): String {
+    val languages = split("/")
+    return languages.find { it.contains("kommune") } ?: languages.firstOrNull() ?: "Ukjent"
+}

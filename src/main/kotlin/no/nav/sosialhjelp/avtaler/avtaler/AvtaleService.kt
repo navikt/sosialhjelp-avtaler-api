@@ -233,6 +233,10 @@ class AvtaleService(
         )
     }
 
+    suspend fun hentSignertAvtaleFraDatabase(uuid: UUID): InputStream? {
+        return digipostService.hentDigipostJobb(uuid)?.signertDokument
+    }
+
     suspend fun hentSignertAvtaleDokumentFraDatabaseEllerDigipost(
         fnr: String,
         tjeneste: Avgiver.Tjeneste,
@@ -270,6 +274,11 @@ class AvtaleService(
     suspend fun hentAvtale(uuid: UUID): Avtale? =
         transaction(databaseContext) { ctx ->
             ctx.avtaleStore.hentAvtale(uuid)
+        }
+
+    suspend fun hentAvtalerForMal(uuid: UUID): List<Avtale> =
+        transaction(databaseContext) { ctx ->
+            ctx.avtaleStore.hentAlleForMal(uuid)
         }
 
     suspend fun lagreAvtale(

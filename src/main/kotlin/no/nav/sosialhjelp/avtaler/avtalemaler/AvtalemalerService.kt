@@ -181,6 +181,8 @@ class AvtalemalerService(
         val avtaleSummaries =
             signeringsinfo.map { info ->
                 AvtaleSummary(
+                    uuid,
+                    info.avtaleUuid,
                     info.orgnr,
                     kommuner.find { it.orgnr == info.orgnr }?.navn ?: "Ukjent kommune",
                     info.erSignert,
@@ -192,9 +194,12 @@ class AvtalemalerService(
     }
 }
 
-data class AvtaleSummary(
+class AvtaleSummary(
+    malUuid: UUID,
+    avtaleUuid: UUID,
     val orgnr: String,
     val name: String,
     val hasSigned: Boolean,
     val signedAt: LocalDateTime?,
+    val avtaleUrl: String? = if (hasSigned) "/sosialhjelp/avtaler-api/api/avtalemal/$malUuid/avtale/$avtaleUuid/signert-avtale" else null,
 )

@@ -201,5 +201,5 @@ class AvtaleSummary(
     val name: String,
     val hasSigned: Boolean,
     val signedAt: LocalDateTime?,
-    val avtaleUrl: String = "/sosialhjelp/avtaler-api/api/avtalemal/$malUuid/avtale/$avtaleUuid/signert-avtale",
+    val avtaleUrl: String? = if (hasSigned) "/sosialhjelp/avtaler-api/api/avtalemal/$malUuid/avtale/$avtaleUuid/signert-avtale" else null,
 )

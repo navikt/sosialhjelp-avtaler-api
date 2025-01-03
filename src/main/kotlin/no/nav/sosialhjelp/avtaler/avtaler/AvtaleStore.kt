@@ -81,7 +81,8 @@ class AvtaleStorePostgres(
                     er_signert,
                     opprettet,
                     navn,
-                    avtalemal_uuid
+                    avtalemal_uuid,
+                    signert_tidspunkt
                 from avtale_v1
                 where uuid = :uuid
                 """.trimIndent()
@@ -209,7 +210,8 @@ class AvtaleStorePostgres(
                     er_signert,
                     opprettet,
                     navn,
-                    avtalemal_uuid
+                    avtalemal_uuid,
+                    signert_tidspunkt
                 from avtale_v1
                 where avtalemal_uuid = :uuid
                 """.trimIndent()
@@ -226,5 +228,6 @@ class AvtaleStorePostgres(
             opprettet = row.localDateTime("opprettet"),
             navn = row.string("navn"),
             avtalemal_uuid = row.uuidOrNull("avtalemal_uuid"),
+            signert_tidspunkt = row.localDateTimeOrNull("signert_tidspunkt"),
         )
 }

@@ -24,7 +24,9 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
 import no.nav.sosialhjelp.avtaler.avtaler.AvtaleService
+import no.nav.sosialhjelp.avtaler.ereg.EregClient
 import no.nav.sosialhjelp.avtaler.gotenberg.GotenbergClient
+import no.nav.sosialhjelp.avtaler.utils.format
 import org.koin.ktor.ext.inject
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
@@ -67,6 +69,7 @@ fun Route.avtalemalerApi() {
     val injectionService by inject<InjectionService>()
     val gotenbergClient by inject<GotenbergClient>()
     val avtaleService by inject<AvtaleService>()
+    val eregClient by inject<EregClient>()
 
     route("/avtalemal") {
         get {
@@ -215,11 +218,15 @@ fun Route.avtalemalerApi() {
             route("/avtale") {
                 get("/signerte-avtaler") {
                     val uuid = call.uuid()
-                    val signerteAvtaler = avtaleService.hentAvtaleUuidsForMal(uuid)
+                    val signerteAvtaler = avtaleService.hentAvtalerForMal(uuid)
                     val avtalerMap =
                         signerteAvtaler
                             .mapNotNull {
-                                avtaleService.hentSignertAvtaleFraDatabase(it)
+                                val document = avtaleService.hentSignertAvtaleFraDatabase(it.uuid) ?: return@mapNotNull null
+                                val kommunenavn = eregClient.hentEnhetNavn(it.orgnr)
+                                val signertTidspunkt = it.signert_tidspunkt.format()
+                                val title = "${it.navn} - $kommunenavn - $signertTidspunkt"
+                                title to document
                             }.toMap()
                     call.response.header(
                         HttpHeaders.ContentDisposition,
@@ -236,11 +243,15 @@ fun Route.avtalemalerApi() {
                 route("/{avtaleUuid}") {
                     get("/signert-avtale") {
                         val uuid = call.avtaleUuid()
-                        val (title, document) =
+                        val avtale = avtaleService.hentAvtale(uuid) ?: return@get call.response.status(HttpStatusCode.NotFound)
+                        val document =
                             avtaleService.hentSignertAvtaleFraDatabase(
                                 uuid,
                             ) ?: return@get call.response.status(HttpStatusCode.NotFound)
 
+                        val kommunenavn = eregClient.hentEnhetNavn(avtale.orgnr)
+                        val signertTidspunkt = avtale.signert_tidspunkt.format()
+                        val title = "${avtale.navn} - $kommunenavn - $signertTidspunkt"
                         call.response.header(
                             HttpHeaders.ContentDisposition,
                             ContentDisposition.Attachment

@@ -29,7 +29,7 @@ interface AvtaleStore : Store {
 
     fun hentAlle(): Map<UUID, List<String>>
 
-    fun hentAlleUuidsForMal(uuid: UUID): List<UUID>
+    fun hentAlleForMal(uuid: UUID): List<Avtale>
 }
 
 data class Avtale(
@@ -196,14 +196,24 @@ class AvtaleStorePostgres(
                 }
         }
 
-    override fun hentAlleUuidsForMal(uuid: UUID): List<UUID> =
+    override fun hentAlleForMal(uuid: UUID): List<Avtale> =
         session { session ->
             @Language("PostgreSQL")
             val sql =
                 """
-                select uuid from avtale_v1 where avtalemal_uuid = :uuid
+                SELECT 
+                    uuid,
+                    orgnr,
+                    avtaleversjon,
+                    navn_innsender,
+                    er_signert,
+                    opprettet,
+                    navn,
+                    avtalemal_uuid
+                from avtale_v1
+                where avtalemal_uuid = :uuid
                 """.trimIndent()
-            session.queryList(sql, mapOf("uuid" to uuid)) { row -> row.uuid("uuid") }
+            session.queryList(sql, mapOf("uuid" to uuid), ::mapper)
         }
 
     private fun mapper(row: Row): Avtale =

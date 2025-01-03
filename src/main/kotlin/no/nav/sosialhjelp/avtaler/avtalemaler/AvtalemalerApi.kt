@@ -236,7 +236,7 @@ fun Route.avtalemalerApi() {
                     )
                     call.respondOutputStream(contentType = ContentType.Application.Zip, status = HttpStatusCode.OK) {
                         this.use {
-                            zipTheDip(avtalerMap, it)
+                            createZip(avtalerMap, it)
                         }
                     }
                 }
@@ -299,7 +299,7 @@ fun Avtalemal.toDto(publishedOrgnrs: List<String>?) =
         kvitteringstekstNynorsk = kvitteringstekstNynorsk,
     )
 
-private fun zipTheDip(
+private fun createZip(
     streams: Map<String, InputStream>,
     outputStream: OutputStream,
 ) = ZipOutputStream(outputStream).use { zipOut ->

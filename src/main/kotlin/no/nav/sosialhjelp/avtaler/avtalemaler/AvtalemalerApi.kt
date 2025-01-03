@@ -221,11 +221,11 @@ fun Route.avtalemalerApi() {
                     val signerteAvtaler = avtaleService.hentAvtalerForMal(uuid)
                     val avtalerMap =
                         signerteAvtaler
-                            .mapNotNull {
-                                val document = avtaleService.hentSignertAvtaleFraDatabase(it.uuid) ?: return@mapNotNull null
-                                val kommunenavn = eregClient.hentEnhetNavn(it.orgnr)
-                                val signertTidspunkt = it.signert_tidspunkt.format()
-                                val title = "${it.navn} - $kommunenavn - $signertTidspunkt"
+                            .mapNotNull { avtale ->
+                                val document = avtaleService.hentSignertAvtaleFraDatabase(avtale.uuid) ?: return@mapNotNull null
+                                val kommunenavn = eregClient.hentEnhetNavn(avtale.orgnr).findBokmaalName()
+                                val signertTidspunkt = avtale.signert_tidspunkt.format()
+                                val title = "${avtale.navn} - $kommunenavn - $signertTidspunkt"
                                 title to document
                             }.toMap()
                     call.response.header(
@@ -249,7 +249,7 @@ fun Route.avtalemalerApi() {
                                 uuid,
                             ) ?: return@get call.response.status(HttpStatusCode.NotFound)
 
-                        val kommunenavn = eregClient.hentEnhetNavn(avtale.orgnr)
+                        val kommunenavn = eregClient.hentEnhetNavn(avtale.orgnr).findBokmaalName()
                         val signertTidspunkt = avtale.signert_tidspunkt.format()
                         val title = "${avtale.navn} - $kommunenavn - $signertTidspunkt"
                         call.response.header(
@@ -305,10 +305,15 @@ private fun createZip(
 ) = ZipOutputStream(outputStream).use { zipOut ->
     streams.forEach { (fileName, file) ->
         file.use { fis ->
-            val zipEntry = ZipEntry(fileName)
+            val zipEntry = ZipEntry("$fileName.pdf")
             zipOut.putNextEntry(zipEntry)
             fis.copyTo(zipOut)
             zipOut.closeEntry()
         }
     }
+}
+
+private fun String.findBokmaalName(): String {
+    val languages = split("/")
+    return languages.find { it.contains("kommune") } ?: languages.firstOrNull() ?: "Ukjent"
 }

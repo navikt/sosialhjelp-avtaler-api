@@ -9,7 +9,7 @@ jobs:
     permissions:
       contents: write
       id-token: write
-    uses: navikt/sosialhjelp-ci/.github/workflows/deploy_app.yml@v6
+    uses: navikt/sosialhjelp-ci/.github/workflows/deploy_app.yml@v7
     with:
       cluster-name: 'dev-gcp'
       resource-name: 'dev'

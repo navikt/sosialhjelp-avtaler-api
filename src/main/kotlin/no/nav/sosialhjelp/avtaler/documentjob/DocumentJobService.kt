@@ -9,9 +9,9 @@ import no.nav.sosialhjelp.avtaler.digipost.DigipostService
 import no.nav.sosialhjelp.avtaler.ereg.EregClient
 import no.nav.sosialhjelp.avtaler.gcpbucket.GcpBucket
 import no.nav.sosialhjelp.avtaler.slack.Slack
+import no.nav.sosialhjelp.avtaler.utils.format
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.time.format.DateTimeFormatter
 
 private val log = KotlinLogging.logger { }
 
@@ -50,11 +50,8 @@ class DocumentJobService(
 
         val kommunenavn = eregClient.hentEnhetNavn(avtale.orgnr)
 
-        val blobNavn = "${avtale.navn} - $kommunenavn - ${
-            avtale.signert_tidspunkt?.format(
-                DateTimeFormatter.ofPattern("dd.MM.yyyy"),
-            ) ?: "datoløs"
-        }.pdf"
+        val signertTidspunkt = avtale.signert_tidspunkt.format()
+        val blobNavn = "${avtale.navn} - $kommunenavn - $signertTidspunkt.pdf"
         val metadata =
             mapOf(
                 "navnInnsender" to (avtale.navn_innsender ?: error("Har ikke navn på innsender")),

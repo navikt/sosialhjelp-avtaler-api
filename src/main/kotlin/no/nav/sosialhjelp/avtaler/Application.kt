@@ -14,6 +14,7 @@ import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.path
 import io.ktor.server.routing.IgnoreTrailingSlash
+import io.ktor.server.routing.Route
 import io.ktor.server.routing.route
 import io.ktor.server.routing.routing
 import io.micrometer.prometheusmetrics.PrometheusConfig
@@ -264,13 +265,20 @@ fun Application.setupRoutes() {
             internalRoutes(prometheusMeterRegistry)
             route("/api") {
                 kommuneApi()
-                authenticate(if (Configuration.local) "local" else TOKEN_X_AUTH) {
+                authenticate(configurations = authOrLocal(TOKEN_X_AUTH)) {
                     avtaleApi()
                 }
-                authenticate(if (Configuration.local) "local" else AZURE_AUTH) {
+                authenticate(configurations = authOrLocal(AZURE_AUTH)) {
                     avtalemalerApi()
                 }
             }
         }
     }
+}
+
+fun Route.authOrLocal(vararg configurations: String): Array<out String> {
+    if (Configuration.local) {
+        return arrayOf("local")
+    }
+    return configurations
 }

@@ -28,6 +28,8 @@ interface AvtaleStore : Store {
     fun hentAvtaleDokument(uuid: UUID): ByteArray?
 
     fun hentAlle(): Map<UUID, List<String>>
+
+    fun hentAlleForMal(uuid: UUID): List<Avtale>
 }
 
 data class Avtale(
@@ -192,6 +194,26 @@ class AvtaleStorePostgres(
                 .mapValues { entry ->
                     entry.value.map { it.second }
                 }
+        }
+
+    override fun hentAlleForMal(uuid: UUID): List<Avtale> =
+        session { session ->
+            @Language("PostgreSQL")
+            val sql =
+                """
+                SELECT 
+                    uuid,
+                    orgnr,
+                    avtaleversjon,
+                    navn_innsender,
+                    er_signert,
+                    opprettet,
+                    navn,
+                    avtalemal_uuid
+                from avtale_v1
+                where avtalemal_uuid = :uuid
+                """.trimIndent()
+            session.queryList(sql, mapOf("uuid" to uuid), ::mapper)
         }
 
     private fun mapper(row: Row): Avtale =

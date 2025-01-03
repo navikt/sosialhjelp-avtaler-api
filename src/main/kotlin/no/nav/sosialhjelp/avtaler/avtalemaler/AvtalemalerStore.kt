@@ -220,10 +220,11 @@ class AvtalemalerStorePostgres(
         session { session ->
             val sql =
                 """
-                select orgnr, er_signert, signert_tidspunkt from avtale_v1 where avtalemal_uuid = :uuid
+                select uuid, orgnr, er_signert, signert_tidspunkt from avtale_v1 where avtalemal_uuid = :uuid
                 """.trimIndent()
             session.queryList(sql, mapOf("uuid" to uuid)) {
                 Signeringsinfo(
+                    it.uuid("uuid"),
                     it.string("orgnr"),
                     it.boolean("er_signert"),
                     it.localDateTimeOrNull("signert_tidspunkt"),
@@ -233,6 +234,7 @@ class AvtalemalerStorePostgres(
 }
 
 data class Signeringsinfo(
+    val avtaleUuid: UUID,
     val orgnr: String,
     val erSignert: Boolean,
     val signertTidspunkt: LocalDateTime?,

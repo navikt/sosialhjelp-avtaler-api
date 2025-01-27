@@ -61,7 +61,8 @@ class AvtaleStorePostgres(
                     er_signert,
                     opprettet,
                     navn,
-                    avtalemal_uuid
+                    avtalemal_uuid,
+                    signert_tidspunkt
                 FROM avtale_v1
                 WHERE orgnr = :orgnr
                 """.trimIndent()
@@ -105,7 +106,8 @@ class AvtaleStorePostgres(
                         er_signert,
                         opprettet,
                         navn,
-                        avtalemal_uuid
+                        avtalemal_uuid,
+                        signert_tidspunkt
                     FROM avtale_v1
                     WHERE orgnr in (?)
                     """.trimIndent()

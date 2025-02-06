@@ -79,8 +79,8 @@ spec:
       runtime: java
     logging:
       destinations:
-        - loki
-        - elastic
+        - id: loki
+        - id: elastic
   secureLogs:
     enabled: true
   envFrom:

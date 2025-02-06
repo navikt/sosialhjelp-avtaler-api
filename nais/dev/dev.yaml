@@ -77,6 +77,10 @@ spec:
     autoInstrumentation:
       enabled: true
       runtime: java
+    logging:
+      destinations:
+        - loki
+        - elastic
   secureLogs:
     enabled: true
   envFrom:

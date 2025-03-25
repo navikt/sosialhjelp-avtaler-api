@@ -64,7 +64,7 @@ spec:
         - host: data.ssb.no
       rules:
         - application: arbeidsgiver-altinn-tilganger
-          namespace: arbeidsgiver
+          namespace: fager
   resources:
     limits:
       memory: 2Gi

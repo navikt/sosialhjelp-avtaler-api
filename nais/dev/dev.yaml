@@ -64,7 +64,7 @@ spec:
         - host: data.ssb.no
       rules:
         - application: arbeidsgiver-altinn-tilganger
-          namespace: arbeidsgiver
+          namespace: fager
         - application: sosialhjelp-konvertering-til-pdf
   resources:
     limits:

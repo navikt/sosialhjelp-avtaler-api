@@ -17,7 +17,6 @@ import io.ktor.server.routing.Route
 import io.ktor.server.routing.get
 import io.ktor.server.routing.post
 import io.ktor.server.routing.route
-import no.nav.sosialhjelp.avtaler.altinn.Avgiver
 import no.nav.sosialhjelp.avtaler.avtalemaler.AvtalemalerService
 import no.nav.sosialhjelp.avtaler.extractFnr
 import no.nav.sosialhjelp.avtaler.kommune.AvtaleResponse
@@ -38,7 +37,6 @@ fun Route.avtaleApi() {
             val kommuner =
                 avtaleService.hentKommuner(
                     fnr = call.extractFnr(),
-                    tjeneste = Avgiver.Tjeneste.AVTALESIGNERING,
                     this.context.getAccessToken(),
                 )
             call.respond(HttpStatusCode.OK, kommuner)
@@ -50,7 +48,6 @@ fun Route.avtaleApi() {
                     avtaleService.hentAvtale(
                         fnr = call.extractFnr(),
                         uuid = uuid,
-                        tjeneste = Avgiver.Tjeneste.AVTALESIGNERING,
                         token = this.context.getAccessToken(),
                     )
                 if (avtale == null) {
@@ -83,7 +80,6 @@ fun Route.avtaleApi() {
                     avtaleService.hentAvtale(
                         call.extractFnr(),
                         uuid,
-                        Avgiver.Tjeneste.AVTALESIGNERING,
                         this.context.getAccessToken(),
                     )
                 if (avtale?.avtalemal_uuid == null) {
@@ -107,7 +103,6 @@ fun Route.avtaleApi() {
                     avtaleService.hentAvtale(
                         call.extractFnr(),
                         uuid,
-                        Avgiver.Tjeneste.AVTALESIGNERING,
                         this.context.getAccessToken(),
                     )
                 if (avtale == null) {
@@ -117,7 +112,6 @@ fun Route.avtaleApi() {
                     avtaleService.hentAvtaleDokument(
                         call.extractFnr(),
                         uuid,
-                        Avgiver.Tjeneste.AVTALESIGNERING,
                         this.context.getAccessToken(),
                     )
 
@@ -141,7 +135,6 @@ fun Route.avtaleApi() {
                 val (title, document) =
                     avtaleService.hentSignertAvtaleDokumentFraDatabaseEllerDigipost(
                         fnr,
-                        Avgiver.Tjeneste.AVTALESIGNERING,
                         token,
                         uuid,
                     ) ?: return@get call.response.status(HttpStatusCode.NotFound)

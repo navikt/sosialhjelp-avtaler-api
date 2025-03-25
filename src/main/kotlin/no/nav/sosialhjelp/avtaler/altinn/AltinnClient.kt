@@ -2,10 +2,9 @@ package no.nav.sosialhjelp.avtaler.altinn
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.request.get
-import io.ktor.client.request.header
+import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.post
 import io.ktor.client.statement.request
-import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import mu.KotlinLogging
 import no.nav.sosialhjelp.avtaler.Configuration
@@ -16,57 +15,53 @@ private val log = KotlinLogging.logger { }
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
 interface AltinnClient {
-    suspend fun hentAvgivere(
+    suspend fun hentTilganger(
         fnr: String,
-        tjeneste: Avgiver.Tjeneste,
         token: String?,
-    ): List<Avgiver>
+    ): AltinnTilgangerResponse?
 }
 
 class AltinnClientLocal : AltinnClient {
-    override suspend fun hentAvgivere(
+    override suspend fun hentTilganger(
         fnr: String,
-        tjeneste: Avgiver.Tjeneste,
         token: String?,
-    ): List<Avgiver> {
-        return listOf(Avgiver("Oslo kommune", "12345789", "KOMM"))
-    }
+    ): AltinnTilgangerResponse =
+        AltinnTilgangerResponse(
+            false,
+            listOf(AltinnTilgang("123456789", setOf(), setOf(), emptyList(), "Whatever kommune", "KOMM")),
+            emptyMap(),
+            mapOf("nav_sosialtjenester_digisos-avtale" to setOf("12345789")),
+        )
 }
 
-class AltinnClientImpl(props: Configuration.AltinnProperties, private val tokenClient: Oauth2Client) : AltinnClient {
+class AltinnClientImpl(
+    props: Configuration.AltinnProperties,
+    private val tokenClient: Oauth2Client,
+) : AltinnClient {
     private val client: HttpClient = defaultHttpClientWithJsonHeaders()
     private val baseUrl = props.baseUrl
     private val altinnRettigheterAudience = props.altinnRettigheterAudience
 
-    override suspend fun hentAvgivere(
+    override suspend fun hentTilganger(
         fnr: String,
-        tjeneste: Avgiver.Tjeneste,
         token: String?,
-    ): List<Avgiver> {
+    ): AltinnTilgangerResponse? {
         if (token == null) {
             log.warn("Ingen access token i request, kan ikke hente ny token til altinn-proxy")
-            return emptyList()
+            return null
         }
 
         val scopedAccessToken = tokenClient.exchangeToken(token, altinnRettigheterAudience).accessToken
 
         val response =
-            client.get("$baseUrl/ekstern/altinn/api/serviceowner/reportees") {
-                url {
-                    parameters.append("ForceEIAuthentication", "")
-                    parameters.append("subject", fnr)
-                    parameters.append("serviceCode", tjeneste.kode)
-                    parameters.append("serviceEdition", tjeneste.versjon.toString())
-                    parameters.append("\$filter", "Type ne 'Person' and Status eq 'Active' and OrganizationForm eq 'KOMM'")
-                    parameters.append("\$top", "200")
-                    header(HttpHeaders.Authorization, "Bearer $scopedAccessToken")
-                }
+            client.post("$baseUrl/altinn-tilganger") {
+                bearerAuth(scopedAccessToken)
             }
-        sikkerLog.info { "Hentet avgivere med url: ${response.request.url}" }
+        sikkerLog.info { "Hentet tilganger med url: ${response.request.url}" }
         if (response.status == HttpStatusCode.OK) {
-            return response.body() ?: emptyList()
+            return response.body()
         }
-        log.warn { "Kunne ikke hente avgivere, status: ${response.status}" }
-        return emptyList()
+        log.warn { "Kunne ikke hente tilganger, status: ${response.status}" }
+        return null
     }
 }

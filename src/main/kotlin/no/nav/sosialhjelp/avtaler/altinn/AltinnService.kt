@@ -6,17 +6,34 @@ import mu.KotlinLogging
 
 private val sikkerLog = KotlinLogging.logger("tjenestekall")
 
-class AltinnService(private val altinnClient: AltinnClient) {
-    suspend fun hentAvgivere(
+class AltinnService(
+    private val altinnClient: AltinnClient,
+) {
+    // Returnerer en liste med orgnr/navn bruker har tilgang til
+    suspend fun hentTilganger(
         fnr: String,
-        tjeneste: Avgiver.Tjeneste,
         token: String?,
-    ): List<Avgiver> =
+    ): List<KommuneTilgang> =
         withContext(Dispatchers.IO) {
-            val avgivere = altinnClient.hentAvgivere(fnr = fnr, tjeneste = tjeneste, token = token)
-            sikkerLog.info {
-                "Avgivere for fnr: $fnr, tjeneste: $tjeneste, avgivere: $avgivere"
+            val response = altinnClient.hentTilganger(fnr = fnr, token = token)
+            if (response == null) {
+                sikkerLog.warn { "Ingen tilganger funnet for fnr: $fnr" }
+                return@withContext emptyList()
             }
-            avgivere
+            val flattenedHierarki = response.hierarki.flatMap { it.underenheter + it }
+            val tilganger =
+                response.tilgangTilOrgNr["nav_sosialtjenester_digisos-avtale"]?.filter { orgnr ->
+                    flattenedHierarki.find { it.orgnr == orgnr }?.organisasjonsform == "KOMM"
+                } ?: emptySet()
+            val orgnrTilNavn = flattenedHierarki.associate { it.orgnr to it.navn }
+            sikkerLog.info {
+                "tilganger for fnr: $fnr, tilganger: $tilganger"
+            }
+            tilganger.map { KommuneTilgang(it, orgnrTilNavn[it]!!) }
         }
 }
+
+data class KommuneTilgang(
+    val orgnr: String,
+    val name: String,
+)

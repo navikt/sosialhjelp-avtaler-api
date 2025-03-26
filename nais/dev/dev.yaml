@@ -63,8 +63,8 @@ spec:
         - host: ereg-services.dev-fss-pub.nais.io
         - host: data.ssb.no
       rules:
-        - application: altinn-rettigheter-proxy
-          namespace: arbeidsgiver
+        - application: arbeidsgiver-altinn-tilganger
+          namespace: fager
         - application: sosialhjelp-konvertering-til-pdf
   resources:
     limits:

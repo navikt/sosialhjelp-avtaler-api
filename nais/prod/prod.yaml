@@ -63,8 +63,8 @@ spec:
         - host: konvertering-til-pdf.prod-fss-pub.nais.io
         - host: data.ssb.no
       rules:
-        - application: altinn-rettigheter-proxy
-          namespace: arbeidsgiver
+        - application: arbeidsgiver-altinn-tilganger
+          namespace: fager
   resources:
     limits:
       memory: 2Gi

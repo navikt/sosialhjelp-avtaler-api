@@ -8,7 +8,6 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import io.ktor.server.application.Application
 import io.ktor.server.application.ApplicationCall
-import io.ktor.server.auth.Principal
 import io.ktor.server.auth.authentication
 import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.auth.principal
@@ -115,11 +114,11 @@ private data class AuthenticationConfiguration(
 
 internal data class UserPrincipal(
     val fnr: String,
-) : Principal
+)
 
 internal data class AzureUserPrincipal(
     val email: String,
-) : Principal
+)
 
 fun ApplicationCall.extractFnr(): String {
     val fnrFromClaims = this.principal<UserPrincipal>()?.fnr
@@ -127,12 +126,4 @@ fun ApplicationCall.extractFnr(): String {
         throw RuntimeException("Fant ikke FNR i token")
     }
     return fnrFromClaims
-}
-
-fun ApplicationCall.extractEmail(): String {
-    val emailFromClaims = this.principal<AzureUserPrincipal>()?.email
-    if (emailFromClaims == null || emailFromClaims.trim().isEmpty()) {
-        throw RuntimeException("Fant ikke email i azure-token")
-    }
-    return emailFromClaims
 }

@@ -10,7 +10,7 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.metrics.micrometer.MicrometerMetrics
-import io.ktor.server.plugins.calllogging.CallLogging
+import io.ktor.server.plugins.callloging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.path
 import io.ktor.server.routing.IgnoreTrailingSlash

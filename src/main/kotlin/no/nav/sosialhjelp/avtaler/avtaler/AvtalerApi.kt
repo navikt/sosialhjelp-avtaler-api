@@ -6,6 +6,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.auth.HttpAuthHeader
 import io.ktor.server.application.ApplicationCall
+import io.ktor.server.application.call
 import io.ktor.server.auth.parseAuthorizationHeader
 import io.ktor.server.request.receive
 import io.ktor.server.response.header

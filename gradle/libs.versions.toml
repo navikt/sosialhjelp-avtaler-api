@@ -13,7 +13,7 @@ tokenSupport = "3.2.0"
 kotliquery = "1.9.1"
 flywaydb = "11.8.2"
 hikari = "6.3.0"
-postgresql = "42.7.5"
+postgresql = "42.7.6"
 digipostSignatureApiClient = "7.0.5"
 jaxbApi = "4.0.2"
 googleCloudLibraries = "26.61.0"
@@ -21,7 +21,7 @@ googleCloudSecretManager = "2.63.0"
 koin = "4.0.4"
 apache-poi = "5.4.1"
 opentelemetry = "2.16.0"
-prometheus = "1.15.0"
+prometheus = "1.15.1"
 
 [libraries]
 konfig = { module = "com.natpryce:konfig", version.ref = "konfig" }

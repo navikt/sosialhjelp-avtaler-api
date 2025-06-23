@@ -10,7 +10,7 @@ import io.ktor.server.application.Application
 import io.ktor.server.application.install
 import io.ktor.server.auth.authenticate
 import io.ktor.server.metrics.micrometer.MicrometerMetrics
-import io.ktor.server.plugins.callloging.CallLogging
+import io.ktor.server.plugins.calllogging.CallLogging
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.request.path
 import io.ktor.server.routing.IgnoreTrailingSlash
@@ -124,10 +124,8 @@ private fun Application.setupKoin() {
                 single { defaultHttpClient() }
                 single {
                     ClientAuthenticationProperties
-                        .builder()
-                        .clientId(Configuration.tokenXProperties.clientId)
+                        .builder(Configuration.tokenXProperties.clientId, ClientAuthenticationMethod.PRIVATE_KEY_JWT)
                         .clientJwk(Configuration.tokenXProperties.privateJwk)
-                        .clientAuthMethod(ClientAuthenticationMethod.PRIVATE_KEY_JWT)
                         .build()
                 }
 

@@ -6,10 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.plugin.serialization)
     alias(libs.plugins.ktor)
     alias(libs.plugins.ktlint)
-}
-
-ktlint {
-    this.version.set(libs.versions.ktlint)
+    alias(libs.plugins.version.catalog.update)
 }
 
 group = "no.nav.sosialhjelp"

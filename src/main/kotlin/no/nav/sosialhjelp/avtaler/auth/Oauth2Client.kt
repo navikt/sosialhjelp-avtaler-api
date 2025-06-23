@@ -1,5 +1,7 @@
 package no.nav.sosialhjelp.avtaler.auth
 
+import com.nimbusds.oauth2.sdk.GrantType
+import com.nimbusds.oauth2.sdk.auth.JWTAuthentication
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.request.forms.submitForm
@@ -7,7 +9,6 @@ import io.ktor.http.Parameters
 import io.ktor.http.ParametersBuilder
 import mu.KotlinLogging
 import no.nav.security.token.support.client.core.ClientAuthenticationProperties
-import no.nav.security.token.support.client.core.OAuth2GrantType
 import no.nav.security.token.support.client.core.OAuth2ParameterNames
 import no.nav.security.token.support.client.core.auth.ClientAssertion
 import no.nav.security.token.support.client.core.oauth2.OAuth2AccessTokenResponse
@@ -52,7 +53,7 @@ class Oauth2ClientImpl(
 }
 
 data class GrantRequest(
-    val grantType: OAuth2GrantType,
+    val grantType: GrantType,
     val params: Map<String, String> = emptyMap(),
 ) {
     companion object {
@@ -61,7 +62,7 @@ data class GrantRequest(
             audience: String,
         ): GrantRequest =
             GrantRequest(
-                grantType = OAuth2GrantType.TOKEN_EXCHANGE,
+                grantType = GrantType.TOKEN_EXCHANGE,
                 params =
                     mapOf(
                         OAuth2ParameterNames.SUBJECT_TOKEN_TYPE to "urn:ietf:params:oauth:token-type:jwt",
@@ -98,6 +99,6 @@ private fun ParametersBuilder.appendClientAuthParams(
 ) = apply {
     val clientAssertion = ClientAssertion(URI.create(tokenEndpointUrl), clientAuthProperties)
     append(OAuth2ParameterNames.CLIENT_ID, clientAuthProperties.clientId)
-    append(OAuth2ParameterNames.CLIENT_ASSERTION_TYPE, clientAssertion.assertionType())
+    append(OAuth2ParameterNames.CLIENT_ASSERTION_TYPE, JWTAuthentication.CLIENT_ASSERTION_TYPE)
     append(OAuth2ParameterNames.CLIENT_ASSERTION, clientAssertion.assertion())
 }

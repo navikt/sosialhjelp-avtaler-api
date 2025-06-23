@@ -1,132 +1,125 @@
 [versions]
+apache-poi = "5.4.1"
+digipostSignatureApiClient = "7.0.5"
+flywaydb = "11.9.2"
+googleCloudLibraries = "26.62.0"
+googleCloudSecretManager = "2.66.0"
+hikari = "6.3.0"
+jackson = "2.19.1"
+jaxbApi = "4.0.2"
+koin = "4.1.0"
 konfig = "1.6.10.0"
-ktor = "2.3.13"
+kotest = "5.9.1"
 kotlin = "2.1.21"
 kotlinSerializationPlugin = "1.8.1"
-kotest = "5.9.1"
-ktlint = "1.0.1"
+kotliquery = "1.9.1"
+ktor = "3.2.0"
 logback = "1.5.18"
 logbackEncoder = "8.1"
-jackson = "2.19.1"
 microutils = "3.0.5"
-tokenSupport = "3.2.0"
-kotliquery = "1.9.1"
-flywaydb = "11.8.2"
-hikari = "6.3.0"
-postgresql = "42.7.7"
-digipostSignatureApiClient = "7.0.5"
-jaxbApi = "4.0.2"
-googleCloudLibraries = "26.61.0"
-googleCloudSecretManager = "2.63.0"
-koin = "4.0.4"
-apache-poi = "5.4.1"
 opentelemetry = "2.16.0"
+postgresql = "42.7.7"
 prometheus = "1.15.1"
+tokenSupport = "3.2.0"
+version-catalog-update = "1.0.0"
 
 [libraries]
-konfig = { module = "com.natpryce:konfig", version.ref = "konfig" }
-ktor-server-core-jvm = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
-ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
-ktor-server-netty-jvm = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
-ktor-server-content-negotiation-jvm = { module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor" }
-ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor" }
-ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor" }
-ktor-server-metrics-micrometer = { module = "io.ktor:ktor-server-metrics-micrometer", version.ref = "ktor" }
-ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
-ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
-ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
-ktor-client-jackson = { module = "io.ktor:ktor-client-jackson", version.ref = "ktor" }
-kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinSerializationPlugin" }
-ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
-ktor-serialization-jackson-jvm = { module = "io.ktor:ktor-serialization-jackson-jvm", version.ref = "ktor" }
-jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
-jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
-kotlin-logging = { module = "io.github.microutils:kotlin-logging", version.ref = "microutils" }
-log4j-core = { module = "org.apache.logging.log4j:log4j-core", version = "2.24.3" }
-logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
-postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+apache-poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "apache-poi" }
+apache-poi-scratchpad = { module = "org.apache.poi:poi-scratchpad", version.ref = "apache-poi" }
 flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flywaydb" }
 flyway-postgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flywaydb" }
-hikariCP = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
-kotliquery = { module = "com.github.seratch:kotliquery", version.ref = "kotliquery" }
-token-validation-ktor = { module = "no.nav.security:token-validation-ktor", version.ref = "tokenSupport" }
-token-client-core = { module = "no.nav.security:token-client-core", version.ref = "tokenSupport" }
-signature-api-client-java = { module = "no.digipost.signature:signature-api-client-java", version.ref = "digipostSignatureApiClient" }
-jaxb-api = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version.ref = "jaxbApi" }
-libraries-bom = { module = "com.google.cloud:libraries-bom", version.ref = "googleCloudLibraries" }
 google-cloud-secretmanager = { module = "com.google.cloud:google-cloud-secretmanager", version.ref = "googleCloudSecretManager" }
 google-cloud-storage = { module = "com.google.cloud:google-cloud-storage" }
-logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logbackEncoder" }
+hikariCP = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
+jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
+jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+jaxb-api = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version.ref = "jaxbApi" }
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin" }
 koin-ktor = { module = "io.insert-koin:koin-ktor" }
 koin-logging = { module = "io.insert-koin:koin-logger-slf4j" }
-apache-poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "apache-poi" }
-apache-poi-scratchpad = { module = "org.apache.poi:poi-scratchpad", version.ref = "apache-poi" }
-opentelemetry-instrumentation-annotations = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations", version.ref = "opentelemetry" }
-micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus", version.ref = "prometheus" }
-
-
-
-ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
-ktor-server-tests-jvm = { module = "io.ktor:ktor-server-tests-jvm", version.ref = "ktor" }
+konfig = { module = "com.natpryce:konfig", version.ref = "konfig" }
 kotest-assertions-core-jvm = { module = "io.kotest:kotest-assertions-core-jvm", version.ref = "kotest" }
+kotlin-logging = { module = "io.github.microutils:kotlin-logging", version.ref = "microutils" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinSerializationPlugin" }
+kotliquery = { module = "com.github.seratch:kotliquery", version.ref = "kotliquery" }
+ktor-client-auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
+ktor-client-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
+ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
+ktor-client-jackson = { module = "io.ktor:ktor-client-jackson", version.ref = "ktor" }
+ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+ktor-serialization-jackson-jvm = { module = "io.ktor:ktor-serialization-jackson-jvm", version.ref = "ktor" }
+ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
+ktor-server-auth-jwt = { module = "io.ktor:ktor-server-auth-jwt", version.ref = "ktor" }
+ktor-server-call-logging = { module = "io.ktor:ktor-server-call-logging", version.ref = "ktor" }
+ktor-server-cio = { module = "io.ktor:ktor-server-cio", version.ref = "ktor" }
+ktor-server-content-negotiation-jvm = { module = "io.ktor:ktor-server-content-negotiation-jvm", version.ref = "ktor" }
+ktor-server-core-jvm = { module = "io.ktor:ktor-server-core-jvm", version.ref = "ktor" }
+ktor-server-metrics-micrometer = { module = "io.ktor:ktor-server-metrics-micrometer", version.ref = "ktor" }
+ktor-server-netty-jvm = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
+ktor-server-tests-jvm = "io.ktor:ktor-server-tests-jvm:2.3.13"
+libraries-bom = { module = "com.google.cloud:libraries-bom", version.ref = "googleCloudLibraries" }
+log4j-core = "org.apache.logging.log4j:log4j-core:2.25.0"
+logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
+logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logbackEncoder" }
+micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus", version.ref = "prometheus" }
+opentelemetry-instrumentation-annotations = { module = "io.opentelemetry.instrumentation:opentelemetry-instrumentation-annotations", version.ref = "opentelemetry" }
+postgresql = { module = "org.postgresql:postgresql", version.ref = "postgresql" }
+signature-api-client-java = { module = "no.digipost.signature:signature-api-client-java", version.ref = "digipostSignatureApiClient" }
+token-client-core = "no.nav.security:token-client-core:5.0.30"
+token-validation-ktor = { module = "no.nav.security:token-validation-ktor", version.ref = "tokenSupport" }
 
 [bundles]
-ktor-server = [
-    "ktor-server-core-jvm",
-    "ktor-server-cio",
-    "ktor-server-netty-jvm",
-    "ktor-server-content-negotiation-jvm",
-    "ktor-server-auth-jwt",
-    "ktor-server-metrics-micrometer",
+apache-poi = [
+    "apache-poi-ooxml",
+    "apache-poi-scratchpad",
 ]
-ktor-client = [
-    "ktor-client-core",
-    "ktor-client-cio",
-    "ktor-client-content-negotiation",
-    "ktor-client-auth",
-    "ktor-client-jackson",
-]
-
-serialization = [
-    "kotlinx-serialization-json",
-    "ktor-serialization-jackson-jvm",
-    "ktor-serialization-kotlinx-json",
-    "jackson-module-kotlin",
-    "jackson-datatype-jsr310",
-]
-
-logging = [
-    "kotlin-logging",
-    "logback-classic",
-    "logstash-logback-encoder",
-    "ktor-server-call-logging",
-]
-
 database = [
-    "postgresql",
     "flyway-core",
     "flyway-postgresql",
     "hikariCP",
     "kotliquery",
+    "postgresql",
 ]
-
+ktor-client = [
+    "ktor-client-auth",
+    "ktor-client-cio",
+    "ktor-client-content-negotiation",
+    "ktor-client-core",
+    "ktor-client-jackson",
+]
+ktor-server = [
+    "ktor-server-auth-jwt",
+    "ktor-server-cio",
+    "ktor-server-content-negotiation-jvm",
+    "ktor-server-core-jvm",
+    "ktor-server-metrics-micrometer",
+    "ktor-server-netty-jvm",
+]
+logging = [
+    "kotlin-logging",
+    "ktor-server-call-logging",
+    "logback-classic",
+    "logstash-logback-encoder",
+]
+serialization = [
+    "jackson-datatype-jsr310",
+    "jackson-module-kotlin",
+    "kotlinx-serialization-json",
+    "ktor-serialization-jackson-jvm",
+    "ktor-serialization-kotlinx-json",
+]
 test = [
-    "ktor-client-mock",
-    "ktor-server-tests-jvm",
     "kotest-assertions-core-jvm",
     "kotlin-test-junit",
-]
-
-apache-poi = [
-    "apache-poi-ooxml",
-    "apache-poi-scratchpad",
+    "ktor-client-mock",
+    "ktor-server-tests-jvm",
 ]
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ktlint = "org.jlleitschuh.gradle.ktlint:12.3.0"
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version = "12.3.0" }
+version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "version-catalog-update" }

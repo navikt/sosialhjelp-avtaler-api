@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.plugin.serialization)
     alias(libs.plugins.ktor)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.version.catalog.update)
 }
 
 ktlint {

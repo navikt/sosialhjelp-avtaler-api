@@ -9,10 +9,6 @@ plugins {
     alias(libs.plugins.version.catalog.update)
 }
 
-ktlint {
-    this.version.set(libs.versions.ktlint)
-}
-
 group = "no.nav.sosialhjelp"
 version = "1.0.0"
 

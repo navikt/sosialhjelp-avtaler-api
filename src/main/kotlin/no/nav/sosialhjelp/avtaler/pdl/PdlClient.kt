@@ -43,7 +43,9 @@ class PdlClient(
                     ),
             )
 
-        val scopedAccessToken = tokenClient.exchangeToken(token, pdlAudience).accessToken
+        val scopedAccessToken =
+            tokenClient.exchangeToken(token, pdlAudience).access_token
+                ?: error("Fikk null access_token fra tokenClient")
 
         val response =
             client.post(pdlUrl) {
@@ -68,9 +70,9 @@ class PdlClient(
         }
     }
 
-    private fun getHentPersonQuery(): String {
-        return this::class.java.getResource("/pdl/hentPerson.graphql")!!
+    private fun getHentPersonQuery(): String =
+        this::class.java
+            .getResource("/pdl/hentPerson.graphql")!!
             .readText()
             .replace("[\n\r]", "")
-    }
 }

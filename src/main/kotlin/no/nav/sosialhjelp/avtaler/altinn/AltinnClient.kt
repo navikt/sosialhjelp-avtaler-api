@@ -51,7 +51,8 @@ class AltinnClientImpl(
             return null
         }
 
-        val scopedAccessToken = tokenClient.exchangeToken(token, altinnRettigheterAudience).accessToken
+        val scopedAccessToken =
+            tokenClient.exchangeToken(token, altinnRettigheterAudience).access_token ?: error("Fikk null access_token fra tokenClient")
 
         val response =
             client.post("$baseUrl/altinn-tilganger") {

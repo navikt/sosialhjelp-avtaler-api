@@ -1,25 +1,25 @@
 [versions]
 apache-poi = "5.4.1"
-digipostSignatureApiClient = "7.0.5"
+digipostSignatureApiClient = "7.0.6"
 flywaydb = "11.9.2"
 googleCloudLibraries = "26.62.0"
 googleCloudSecretManager = "2.66.0"
 hikari = "6.3.0"
 jackson = "2.19.1"
 jaxbApi = "4.0.2"
-koin = "4.1.0"
+koin = "4.1.1"
 konfig = "1.6.10.0"
 kotest = "5.9.1"
 kotlin = "2.1.21"
 kotlinSerializationPlugin = "1.8.1"
 kotliquery = "1.9.1"
-ktor = "3.2.0"
+ktor = "3.2.3"
 logback = "1.5.18"
 logbackEncoder = "8.1"
 microutils = "3.0.5"
 opentelemetry = "2.16.0"
 postgresql = "42.7.7"
-prometheus = "1.15.1"
+prometheus = "1.15.3"
 tokenSupport = "3.2.0"
 version-catalog-update = "1.0.0"
 
@@ -60,7 +60,7 @@ ktor-server-metrics-micrometer = { module = "io.ktor:ktor-server-metrics-microme
 ktor-server-netty-jvm = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
 ktor-server-tests-jvm = "io.ktor:ktor-server-tests-jvm:2.3.13"
 libraries-bom = { module = "com.google.cloud:libraries-bom", version.ref = "googleCloudLibraries" }
-log4j-core = "org.apache.logging.log4j:log4j-core:2.25.0"
+log4j-core = "org.apache.logging.log4j:log4j-core:2.25.1"
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logbackEncoder" }
 micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus", version.ref = "prometheus" }

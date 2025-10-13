@@ -1,7 +1,7 @@
 [versions]
 apache-poi = "5.4.1"
 digipostSignatureApiClient = "7.0.5"
-flywaydb = "11.13.2"
+flywaydb = "11.9.2"
 googleCloudLibraries = "26.68.0"
 googleCloudSecretManager = "2.75.0"
 hikari = "7.0.1"

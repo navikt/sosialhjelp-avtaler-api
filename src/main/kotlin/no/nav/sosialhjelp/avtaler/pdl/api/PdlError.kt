@@ -6,7 +6,9 @@ data class PdlError(
     val path: List<String>?,
     val extensions: PdlErrorExtension,
 ) {
-    fun errorMessage(): String = "$message with code: ${extensions.code} and classification: ${extensions.classification}"
+    fun errorMessage(): String {
+        return "$message with code: ${extensions.code} and classification: ${extensions.classification}"
+    }
 }
 
 data class PdlErrorLocation(

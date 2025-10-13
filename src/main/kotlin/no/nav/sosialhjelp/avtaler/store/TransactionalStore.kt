@@ -6,9 +6,7 @@ import kotliquery.using
 import no.nav.sosialhjelp.avtaler.db.SessionFactory
 import no.nav.sosialhjelp.avtaler.db.TransactionalSessionFactory
 
-abstract class TransactionalStore(
-    private val sessionFactory: SessionFactory,
-) : Store {
+abstract class TransactionalStore(private val sessionFactory: SessionFactory) : Store {
     protected fun <T> session(block: (Session) -> T): T =
         when (sessionFactory) {
             // closing should be handled in top-level transaction function in this case

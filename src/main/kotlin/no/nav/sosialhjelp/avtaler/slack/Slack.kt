@@ -32,8 +32,7 @@ object Slack {
 
             val client = HttpClient.newBuilder().build()
             val request =
-                HttpRequest
-                    .newBuilder()
+                HttpRequest.newBuilder()
                     .uri(URI.create(hookUrl))
                     .header("Content-Type", "application/json")
                     .POST(HttpRequest.BodyPublishers.ofString(requestBody))

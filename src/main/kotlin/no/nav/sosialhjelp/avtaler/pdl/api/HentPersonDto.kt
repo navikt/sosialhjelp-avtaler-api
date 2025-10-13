@@ -18,5 +18,7 @@ data class PdlPersonNavn(
     val mellomnavn: String?,
     val etternavn: String,
 ) {
-    fun fulltNavn(): String = mellomnavn?.let { "$fornavn $it $etternavn" } ?: "$fornavn $etternavn"
+    fun fulltNavn(): String {
+        return mellomnavn?.let { "$fornavn $it $etternavn" } ?: "$fornavn $etternavn"
+    }
 }

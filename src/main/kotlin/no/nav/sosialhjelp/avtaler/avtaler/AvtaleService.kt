@@ -212,7 +212,9 @@ class AvtaleService(
         )
     }
 
-    suspend fun hentSignertAvtaleFraDatabase(uuid: UUID): InputStream? = digipostService.hentDigipostJobb(uuid)?.signertDokument
+    suspend fun hentSignertAvtaleFraDatabase(uuid: UUID): InputStream? {
+        return digipostService.hentDigipostJobb(uuid)?.signertDokument
+    }
 
     suspend fun hentSignertAvtaleDokumentFraDatabaseEllerDigipost(
         fnr: String,

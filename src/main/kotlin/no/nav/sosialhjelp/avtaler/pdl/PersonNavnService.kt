@@ -6,12 +6,8 @@ class PersonNavnService(
     suspend fun getFulltNavn(
         ident: String,
         token: String,
-    ): String =
-        pdlClient
-            .hentPerson(ident, token)
-            ?.hentPerson
-            ?.navn
-            ?.firstOrNull()
-            ?.fulltNavn()
+    ): String {
+        return pdlClient.hentPerson(ident, token)?.hentPerson?.navn?.firstOrNull()?.fulltNavn()
             ?: throw RuntimeException("Pdl - noe feilet")
+    }
 }

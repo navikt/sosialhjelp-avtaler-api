@@ -1,9 +1,9 @@
 [versions]
 apache-poi = "5.4.1"
 digipostSignatureApiClient = "7.0.5"
-flywaydb = "11.9.2"
-googleCloudLibraries = "26.68.0"
-googleCloudSecretManager = "2.75.0"
+flywaydb = "11.14.0"
+googleCloudLibraries = "26.70.0"
+googleCloudSecretManager = "2.76.0"
 hikari = "7.0.1"
 jackson = "2.20.0"
 jaxbApi = "4.0.2"
@@ -120,6 +120,6 @@ test = [
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-ktlint = "org.jlleitschuh.gradle.ktlint:13.0.0"
+ktlint = "org.jlleitschuh.gradle.ktlint:13.1.0"
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "version-catalog-update" }

@@ -21,7 +21,10 @@ interface DigipostJobbDataStore : Store {
     fun hentAlleUtenLagretDokument(): List<DigipostJobbData>
 }
 
-class DigipostJobbDataStorePostgres(sessionFactory: () -> Session) : DigipostJobbDataStore, TransactionalStore(sessionFactory) {
+class DigipostJobbDataStorePostgres(
+    sessionFactory: () -> Session,
+) : TransactionalStore(sessionFactory),
+    DigipostJobbDataStore {
     override fun lagreDigipostResponse(digipostJobbData: DigipostJobbData): DigipostJobbData =
         session {
             @Language("PostgreSQL")

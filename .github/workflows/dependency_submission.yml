@@ -6,6 +6,7 @@ on:
       - 'main'
     paths:
       - 'build.gradle.kts'
+      - 'gradle/libs.versions.toml'
 
 jobs:
   dependency_submission:

@@ -36,7 +36,6 @@ class DatabaseConfiguration(
             Flyway
                 .configure()
                 .dataSource(dataSource,)
-                .locations("classpath:db/migration")
                 .validateMigrationNaming(true)
                 .load()
         flyway.migrate()

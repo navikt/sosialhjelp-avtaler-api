@@ -14,6 +14,8 @@ version = "1.0.0"
 
 tasks.named<ShadowJar>("shadowJar") {
     mergeServiceFiles()
+    isZip64 = true
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
 application {

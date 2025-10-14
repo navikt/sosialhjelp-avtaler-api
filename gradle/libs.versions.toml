@@ -120,6 +120,6 @@ test = [
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-ktlint = "org.jlleitschuh.gradle.ktlint:12.3.0"
+ktlint = "org.jlleitschuh.gradle.ktlint:13.1.0"
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "version-catalog-update" }

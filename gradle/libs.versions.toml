@@ -1,27 +1,27 @@
 [versions]
 apache-poi = "5.4.1"
-digipostSignatureApiClient = "7.0.5"
+digipostSignatureApiClient = "7.0.6"
 flywaydb = "11.14.0"
 googleCloudLibraries = "26.70.0"
 googleCloudSecretManager = "2.77.0"
-hikari = "7.0.1"
+hikari = "7.0.2"
 jackson = "2.20.0"
-jaxbApi = "4.0.2"
-koin = "4.1.0"
+jaxbApi = "4.0.4"
+koin = "4.1.1"
 konfig = "1.6.10.0"
-kotest = "6.0.0"
+kotest = "6.0.4"
 kotlin = "2.2.20"
 kotlinSerializationPlugin = "1.9.0"
 kotliquery = "1.9.1"
 ktor = "3.3.1"
-logback = "1.5.18"
+logback = "1.5.19"
 logbackEncoder = "8.1"
 microutils = "3.0.5"
 opentelemetry = "2.20.1"
-postgresql = "42.7.7"
-prometheus = "1.15.1"
+postgresql = "42.7.8"
+prometheus = "1.15.5"
 tokenSupport = "3.2.0"
-version-catalog-update = "1.0.0"
+version-catalog-update = "1.0.1"
 
 [libraries]
 apache-poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "apache-poi" }
@@ -60,7 +60,7 @@ ktor-server-metrics-micrometer = { module = "io.ktor:ktor-server-metrics-microme
 ktor-server-netty-jvm = { module = "io.ktor:ktor-server-netty-jvm", version.ref = "ktor" }
 ktor-server-tests-jvm = "io.ktor:ktor-server-tests-jvm:2.3.13"
 libraries-bom = { module = "com.google.cloud:libraries-bom", version.ref = "googleCloudLibraries" }
-log4j-core = "org.apache.logging.log4j:log4j-core:2.25.0"
+log4j-core = "org.apache.logging.log4j:log4j-core:2.25.2"
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 logstash-logback-encoder = { module = "net.logstash.logback:logstash-logback-encoder", version.ref = "logbackEncoder" }
 micrometer-registry-prometheus = { module = "io.micrometer:micrometer-registry-prometheus", version.ref = "prometheus" }
@@ -120,6 +120,6 @@ test = [
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-ktlint = "org.jlleitschuh.gradle.ktlint:12.3.0"
+ktlint = "org.jlleitschuh.gradle.ktlint:13.1.0"
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "version-catalog-update" }

@@ -32,7 +32,9 @@ interface DatabaseSessionContext {
     val avtalemalerStore: AvtalemalerStore
 }
 
-class DefaultDatabaseSessionContext(sessionFactory: SessionFactory) : DatabaseSessionContext {
+class DefaultDatabaseSessionContext(
+    sessionFactory: SessionFactory,
+) : DatabaseSessionContext {
     override val avtaleStore = AvtaleStorePostgres(sessionFactory)
     override val digipostJobbDataStore = DigipostJobbDataStorePostgres(sessionFactory)
     override val avtalemalerStore = AvtalemalerStorePostgres(sessionFactory)

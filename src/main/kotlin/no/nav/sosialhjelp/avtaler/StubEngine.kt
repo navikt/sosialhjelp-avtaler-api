@@ -22,7 +22,9 @@ class MockRoute(
     val handler: MockRequestHandler,
 )
 
-class MockEngineBuilder(private val routes: MutableList<MockRoute> = mutableListOf()) : List<MockRoute> by routes {
+class MockEngineBuilder(
+    private val routes: MutableList<MockRoute> = mutableListOf(),
+) : List<MockRoute> by routes {
     private fun add(
         url: String,
         method: HttpMethod,

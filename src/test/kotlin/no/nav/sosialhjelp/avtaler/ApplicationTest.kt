@@ -10,7 +10,10 @@ import kotlinx.serialization.json.Json
 import kotlin.test.Test
 
 @Serializable
-data class Kommune(val organisasjonsnummer: String, val navn: String)
+data class Kommune(
+    val organisasjonsnummer: String,
+    val navn: String,
+)
 
 internal class ApplicationTest {
     @Test

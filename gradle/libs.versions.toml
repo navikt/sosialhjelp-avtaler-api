@@ -1,23 +1,23 @@
 [versions]
-apache-poi = "5.4.1"
+apache-poi = "5.5.0"
 digipostSignatureApiClient = "7.0.6"
-flywaydb = "11.16.0"
-googleCloudLibraries = "26.71.0"
-googleCloudSecretManager = "2.78.0"
+flywaydb = "11.17.0"
+googleCloudLibraries = "26.72.0"
+googleCloudSecretManager = "2.80.0"
 hikari = "7.0.2"
 jackson = "2.20.1"
 jaxbApi = "4.0.4"
 koin = "4.1.1"
 konfig = "1.6.10.0"
-kotest = "6.0.4"
+kotest = "6.0.5"
 kotlin = "2.2.21"
 kotlinSerializationPlugin = "1.9.0"
 kotliquery = "1.9.1"
 ktor = "3.3.2"
-logback = "1.5.20"
+logback = "1.5.21"
 logbackEncoder = "9.0"
 microutils = "3.0.5"
-opentelemetry = "2.21.0"
+opentelemetry = "2.22.0"
 postgresql = "42.7.8"
 prometheus = "1.16.0"
 tokenSupport = "3.2.0"
@@ -120,6 +120,6 @@ test = [
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-plugin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-ktlint = "org.jlleitschuh.gradle.ktlint:13.1.0"
+ktlint = "org.jlleitschuh.gradle.ktlint:14.0.1"
 ktor = { id = "io.ktor.plugin", version.ref = "ktor" }
 version-catalog-update = { id = "nl.littlerobots.version-catalog-update", version.ref = "version-catalog-update" }

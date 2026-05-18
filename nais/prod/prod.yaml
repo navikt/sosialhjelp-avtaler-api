@@ -65,6 +65,8 @@ spec:
       rules:
         - application: arbeidsgiver-altinn-tilganger
           namespace: fager
+        - application: logging
+          namespace: nais-system
   resources:
     limits:
       memory: 2Gi

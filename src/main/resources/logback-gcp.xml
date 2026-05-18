@@ -3,13 +3,6 @@
         <encoder class="net.logstash.logback.encoder.LogstashEncoder" />
     </appender>
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d{YYYY-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-        </encoder>
-    </appender>
-
-
     <appender name="team-logs" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
         <destination>team-logs.nais-system:5170</destination>
         <encoder class="net.logstash.logback.encoder.LogstashEncoder">
@@ -31,3 +24,4 @@
         <appender-ref ref="STDOUT_JSON" />
     </root>
 </configuration>
+

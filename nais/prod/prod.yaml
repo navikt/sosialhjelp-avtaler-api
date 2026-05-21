@@ -77,8 +77,5 @@ spec:
     autoInstrumentation:
       enabled: true
       runtime: java
-  env:
-    - name: JDK_JAVA_OPTIONS
-      value: "-Dlogback.configurationFile=logback-gcp.xml"
   envFrom:
     - secret: digisos-slack-hook

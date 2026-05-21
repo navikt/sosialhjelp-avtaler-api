@@ -83,8 +83,5 @@ spec:
       destinations:
         - id: loki
         - id: elastic
-  env:
-    - name: JDK_JAVA_OPTIONS
-      value: "-Dlogback.configurationFile=logback-gcp.xml"
   envFrom:
     - secret: digisos-slack-hook

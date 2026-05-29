@@ -66,6 +66,8 @@ spec:
         - application: arbeidsgiver-altinn-tilganger
           namespace: fager
         - application: sosialhjelp-konvertering-til-pdf
+        - application: logging
+          namespace: nais-system
   resources:
     limits:
       cpu: 400m
@@ -81,7 +83,5 @@ spec:
       destinations:
         - id: loki
         - id: elastic
-  secureLogs:
-    enabled: true
   envFrom:
     - secret: digisos-slack-hook

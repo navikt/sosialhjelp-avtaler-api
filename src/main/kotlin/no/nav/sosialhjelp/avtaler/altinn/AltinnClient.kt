@@ -12,7 +12,7 @@ import no.nav.sosialhjelp.avtaler.auth.Oauth2Client
 import no.nav.sosialhjelp.avtaler.defaultHttpClientWithJsonHeaders
 
 private val log = KotlinLogging.logger { }
-private val sikkerLog = KotlinLogging.logger("tjenestekall")
+private val teamLogger = KotlinLogging.logger("team-logger")
 
 interface AltinnClient {
     suspend fun hentTilganger(
@@ -58,7 +58,7 @@ class AltinnClientImpl(
             client.post("$baseUrl/altinn-tilganger") {
                 bearerAuth(scopedAccessToken)
             }
-        sikkerLog.info { "Hentet tilganger med url: ${response.request.url}" }
+        teamLogger.info { "Hentet tilganger med url: ${response.request.url}" }
         if (response.status == HttpStatusCode.OK) {
             return response.body()
         }

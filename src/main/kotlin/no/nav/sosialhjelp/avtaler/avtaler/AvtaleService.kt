@@ -20,7 +20,7 @@ import java.time.ZoneId
 import java.util.UUID
 
 private val log = KotlinLogging.logger { }
-private val sikkerLog = KotlinLogging.logger("tjenestekall")
+private val teamLogger = KotlinLogging.logger("team-logger")
 
 class AvtaleService(
     private val altinnService: AltinnService,
@@ -109,7 +109,7 @@ class AvtaleService(
     ): List<KommuneTilgang> =
         altinnService
             .hentTilganger(fnr = fnr, token = token)
-            .also { sikkerLog.info("Hentet for fnr: $fnr, tilganger: $this") }
+            .also { teamLogger.info("Hentet for fnr: $fnr, tilganger: $this") }
 
     suspend fun signerAvtale(
         fnr: String,

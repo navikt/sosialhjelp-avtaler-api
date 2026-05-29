@@ -12,6 +12,12 @@ plugins {
 group = "no.nav.sosialhjelp"
 version = "1.0.0"
 
+buildscript {
+    configurations.classpath {
+        resolutionStrategy.force("org.codehaus.plexus:plexus-utils:4.0.3")
+    }
+}
+
 tasks.named<ShadowJar>("shadowJar") {
     mergeServiceFiles()
     isZip64 = true
@@ -51,6 +57,7 @@ dependencies {
     implementation(libs.token.client.core)
 
     implementation(libs.signature.api.client.java)
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.6.1")
     implementation(libs.jaxb.api)
 
     implementation(platform(libs.libraries.bom))

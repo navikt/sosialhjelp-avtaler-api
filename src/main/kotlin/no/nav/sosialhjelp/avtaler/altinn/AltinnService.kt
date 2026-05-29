@@ -4,7 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import mu.KotlinLogging
 
-private val sikkerLog = KotlinLogging.logger("tjenestekall")
+private val teamLogger = KotlinLogging.logger("team-logger")
 
 class AltinnService(
     private val altinnClient: AltinnClient,
@@ -17,7 +17,7 @@ class AltinnService(
         withContext(Dispatchers.IO) {
             val response = altinnClient.hentTilganger(fnr = fnr, token = token)
             if (response == null) {
-                sikkerLog.warn { "Ingen tilganger funnet for fnr: $fnr" }
+                teamLogger.warn { "Ingen tilganger funnet for fnr: $fnr" }
                 return@withContext emptyList()
             }
             val flattenedHierarki = response.hierarki.flatMap { it.underenheter + it }
@@ -26,7 +26,7 @@ class AltinnService(
                     flattenedHierarki.find { it.orgnr == orgnr }?.organisasjonsform == "KOMM"
                 } ?: emptySet()
             val orgnrTilNavn = flattenedHierarki.associate { it.orgnr to it.navn }
-            sikkerLog.info {
+            teamLogger.info {
                 "tilganger for fnr: $fnr, tilganger: $tilganger"
             }
             tilganger.map { KommuneTilgang(it, orgnrTilNavn[it]!!) }

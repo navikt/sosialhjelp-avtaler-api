@@ -12,6 +12,12 @@ plugins {
 group = "no.nav.sosialhjelp"
 version = "1.0.0"
 
+buildscript {
+    configurations.classpath {
+        resolutionStrategy.force("org.codehaus.plexus:plexus-utils:4.0.3")
+    }
+}
+
 tasks.named<ShadowJar>("shadowJar") {
     mergeServiceFiles()
     isZip64 = true

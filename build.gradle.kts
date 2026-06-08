@@ -45,6 +45,12 @@ dependencies {
 
     implementation(libs.bundles.serialization)
 
+    constraints {
+        implementation("io.netty:netty-handler:4.2.15.Final") {
+            because("Temporary override for GHSA-3qp7-7mw8-wx86/CVE-2026-44249 until upstream transitive dependencies are updated")
+        }
+    }
+
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.ktor)
     implementation(libs.koin.logging)

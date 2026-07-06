@@ -33,6 +33,7 @@ google-cloud-storage = { module = "com.google.cloud:google-cloud-storage" }
 hikariCP = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
+fasterxml_jackson_bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson" }
 jaxb-api = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version.ref = "jaxbApi" }
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin" }
 koin-ktor = { module = "io.insert-koin:koin-ktor" }

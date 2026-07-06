@@ -44,6 +44,7 @@ dependencies {
     implementation(libs.bundles.ktor.client)
 
     implementation(libs.bundles.serialization)
+    implementation(libs.fasterxml.jackson.bom)
 
     constraints {
         implementation("io.netty:netty-handler:4.2.15.Final") {

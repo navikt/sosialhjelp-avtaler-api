@@ -64,7 +64,7 @@ dependencies {
     implementation(libs.token.client.core)
 
     implementation(libs.signature.api.client.java)
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.6.2")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.6.3")
     implementation(libs.jaxb.api)
 
     implementation(platform(libs.libraries.bom))

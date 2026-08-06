@@ -108,7 +108,12 @@ class DigipostClientImpl(
                 DigisosKeyStoreCredentials::class.java,
             )
 
-        val secretPayload = accessSecretVersion.accessSecretVersion(virksomhetProjectId, virksomhetSecretId, virksomhetVersionId)
+        val secretPayload =
+            accessSecretVersion.accessSecretVersion(
+                virksomhetProjectId,
+                virksomhetSecretId,
+                virksomhetVersionId,
+            )
 
         val inputStream =
             try {
@@ -224,5 +229,5 @@ class DigipostClientLocal : DigipostClient {
         statusQueryToken: String,
         jobReference: String,
         statusUrl: URI,
-    ): ResponseInputStream? = ResponseInputStream(InputStream.nullInputStream(), 1L)
+    ): ResponseInputStream = ResponseInputStream(InputStream.nullInputStream(), 1L)
 }

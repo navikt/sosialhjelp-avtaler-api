@@ -5,8 +5,24 @@ import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import mu.KotlinLogging
 import no.digipost.signature.client.ClientConfiguration
 import no.digipost.signature.client.ServiceEnvironment
-import no.digipost.signature.client.core.*
-import no.digipost.signature.client.direct.*
+import no.digipost.signature.client.core.ConfirmationReference
+import no.digipost.signature.client.core.DeleteDocumentsUrl
+import no.digipost.signature.client.core.DocumentType
+import no.digipost.signature.client.core.IdentifierInSignedDocuments
+import no.digipost.signature.client.core.PAdESReference
+import no.digipost.signature.client.core.ResponseInputStream
+import no.digipost.signature.client.core.Sender
+import no.digipost.signature.client.direct.DirectClient
+import no.digipost.signature.client.direct.DirectDocument
+import no.digipost.signature.client.direct.DirectJob
+import no.digipost.signature.client.direct.DirectJobResponse
+import no.digipost.signature.client.direct.DirectJobStatus
+import no.digipost.signature.client.direct.DirectJobStatusResponse
+import no.digipost.signature.client.direct.DirectSigner
+import no.digipost.signature.client.direct.ExitUrls
+import no.digipost.signature.client.direct.Signature
+import no.digipost.signature.client.direct.SignerStatus
+import no.digipost.signature.client.direct.StatusReference
 import no.digipost.signature.client.security.KeyStoreConfig
 import no.nav.sosialhjelp.avtaler.Configuration
 import no.nav.sosialhjelp.avtaler.avtaler.Avtale
@@ -17,7 +33,7 @@ import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.net.URI
 import java.time.Instant
-import java.util.*
+import java.util.Collections
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.toJavaDuration
 
@@ -96,7 +112,7 @@ class DigipostClientImpl(
             accessSecretVersion.accessSecretVersion(
                 virksomhetProjectId,
                 virksomhetSecretId,
-                virksomhetVersionId
+                virksomhetVersionId,
             )
 
         val inputStream =

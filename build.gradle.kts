@@ -14,7 +14,7 @@ version = "1.0.0"
 
 buildscript {
     configurations.classpath {
-        resolutionStrategy.force("org.codehaus.plexus:plexus-utils:4.0.3")
+        resolutionStrategy.force("org.codehaus.plexus:plexus-utils:4.1.0")
     }
 }
 

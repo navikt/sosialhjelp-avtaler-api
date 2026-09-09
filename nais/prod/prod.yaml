@@ -37,7 +37,7 @@ spec:
           - id: "ec26a5a7-0909-40e4-b68f-8eb9c755aa77"
   gcp:
     sqlInstances:
-      - type: POSTGRES_14
+      - type: POSTGRES_15
         name: sosialhjelp-avtaler-api-db
         tier: db-custom-1-3840
         diskSize: 10

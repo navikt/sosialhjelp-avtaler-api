@@ -1,15 +1,15 @@
 [versions]
 apache-poi = "5.5.1"
 digipostSignatureApiClient = "7.0.8"
-flywaydb = "13.5.0"
-googleCloudLibraries = "26.88.0"
+flywaydb = "13.6.0"
+googleCloudLibraries = "26.88.1"
 googleCloudSecretManager = "2.97.0"
 hikari = "7.1.0"
 jackson = "2.22.2"
 jaxbApi = "4.0.5"
 koin = "4.2.2"
 konfig = "1.6.10.0"
-kotest = "6.2.4"
+kotest = "6.2.5"
 kotlin = "2.4.20"
 kotlinSerializationPlugin = "1.11.0"
 kotliquery = "1.9.1"
@@ -26,6 +26,7 @@ version-catalog-update = "1.1.1"
 [libraries]
 apache-poi-ooxml = { module = "org.apache.poi:poi-ooxml", version.ref = "apache-poi" }
 apache-poi-scratchpad = { module = "org.apache.poi:poi-scratchpad", version.ref = "apache-poi" }
+fasterxml_jackson_bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson" }
 flyway-core = { module = "org.flywaydb:flyway-core", version.ref = "flywaydb" }
 flyway-postgresql = { module = "org.flywaydb:flyway-database-postgresql", version.ref = "flywaydb" }
 google-cloud-secretmanager = { module = "com.google.cloud:google-cloud-secretmanager", version.ref = "googleCloudSecretManager" }
@@ -33,7 +34,6 @@ google-cloud-storage = { module = "com.google.cloud:google-cloud-storage" }
 hikariCP = { module = "com.zaxxer:HikariCP", version.ref = "hikari" }
 jackson-datatype-jsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310", version.ref = "jackson" }
 jackson-module-kotlin = { module = "com.fasterxml.jackson.module:jackson-module-kotlin", version.ref = "jackson" }
-fasterxml_jackson_bom = { module = "com.fasterxml.jackson:jackson-bom", version.ref = "jackson" }
 jaxb-api = { module = "jakarta.xml.bind:jakarta.xml.bind-api", version.ref = "jaxbApi" }
 koin-bom = { module = "io.insert-koin:koin-bom", version.ref = "koin" }
 koin-ktor = { module = "io.insert-koin:koin-ktor" }

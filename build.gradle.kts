@@ -45,6 +45,7 @@ dependencies {
 
     implementation(libs.bundles.serialization)
     implementation(libs.fasterxml.jackson.bom)
+    implementation(libs.jackson.bom)
 
     constraints {
         implementation("io.netty:netty-handler:4.2.17.Final") {

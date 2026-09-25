@@ -48,7 +48,7 @@ dependencies {
     implementation(libs.jackson.bom)
 
     constraints {
-        implementation("io.netty:netty-handler:4.2.17.Final") {
+        implementation("io.netty:netty-handler:4.2.18.Final") {
             because("Temporary override for GHSA-3qp7-7mw8-wx86/CVE-2026-44249 until upstream transitive dependencies are updated")
         }
     }

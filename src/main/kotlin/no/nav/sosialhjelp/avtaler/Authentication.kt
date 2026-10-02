@@ -59,12 +59,15 @@ fun Application.installAuthentication(httpClient: HttpClient) {
             verifier(jwkProviderTokenx, tokenXConfig.metadata.issuer)
             validate { credentials ->
                 requireNotNull(credentials.payload.audience) {
+                    log.warn { "Auth: Missing audience in token" }
                     "Auth: Missing audience in token"
                 }
                 require(credentials.payload.audience.contains(tokenXConfig.clientId)) {
+                    log.warn { "Auth: Valid audience not found in claims. Audience: ${credentials.payload.audience}, expected: ${tokenXConfig.clientId}" }
                     "Auth: Valid audience not found in claims"
                 }
                 require(credentials.payload.getClaim("acr").asString() in setOf("idporten-loa-high", "idporten-loa-substantial")) {
+                    log.warn { "Auth: LOA_SUBSTANTIAL required, but got ${credentials.payload.getClaim("acr").asString()}" }
                     "Auth: LOA_SUBSTANTIAL required"
                 }
                 UserPrincipal(credentials.payload.getClaim(Configuration.tokenXProperties.userclaim).asString())

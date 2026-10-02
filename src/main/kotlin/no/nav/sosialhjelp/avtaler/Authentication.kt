@@ -68,9 +68,16 @@ fun Application.installAuthentication(httpClient: HttpClient) {
                     }
                     "Auth: Valid audience not found in claims"
                 }
-                require(credentials.payload.getClaim("acr").asString() in setOf("idporten-loa-high", "idporten-loa-substantial")) {
-                    log.warn { "Auth: LOA_SUBSTANTIAL required, but got ${credentials.payload.getClaim("acr").asString()}" }
-                    "Auth: LOA_SUBSTANTIAL required"
+                require(
+                    credentials.payload.getClaim("acr").asString() in
+                        setOf("idporten-loa-high", "idporten-loa-substantial", "Level3", "Level4"),
+                ) {
+                    log.warn {
+                        "Auth: idporten-loa-substantial (Level3) required, but got ${credentials.payload.getClaim(
+                            "acr",
+                        ).asString()}"
+                    }
+                    "Auth: Auth: idporten-loa-substantial (Level3) required"
                 }
                 UserPrincipal(credentials.payload.getClaim(Configuration.tokenXProperties.userclaim).asString())
             }

@@ -64,7 +64,7 @@ fun Application.installAuthentication(httpClient: HttpClient) {
                 require(credentials.payload.audience.contains(tokenXConfig.clientId)) {
                     "Auth: Valid audience not found in claims"
                 }
-                require(credentials.payload.getClaim("acr").asString() in setOf("LOA_HIGH", "LOA_SUBSTANTIAL")) {
+                require(credentials.payload.getClaim("acr").asString() in setOf("idporten-loa-high", "idporten-loa-substantial")) {
                     "Auth: LOA_SUBSTANTIAL required"
                 }
                 UserPrincipal(credentials.payload.getClaim(Configuration.tokenXProperties.userclaim).asString())

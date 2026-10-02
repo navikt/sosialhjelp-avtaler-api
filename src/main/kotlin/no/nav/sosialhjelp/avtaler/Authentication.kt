@@ -59,12 +59,26 @@ fun Application.installAuthentication(httpClient: HttpClient) {
             verifier(jwkProviderTokenx, tokenXConfig.metadata.issuer)
             validate { credentials ->
                 requireNotNull(credentials.payload.audience) {
+                    log.warn { "Auth: Missing audience in token" }
                     "Auth: Missing audience in token"
                 }
                 require(credentials.payload.audience.contains(tokenXConfig.clientId)) {
+                    log.warn {
+                        "Auth: Valid audience not found in claims. Audience: ${credentials.payload.audience}, expected: ${tokenXConfig.clientId}"
+                    }
                     "Auth: Valid audience not found in claims"
                 }
-                require(credentials.payload.getClaim("acr").asString() == ("Level4")) { "Auth: Level4 required" }
+                require(
+                    credentials.payload.getClaim("acr").asString() in
+                        setOf("idporten-loa-high", "idporten-loa-substantial", "Level3", "Level4"),
+                ) {
+                    log.warn {
+                        "Auth: idporten-loa-substantial (Level3) required, but got ${credentials.payload.getClaim(
+                            "acr",
+                        ).asString()}"
+                    }
+                    "Auth: Auth: idporten-loa-substantial (Level3) required"
+                }
                 UserPrincipal(credentials.payload.getClaim(Configuration.tokenXProperties.userclaim).asString())
             }
         }

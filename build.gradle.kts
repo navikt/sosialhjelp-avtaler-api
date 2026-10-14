@@ -48,7 +48,7 @@ dependencies {
     implementation(libs.jackson.bom)
 
     constraints {
-        implementation("io.netty:netty-handler:4.2.18.Final") {
+        implementation("io.netty:netty-handler:4.2.19.Final") {
             because("Temporary override for GHSA-3qp7-7mw8-wx86/CVE-2026-44249 until upstream transitive dependencies are updated")
         }
     }
@@ -65,7 +65,7 @@ dependencies {
     implementation(libs.token.client.core)
 
     implementation(libs.signature.api.client.java)
-    implementation("org.apache.httpcomponents.client5:httpclient5:5.6.4")
+    implementation("org.apache.httpcomponents.client5:httpclient5:5.6.5")
     implementation(libs.jaxb.api)
 
     implementation(platform(libs.libraries.bom))

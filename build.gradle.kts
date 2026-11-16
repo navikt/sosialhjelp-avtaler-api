@@ -15,6 +15,7 @@ version = "1.0.0"
 buildscript {
     configurations.classpath {
         resolutionStrategy.force("org.codehaus.plexus:plexus-utils:4.1.0")
+        resolutionStrategy.force("com.fasterxml.jackson.core:jackson-core:2.23.0")
     }
 }
 

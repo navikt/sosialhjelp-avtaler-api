@@ -14,7 +14,7 @@ version = "1.0.0"
 
 buildscript {
     configurations.classpath {
-        resolutionStrategy.force("org.codehaus.plexus:plexus-utils:4.1.0")
+        resolutionStrategy.force("org.codehaus.plexus:plexus-utils:4.2.0")
         resolutionStrategy.force("com.fasterxml.jackson.core:jackson-core:2.23.0")
     }
 }
@@ -49,7 +49,7 @@ dependencies {
     implementation(libs.jackson.bom)
 
     constraints {
-        implementation("io.netty:netty-handler:4.2.20.Final") {
+        implementation("io.netty:netty-handler:4.2.21.Final") {
             because("Temporary override for GHSA-3qp7-7mw8-wx86/CVE-2026-44249 until upstream transitive dependencies are updated")
         }
     }
